@@ -1,0 +1,12 @@
+[package]
+name = "tsicket"
+version = "0.1.0"
+authors = ["zhou"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "1.0.8"                                     # web framework
+diesel = { version = "1.0.0", features = ["mysql"] }    # for database
+juniper = "0.14.0"                                      # graphQL

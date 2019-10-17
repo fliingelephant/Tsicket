@@ -1,0 +1,6 @@
+/Tsicket.iml
+/.idea/
+
+/target
+**/*.rs.bk
+/Cargo.lock
