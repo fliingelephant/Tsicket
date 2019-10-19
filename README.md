@@ -1,13 +1,14 @@
-### 清易票 *Tsicket*
+## 清易票 *Tsicket*
 
 - Three modules:
 
-  - ***tsicket_app*** (binary)
-  - ***tsicket_db*** (library)
-  - ***tsicket_utils*** (library)
+  - ***[tsicket_app](https://github.com/fliingelephant/Tsicket/app)*** (binary): the main module
+  - ***[tsicket_db](https://github.com/fliingelephant/Tsicket/db)*** (library): for database
+  - ***[tsicket_utils](https://github.com/fliingelephant/Tsicket/utils)*** (library): for basic facilities such as error management, etc.
 
 - Directory structure:
 
+  ```shell
   .
   ├── Cargo.lock
   ├── Cargo.toml
@@ -33,3 +34,6 @@
     │  ├── lib.rs
     │  └── logger.rs
     └── tsicket_utils.iml
+  ```
+  
+  
