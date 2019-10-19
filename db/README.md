@@ -1,12 +1,21 @@
-### Library Module: *tsicket_db*
+## Library Module: *tsicket_db*
 
-- For MySQL database
+For ***MySQL*** database.
 
-- Directory structure:
+#### Dependencies:
 
-  .
-  ├── Cargo.toml
-  ├── README.md
-  ├── src
-  │  └── lib.rs
-  └── tsicket_db.iml
+- ***[diesel](https://diesel.rs)*** (ORM)
+
+---
+
+#### Directory structure:
+
+```shell
+.
+├── Cargo.toml
+├── README.md
+├── src
+│  └── lib.rs
+└── tsicket_db.iml
+```
+
