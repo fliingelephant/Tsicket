@@ -21,12 +21,8 @@ export default {
 <style>
   #app {
     font-family: 'Microsoft YaHei', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     text-align: center;
-
     margin: auto;
-
   }
   .topbar {
     border-bottom: solid 1px;

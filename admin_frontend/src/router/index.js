@@ -5,6 +5,8 @@ import EventList from "@/components/EventList";
 import Register from "@/components/Register";
 import LogIn from "@/components/LogIn";
 import Help from "@/components/Help";
+import AdminLogIn from "@/components/AdminLogIn";
+import AdminMenu from "@/components/AdminMenu";
 
 Vue.use(Router)
 
@@ -44,6 +46,22 @@ export default new Router({
             component: Help,
             meta: {
                 title: '帮助'
+            }
+        },
+        {
+            path:'/AdminLogIn',
+            name: 'AdminLogIn',
+            component: AdminLogIn,
+            meta: {
+                title: '管理员登陆'
+            }
+        },
+        {
+            path:'/AdminMenu',
+            name: 'AdminMenu',
+            component: AdminMenu,
+            meta: {
+                title: '管理员菜单'
             }
         }
     ]
