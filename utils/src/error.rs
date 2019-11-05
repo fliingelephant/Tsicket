@@ -1,4 +1,4 @@
-use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
+/*use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
 use actix::MailboxError;
 use diesel::{
     r2d2::PoolError,
@@ -123,4 +123,4 @@ impl From<ValidationErrors> for Error {
             "errors": err_map,
         }))
     }
-}
+}*/
