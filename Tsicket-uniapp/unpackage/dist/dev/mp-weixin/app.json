@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/user/user",
+    "pages/discover/disover",
+    "pages/activity/activity"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "清易票",
+    "navigationBarBackgroundColor": "#81D3F8",
+    "backgroundTextStyle": "light",
+    "backgroundColor": "#FFFFFF"
+  },
+  "tabBar": {
+    "color": "#D7D7D7",
+    "selectedColor": "#81D3F8",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "主页"
+      },
+      {
+        "pagePath": "pages/discover/disover",
+        "text": "动态"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "个人"
+      }
+    ]
+  },
+  "usingComponents": {},
+  "sitemapLocation": "sitemap70.json"
+}
