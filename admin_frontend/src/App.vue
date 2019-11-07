@@ -1,8 +1,18 @@
 <template>
   <div id="app">
     <el-row class = "topbar" type="flex" justify="space-between">
-      <el-col :span="10" class="topbar-tittle">
+      <el-col :span="20" class="topbar-tittle">
         <div>清易票活动平台</div>
+      </el-col>
+      <el-col :span="4" class="topbar-info">
+        <el-dropdown :hide-on-click="false" @command="handleCommand" v-model="username">
+        <span class="el-dropdown-link" style="cursor: pointer;">
+        <p style="display:inline">{{$store.state.username}}</p>
+        </span>
+        <el-dropdown-menu  slot="dropdown">
+          <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+        </el-dropdown-menu>
+        </el-dropdown>
       </el-col>
     </el-row>
     <router-view/>
@@ -14,6 +24,22 @@
 export default {
   name: 'app',
   components: {
+
+  },
+    data(){
+      return{
+          username:''
+      }
+    },
+  methods: {
+      handleCommand(command) {
+          this.$axios
+              .post("/logout")
+              .then(res=>{
+                  this.$store.commit('logout')
+                  this.$router.push('/')
+              })
+      },
   }
 }
 </script>

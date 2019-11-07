@@ -46,7 +46,31 @@ export default {
   },
   methods:{
     login(){
-      this.$router.push('/EventList')
+      this.params = new URLSearchParams()
+      this.params.append("username", this.username)
+      this.params.append("password", this.password)
+        this.$axios.post("/login", this.params).then(response => {
+          if(response.status===200) {
+            if ('error' in response.data) {
+              this.$message({
+                message: '登录失败',
+                type: 'error'
+              })
+            } else {
+              let resdata = {
+                username: this.username,
+                admin: false
+              }
+              this.$store.commit('login', resdata)
+              this.$message({
+                message: '登录成功',
+                type: 'success'
+              })
+              this.$router.push('/EventList')
+            }
+          }
+        })
+
     },
     toRegister(){
       this.$router.push('/Register')

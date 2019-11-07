@@ -31,6 +31,41 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+        <el-form-item prop="distributestart">
+          <el-row :gutter="20">
+            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票开始时间</div></el-col>
+            <el-col :span="12">
+              <el-date-picker
+                      v-model="distributestart"
+                      type="datetime"
+              ></el-date-picker>
+            </el-col>
+
+          </el-row>
+        </el-form-item>
+        <el-form-item prop="distributeend">
+          <el-row :gutter="20">
+            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票停止时间</div></el-col>
+            <el-col :span="12">
+              <el-date-picker
+                      v-model="distributeend"
+                      type="datetime"
+              ></el-date-picker>
+            </el-col>
+
+          </el-row>
+        </el-form-item>
+
+        <el-form-item prop="capacity">
+          <el-row :gutter="20">
+            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动容量</div></el-col>
+            <el-col :span="12"><el-input-number
+              v-model="capacity"
+            ></el-input-number></el-col>
+
+          </el-row>
+        </el-form-item>
+
         <el-form-item prop="datetime">
           <el-row :gutter="20">
             <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动开始时间</div></el-col>
@@ -102,6 +137,9 @@
                 method: '',
                 type:'',
                 description:'',
+                distributestart:'',
+                distributeend:'',
+                capacity:'',
 
                 types:[{
                     value:'0',

@@ -17,6 +17,7 @@ export default new Router({
             name: 'LogIn',
             component: LogIn,
             meta:{
+                hasInfo:false,
                 title:'登录'
             }
         },{
@@ -24,6 +25,7 @@ export default new Router({
             name: 'Register',
             component: Register,
             meta:{
+                hasInfo:false,
                 title:'注册'
             }
         },{
@@ -31,6 +33,7 @@ export default new Router({
             name: 'EventInfo',
             component: EventInfo,
             meta:{
+                hasInfo:true,
                 title:'编辑活动'
             }
         },{
@@ -38,6 +41,7 @@ export default new Router({
             name: 'EventList',
             component: EventList,
             meta:{
+                hasInfo:true,
                 title:'过往活动'
             }
         },{
@@ -45,6 +49,7 @@ export default new Router({
             name: 'Help',
             component: Help,
             meta: {
+                hasInfo:true,
                 title: '帮助'
             }
         },
@@ -53,7 +58,9 @@ export default new Router({
             name: 'AdminLogIn',
             component: AdminLogIn,
             meta: {
+                hasInfo:false,
                 title: '管理员登陆'
+
             }
         },
         {
@@ -61,6 +68,7 @@ export default new Router({
             name: 'AdminMenu',
             component: AdminMenu,
             meta: {
+                hasInfo:true,
                 title: '管理员菜单'
             }
         }

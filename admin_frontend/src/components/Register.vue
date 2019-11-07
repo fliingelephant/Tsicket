@@ -4,7 +4,7 @@
       <div>活动发布者注册</div>
     </el-header>
     <el-main>
-      <el-form>
+      <el-form ref="register">
         <el-form-item prop="username">
           <el-row :gutter="20">
             <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>用户名</div></el-col>
@@ -94,13 +94,27 @@
             }
         },
         methods:{
-            reg:function(){
+            reg(){
                 if(this.password===this.confirm && this.regular.test(this.password)&& this.regular.test(this.username)){
-                    this.$message({
-                        message:'注册成功',
-                        type:'success'
+                    this.params = new URLSearchParams()
+                    this.params.append("username", this.username)
+                    this.params.append("password", this.password)
+                    this.$axios.post("/register", this.params).then(response => {
+                        if(response.status===200) {
+                            if ('error' in response.data) {
+                                this.$message({
+                                    message: '注册失败',
+                                    type: 'error'
+                                })
+                            } else {
+                                this.$message({
+                                    message: '注册成功',
+                                    type: 'success'
+                                })
+                                this.$router.push('/')
+                            }
+                        }
                     })
-                    this.$router.push('/')
                 }
                 else if(!this.regular.test(this.username)){
                     this.$message({
