@@ -10,8 +10,5 @@ jobs:
       - name: build vue
         run: |
           npm --version
-      - name: test rust
-        run: |
-          cargo check --verbose --all
 
 
