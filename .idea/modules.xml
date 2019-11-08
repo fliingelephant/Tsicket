@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/app/tsicket_app.iml" filepath="$PROJECT_DIR$/app/tsicket_app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/db/tsicket_db.iml" filepath="$PROJECT_DIR$/db/tsicket_db.iml" />
+      <module fileurl="file://$PROJECT_DIR$/utils/tsicket_utils.iml" filepath="$PROJECT_DIR$/utils/tsicket_utils.iml" />
+    </modules>
+  </component>
+</project>

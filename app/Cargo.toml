@@ -1,0 +1,18 @@
+[package]
+name = "tsicket_app"
+version = "0.1.0"
+authors = ["zhou <fliingelephant@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tsicket_db = { path = "../db" }
+tsicket_utils = { path = "../utils" }
+
+actix-web = "1.0.8"                 # web framework
+chrono = "0.4.9"                    # for date and time
+env_logger = ""                     # an implementation of logging
+failure = ""
+log = ""
+serde = "1.0.0"
