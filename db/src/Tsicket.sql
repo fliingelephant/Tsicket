@@ -65,7 +65,7 @@ CREATE TABLE `event`  (
     `start_time` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `end_time` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `event_type` TINYINT DEFAULT 0 ,
-    `event_introduction` VARCHAR(1024) DEFAULT '',
+    `event_introduction` VARCHAR(1024) DEFAULT NULL,
     `event_capacity` INT(32) NOT NULL ,
     `current_participants` INT(32) NOT NULL DEFAULT 0,
     `left_tickets` INT(32) NOT NULL ,

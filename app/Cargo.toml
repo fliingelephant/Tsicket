@@ -16,3 +16,4 @@ env_logger = ""                     # an implementation of logging
 failure = ""
 log = ""
 serde = "1.0.0"
+mysql = "17.0.0"
