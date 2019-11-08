@@ -7,11 +7,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: build vue
+      - name: build
         run: |
           cd admin_frontend 
           npm install
           npm run build
+          cd ..
+      - name: check
+        run: |
+          cd backend
+          cargo check --verbose --all
           cd ..
 
 
