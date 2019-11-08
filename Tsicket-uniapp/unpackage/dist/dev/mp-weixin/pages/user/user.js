@@ -236,11 +236,23 @@ var app = getApp();var _default =
         url: "../activity/activity" });
 
     },
-    getUserInfo: function getUserInfo(e) {
+    getUserInfo: function getUserInfo(e) {var _this2 = this;
       console.log(e);
       app.globalData.userInfo = e.detail.userInfo;
-      this.userInfo = e.detail.userInfo,
-      this.hasUserInfo = true;
+      this.userInfo = e.detail.userInfo;
+      uni.request({
+        url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+        data: {
+          id: this.userInfo.id },
+
+        header: {
+          'content-type': 'application/json' //自定义请求头信息
+        },
+        success: function success(res) {
+          console.log(res.data);
+          _this2.hasUserInfo = true;
+        } });
+
     },
     tabSelect: function tabSelect(e) {
       this.current = e.currentTarget.dataset.id;
@@ -250,6 +262,15 @@ var app = getApp();var _default =
     },
     swiperChange: function swiperChange(e) {
       this.current = e.detail.current;
+    },
+    likePage: function likePage() {
+
+    },
+    followPage: function followPage() {
+
+    },
+    historyPage: function historyPage() {
+
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

@@ -12,8 +12,8 @@
 		<swiper class="card-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
 		 :autoplay="true" interval="5000" duration="500" @change="cardSwiper" indicator-color="#8799a3"
 		 indicator-active-color="#0081ff">
-			<swiper-item v-for="(item,index) in swiperList" :key="index" :class="cardCur==index?'cur':''">
-				<view class="swiper-item" @click="activitydetail">
+			<swiper-item v-for="(item,index) in swiperList" :key="index" :class="cardCur==index?'cur':''" @click="activityPage">
+				<view class="swiper-item">
 					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
 					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
 				</view>
@@ -61,9 +61,9 @@
 			cardSwiper(e) {
 				this.cardCur = e.detail.current
 			},
-			activitydetail(e) {
+			activityPage(e) {
 				uni.navigateTo({
-					url:"../activity/activity"
+					url:"../activity/activity?id=" + this.swiperList[this.cardCur].id
 				})
 			}
 		}

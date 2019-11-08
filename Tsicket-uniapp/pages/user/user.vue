@@ -12,15 +12,15 @@
 							</view>
 						</view>
 						<view class="text-left flex justify-start text-sm padding">
-							<view class="padding-right-xl">
+							<view class="padding-right-xl" @click="likePage">
 								<view class="text-xl text-bold">{{like}}</view>
 								喜爱
 							</view>
-							<view class="padding-right-xl">
+							<view class="padding-right-xl" @click="followPage">
 								<view class="text-xl text-bold">{{follow}}</view>
 								关注
 							</view>
-							<view class="padding-right-xl">
+							<view class="padding-right-xl" @click="historyPage">
 								<view class="text-xl text-bold">{{history}}</view>
 								历史
 							</view>
@@ -115,8 +115,20 @@
 			getUserInfo(e) {
 				console.log(e)
 				app.globalData.userInfo = e.detail.userInfo
-				this.userInfo = e.detail.userInfo,
-					this.hasUserInfo = true
+				this.userInfo = e.detail.userInfo
+				uni.request({
+				    url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+				    data: {
+				        id: this.userInfo.id
+				    },
+				    header: {
+				        'content-type': 'application/json' //自定义请求头信息
+				    },
+				    success: (res) => {
+				        console.log(res.data);
+						this.hasUserInfo = true
+				    }
+				});
 			},
 			tabSelect(e) {
 				this.current = e.currentTarget.dataset.id;
@@ -126,6 +138,15 @@
 			},
 			swiperChange(e) {
 				this.current = e.detail.current;
+			},
+			likePage() {
+				
+			},
+			followPage() {
+				
+			},
+			historyPage() {
+				
 			}
 		}
 	}
