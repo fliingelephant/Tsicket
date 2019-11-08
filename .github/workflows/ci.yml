@@ -11,7 +11,7 @@ jobs:
         run: |
           cd admin_frontend 
           npm install
-          npm run server
+          npm run build
           cd ..
 
 
