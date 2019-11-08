@@ -1,0 +1,50 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "清易票"
+			}
+		},
+		{
+			"path": "pages/user/user",
+			"style": {}
+		},
+		{
+			"path": "pages/discover/disover",
+			"style": {}
+		},
+		{
+			"path": "pages/activity/activity",
+			"style": {}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "清易票",
+		"navigationBarBackgroundColor": "#81D3F8",
+		"backgroundTextStyle":"light",
+		"backgroundColor" : "#FFFFFF"
+		
+	},
+	"tabBar": {
+	    "color": "#D7D7D7",
+	    "selectedColor": "#81D3F8",
+	    "borderStyle": "black",
+	    "backgroundColor": "#ffffff",
+	    "list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "主页"
+			},
+			{
+				"pagePath": "pages/discover/disover",
+				"text": "动态"
+			},
+			{
+				"pagePath": "pages/user/user",
+				"text": "个人"
+			}
+	    ]
+	}
+}

@@ -1,0 +1,32 @@
+
+.userinfo {
+	width: 100%;
+	height: 400rpx;
+	padding: 40rpx 40rpx 40rpx 40rpx;
+}
+.usercard {
+	position: absolute;
+	width: 670rpx;
+	height: 320rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	z-index: -1;
+}
+.getinfobtn {
+	padding: 120rpx;
+}
+.cu-avatar.xxl {
+	width: 200rpx;
+	height: 200rpx;
+	font-size: 3em;
+	border: 10rpx solid #fff;
+}
+.text-ellipsis {
+	max-width: 400rpx;
+	-o-text-overflow: ellipsis;
+	   text-overflow: ellipsis;
+	overflow: hidden;
+}
+.tab-swiper-view {
+	height: calc(100vh - 400rpx - 80rpx)
+}
+
