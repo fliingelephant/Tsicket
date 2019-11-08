@@ -9,6 +9,7 @@ jobs:
     steps:
       - name: build vue
         run: |
+          cd ..
           npm install
           npm run build
 
