@@ -26,13 +26,13 @@
 				</view>
 			</view>
 			<view class="toolbar flex align-stretch text-center">
-				<view class="flex-sub flex align-center justify-center">
+				<view class="flex-sub flex align-center justify-center" @click="reserve">
 					<view class="">加入</view>
 				</view>
-				<view class="flex-sub flex align-center justify-center">
+				<view class="flex-sub flex align-center justify-center" @click="share">
 					<view class="">分享</view>
 				</view>
-				<view class="flex-sub flex align-center justify-center">
+				<view class="flex-sub flex align-center justify-center" @click="like">
 					<view class="">喜爱</view>
 				</view>
 			</view>
@@ -69,6 +69,8 @@
 </template>
 
 <script>
+	const app = getApp()
+	
 	export default {
 		data() {
 			return {
@@ -93,8 +95,21 @@
 				]
 			};
 		},
-		onLoad() {
-			return 0;
+		onLoad(option) {
+			console.log(option)
+			uni.request({
+			    url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+			    data: {
+			        id: option.id
+			    },
+			    header: {
+			        'content-type': 'application/json' //自定义请求头信息
+			    },
+			    success: (res) => {
+			        console.log(res.data);
+			    }
+			});
+			return 0
 		},
 		methods: {
 			tabSelect(e) {
@@ -105,6 +120,27 @@
 			},
 			swiperChange(e) {
 				this.current = e.detail.current;
+			},
+			reserve() {
+				uni.request({
+				    url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+				    data: {
+				        activityid: this.id,
+						userid: app.globalData.userInfo
+				    },
+				    header: {
+				        'content-type': 'application/json' //自定义请求头信息
+				    },
+				    success: (res) => {
+				        console.log(res.data);
+				    }
+				});
+			},
+			share() {
+				
+			},
+			like() {
+				
 			}
 		}
 	}
