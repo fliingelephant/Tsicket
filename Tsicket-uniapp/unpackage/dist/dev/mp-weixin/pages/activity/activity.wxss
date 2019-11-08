@@ -1,0 +1,57 @@
+
+.collapse {
+	width: 100%;
+	padding: 40rpx 40rpx 40rpx 40rpx;
+}
+.idcard {
+	position: absolute;
+	width: 670rpx;
+	height: 300rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	z-index: -1;
+}
+.card-back {
+	position: absolute;
+	width: 670rpx;
+	height: 400rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #F2F2F2;
+	z-index: -2;
+}
+.line-round {
+	margin-top: 10rpx;
+	width: 70rpx;
+	height: 10rpx;
+	border-radius: 5rpx 5rpx 5rpx 5rpx;
+	background-color: gainsboro;
+}
+.info {
+	height: 300rpx;
+}
+.info-flex {
+	height: 240rpx;
+}
+.flex-column {
+	height: 240rpx;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	    -ms-flex-direction: column;
+	        flex-direction: column;
+	-webkit-box-pack: justify;
+	-webkit-justify-content: space-between;
+	    -ms-flex-pack: justify;
+	        justify-content: space-between;
+}
+.toolbar {
+	height: 100rpx;
+	width: 670rpx;
+}
+.tab-swiper-view {
+	height: calc(100vh - 480rpx - 80rpx)
+}
+

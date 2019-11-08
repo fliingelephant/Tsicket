@@ -1,0 +1,62 @@
+image.card {
+	border-radius: 20upx 20upx 20upx 20upx;
+}
+
+.flex-page {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.tabs {
+	flex-grow: 1;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.tabs>.nav {
+	width: 100%;
+	padding: 0 40rpx;
+}
+
+.tab {
+	display: inline;
+	line-height: 80rpx;
+	height: 80rpx;
+	margin: 0 20rpx;
+	background: #81D3F8;
+	transition: all 0.2s ease-in 0s;
+	border-radius: 10rpx 10rpx 10rpx 10rpx;
+	color: #FFFFFF;
+}
+
+.tab-choose {
+	background: #06B4FF;
+	transition: all 0.2s ease-in 0s;
+}
+
+.tab-swiper-view {
+	height: calc(100vh - 30rpx - 80rpx)
+}
+
+.tab-swiper {
+	height: 100%;
+}
+
+.tab-swiper-item {
+	height: 100%;
+}
+
+.tab-scroll {
+	height: 100%;
+	padding: 30rpx 30rpx 0;
+}
+
+.tab-intro {
+	height: auto;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #F2F2F2;
+	margin-bottom: 30rpx;
+}
