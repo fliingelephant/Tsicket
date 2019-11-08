@@ -1,5 +1,4 @@
 name: CI
-
 on: [push]
 
 jobs:
@@ -7,8 +6,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@master
       - name: build vue
         run: |
-          npm --version
+          cd admin_frontend 
+          npm install
+          npm run server
+          cd ..
 
 
