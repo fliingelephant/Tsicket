@@ -9,8 +9,8 @@ jobs:
 
     steps:
       - name: build vue
-        path: admin_frontend
         run: |
+          cd admin_frontend 
           npm install
           npm run build
 
