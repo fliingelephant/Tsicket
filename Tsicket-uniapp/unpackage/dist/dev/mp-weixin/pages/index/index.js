@@ -194,9 +194,9 @@ var _default =
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
     },
-    activitydetail: function activitydetail(e) {
+    activityPage: function activityPage(e) {
       uni.navigateTo({
-        url: "../activity/activity" });
+        url: "../activity/activity?id=" + this.swiperList[this.cardCur].id });
 
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
