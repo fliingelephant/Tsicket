@@ -26,7 +26,7 @@ fn format_string(mut src: String)->String{
     return rlt;
 }
 
-fn user_sign_up(id: &str, name: &str)->bool{
+fn user_sign_up(id: String, name: String)->bool{
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     let command = format!("INSERT INTO user_account (account_id, nickname) VALUES\
      ('{id}', '{name}');", id=id, name=name);
@@ -38,8 +38,8 @@ fn user_sign_up(id: &str, name: &str)->bool{
     }
 }
 
-fn sponsor_sign_up(id: &str, name: &str, raw_password: &str)->bool{
-    let password = format!("{:x}", md5::compute(raw_password));
+fn sponsor_sign_up(id: String, name: String, raw_password: String)->bool{
+    let password = format!("{:x}", md5::compute(raw_password + &id));
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     let command = format!("INSERT INTO sponsor_account (account_id, sponsor_name, password) VALUES\
      ('{id}', '{name}', '{password}');", id=id, name=name, password=password);
@@ -51,8 +51,8 @@ fn sponsor_sign_up(id: &str, name: &str, raw_password: &str)->bool{
     }
 }
 
-fn sponsor_log_in(id :&str, raw_password: &str)->i8{
-    let password = format!("{:x}", md5::compute(raw_password));
+fn sponsor_log_in(id :String, raw_password: String)->i8{
+    let password = format!("{:x}", md5::compute(raw_password + &id));
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     let command = format!("SELECT password FROM sponsor_account WHERE account_id='{id}';", id=id);
     //println!("{}", command);
@@ -72,8 +72,8 @@ fn sponsor_log_in(id :&str, raw_password: &str)->i8{
     return -1;
 }//返回值：-1：账号不存在，0：密码错误， 1：登录成功
 
-fn admin_sign_up(id: &str, name: &str, raw_password: &str)->bool{
-    let password = format!("{:x}", md5::compute(raw_password));
+fn admin_sign_up(id: String, name: String, raw_password: String)->bool{
+    let password = format!("{:x}", md5::compute(raw_password + &id));
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     let command = format!("INSERT INTO admin_account (account_id, admin_name, password) VALUES\
      ('{id}', '{name}', '{password}');", id=id, name=name, password=password);
@@ -85,8 +85,8 @@ fn admin_sign_up(id: &str, name: &str, raw_password: &str)->bool{
     }
 }
 
-fn admin_log_in(id :&str, raw_password: &str)->i8{
-    let password = format!("{:x}", md5::compute(raw_password));
+fn admin_log_in(id :String, raw_password: String)->i8{
+    let password = format!("{:x}", md5::compute(raw_password + &id));
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     let command = format!("SELECT password FROM admin_account WHERE account_id='{id}';", id=id);
     //println!("{}", command);
@@ -106,7 +106,7 @@ fn admin_log_in(id :&str, raw_password: &str)->i8{
     return -1;
 }//返回值：-1：账号不存在，0：密码错误， 1：登录成功
 
-fn get_sponsor_events(name: &str)->Vec<Event>{
+fn get_sponsor_events(name: String)->Vec<Event>{
     let mut event_list: Vec<Event> = vec![];
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     let command = format!("SELECT * FROM event WHERE sponsor_name='{name}'", name=name);
