@@ -18,7 +18,11 @@ fn main() {
     println!("result of admin successful log in : {}", admin_log_in("0011".to_string(), "123".to_string()));
     println!("result admin log in with wrong password: {}", admin_log_in("0011".to_string(), "321".to_string()));
     println!("result admin log in with invalid id: {}", admin_log_in("0".to_string(), "123".to_string()));*/
-    let events = get_sponsor_events("1".to_string());
+    let mut events = get_sponsor_events("1".to_string());
     println!("{}", events.len());
     println!("{}", events[0].event_introduction);
+    events[0].event_introduction = "123".to_string();
+    events[0].start_time = "1988-09-10 23:11:28".to_string();
+    events[0].update_type = 1;
+    update(events);
 }
