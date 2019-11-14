@@ -10,5 +10,11 @@
         <property name="serverTimezone" value="Hongkong" />
       </driver-properties>
     </data-source>
+    <data-source source="LOCAL" name="tsicket@154.8.167.168" uuid="dcf4dfeb-6af4-4fb2-9cff-79738e7fe396">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://154.8.167.168:3306/tsicket</jdbc-url>
+    </data-source>
   </component>
 </project>
