@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import EventInfo from "@/components/EventInfo";
+import AddEvent from "@/components/AddEvent";
+import ChangeEvent from "@/components/ChangeEvent";
 import EventList from "@/components/EventList";
 import Register from "@/components/Register";
 import LogIn from "@/components/LogIn";
 import Help from "@/components/Help";
 import AdminLogIn from "@/components/AdminLogIn";
 import AdminMenu from "@/components/AdminMenu";
+import ChangeInfo from "@/components/ChangeInfo";
+import EventInfo from "@/components/EventInfo";
 
 Vue.use(Router)
 
@@ -29,12 +32,20 @@ export default new Router({
                 title:'注册'
             }
         },{
-            path:'/EventInfo',
-            name: 'EventInfo',
-            component: EventInfo,
+            path:'/AddEvent',
+            name: 'AddEvent',
+            component: AddEvent,
             meta:{
                 hasInfo:true,
                 title:'编辑活动'
+            }
+        },        {
+            path:'/ChangeEvent',
+            name: 'ChangeEvent',
+            component: ChangeEvent,
+            meta:{
+                hasInfo:true,
+                title:'修改活动信息'
             }
         },{
             path:'/EventList',
@@ -42,7 +53,15 @@ export default new Router({
             component: EventList,
             meta:{
                 hasInfo:true,
-                title:'过往活动'
+                title:'活动列表'
+            }
+        },{
+            path:'/EventInfo',
+            name: 'EventInfo',
+            component: EventInfo,
+            meta:{
+                hasInfo:true,
+                title:'活动详情'
             }
         },{
             path:'/Help',
@@ -71,6 +90,15 @@ export default new Router({
                 hasInfo:true,
                 title: '管理员菜单'
             }
-        }
+        },
+        {
+            path:'/ChangeInfo',
+            name: '/ChangeInfo',
+            component: ChangeInfo,
+            meta: {
+                hasInfo:true,
+                title: '更改信息'
+            }
+        },
     ]
 })

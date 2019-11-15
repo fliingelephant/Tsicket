@@ -1,163 +1,108 @@
 <template>
   <el-container class="login-container">
     <el-header class="login-header">
-      <div>
-        活动发布
-      </div>
+      <el-row>
+        <el-col :span="20"><div>活动列表</div></el-col>
+        <el-col :span="4"><div class="add-event"><el-button>管理人员</el-button></div></el-col>
+      </el-row>
     </el-header>
     <el-main>
-      <el-form
-              ref="usernameRegister"
-              label-suffix="left"
-              label-width="0px"
-      >
-        <el-form-item prop="name">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动名称</div></el-col>
-            <el-col :span="12"><el-input
-                    type="text"
-                    v-model="name"
-                    auto-complete="off"
-            ></el-input></el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item prop="place">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动地点</div></el-col>
-            <el-col :span="12"><el-input
-                    type="text"
-                    v-model="place"
-                    auto-complete="off"
-            ></el-input></el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item prop="distributestart">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票开始时间</div></el-col>
-            <el-col :span="12">
-              <el-date-picker
-                      v-model="distributestart"
-                      type="datetime"
-              ></el-date-picker>
-            </el-col>
+      <el-tabs v-model="activeName">
+        <el-tab-pane label="活动详情" name="first">
+          <el-form
+                  ref="usernameRegister"
+                  label-suffix="left"
+                  label-width="0px"
+          >
+            <el-form-item prop="name">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动名称</div></el-col>
+                <el-col :span="12"><div class="login-main">{{event_name}}</div></el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item prop="place">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动地点</div></el-col>
+                <el-col :span="12"><div class="login-main">{{event_place}}</div></el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item prop="distributestart">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票开始时间</div></el-col>
+                <el-col :span="12"><div class="login-main">{{start_time}}</div></el-col>
 
-          </el-row>
-        </el-form-item>
-        <el-form-item prop="distributeend">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票停止时间</div></el-col>
-            <el-col :span="12">
-              <el-date-picker
-                      v-model="distributeend"
-                      type="datetime"
-              ></el-date-picker>
-            </el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item prop="distributeend">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票停止时间</div></el-col>
+                <el-col :span="12"><div class="login-main">{{end_time}}</div></el-col>
 
-          </el-row>
-        </el-form-item>
+              </el-row>
+            </el-form-item>
 
-        <el-form-item prop="capacity">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动容量</div></el-col>
-            <el-col :span="12"><el-input-number
-              v-model="capacity"
-            ></el-input-number></el-col>
+            <el-form-item prop="capacity">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动容量</div></el-col>
+                <el-col :span="12"><div class="login-main">{{event_capacity}}</div></el-col>
+              </el-row>
+            </el-form-item>
 
-          </el-row>
-        </el-form-item>
+            <el-form-item prop="datetime">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动开始时间</div></el-col>
+                <el-col :span="12"><div class="login-main">{{event_start}}</div></el-col>
 
-        <el-form-item prop="datetime">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动开始时间</div></el-col>
-            <el-col :span="12">
-              <el-date-picker
-                      v-model="date"
-                      type="datetime"
-              ></el-date-picker>
-            </el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item prop="method">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动发票方式</div></el-col>
+                <el-col :span="12"><div class="login-main">{{distribute}}</div></el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item prop="type">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动类别</div></el-col>
+                <el-col :span="12"><div class="login-main">{{event_type}}</div></el-col>
+              </el-row>
+            </el-form-item>
 
-          </el-row>
-        </el-form-item>
-        <el-form-item prop="method">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动发票方式</div></el-col>
-            <el-col :span="12">
-              <el-radio v-model="method" label="0">抢票</el-radio>
-              <el-radio v-model="method" label="1">扫码领票</el-radio>
-              <el-radio v-model="method" label="2">申请审核</el-radio>
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item prop="type">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动类别</div></el-col>
-            <el-col :span="12">
-              <el-select v-model="type">
-                <el-option
-                        v-for="type in types"
-                        :key="type.value"
-                        :label="type.label"
-                        :value="type.value"
-                ></el-option>
-              </el-select>
-            </el-col>
-          </el-row>
-        </el-form-item>
-
-        <el-form-item prop="description">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动简介</div></el-col>
-            <el-col :span="12"><el-input
-                    type="textarea"
-                    v-model="description"
-                    :autosize="{minRows:5,maxRows:20}"
-                    auto-complete="off"
-            ></el-input></el-col>
-          </el-row>
-        </el-form-item>
-      </el-form>
-      <el-row>
-        <el-col>
-          <el-button @click="post" type="primary" style="width: 10%">发布</el-button>
-        </el-col>
-      </el-row>
+            <el-form-item prop="description">
+              <el-row :gutter="20">
+                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动简介</div></el-col>
+                <el-col :span="12"><div class="login-main">{{event_intro}}</div></el-col>
+              </el-row>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
     </el-main>
   </el-container>
 </template>
 
 <script>
     export default {
-        name: "Register",
+        name: "EventInfo",
         data() {
             return {
-                name: '',
-                place: '',
-                date: '',
-                time: '',
-                method: '',
-                type:'',
-                description:'',
-                distributestart:'',
-                distributeend:'',
-                capacity:'',
-
-                types:[{
-                    value:'0',
-                    label:'讲座'
-                },{
-                    value:'1',
-                    label:'文艺活动'
-                },{
-                    value:'2',
-                    label:'其他'
-                }
-                ]
-            }
+                activeName: 'first',
+                event_name: '测试——活动名称',
+                event_place: '测试——活动地点',
+                event_start: '2019.6.18 12:00:00',
+                distribute:'测试——抢票',
+                event_type:'讲座',
+                event_intro:'测试——本活动是一场讲座，会邀请xxxyyy来到zzzzzzzzz，为大家带来xxxxx。',
+                start_time:"2019.6.10 12:00:00",
+                end_time:"2019.6.10 12:00:00",
+                event_capacity:20,
+                left_ticket:10,
+                events:[],
+                new_events:[]
+            };
         },
-        methods:{
-            post(){
-                this.$router.push('/EventList')
-            }
+        methods: {
+
         }
     }
 </script>
@@ -173,12 +118,15 @@
   }
 
   .login-header {
-    display: flex;
-    text-align: center;
+    text-align: left;
     border-top: none;
     border-left: none;
     border-right: none;
 
+  }
+
+  .add-event{
+    text-align: right;
   }
   .login-main {
     font-weight: 400;
@@ -187,5 +135,4 @@
   .compulsory{
     color:#ff0000
   }
-
 </style>

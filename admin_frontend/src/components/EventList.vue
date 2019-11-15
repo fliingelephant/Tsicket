@@ -30,6 +30,11 @@
           prop="left_ticket"
           label="剩余票数">
         </el-table-column>
+        <el-table-column
+                label="操作">
+          <el-button @click="eventInfo" type="text" size="small">查看</el-button>
+          <el-button @click="changeEvent" type="text" size="small">编辑</el-button>
+        </el-table-column>
       </el-table>
 
     </el-main>
@@ -44,12 +49,30 @@
         name: "Register",
         data() {
             return({
-                tableData: [],
+                tableData: [{
+                    event_name:"测试_活动名称",
+                    start_time:"2019.6.10 12:00:00",
+                    end_time:"2019.6.10 12:00:00",
+                    event_capacity:20,
+                    left_ticket:10
+                },{
+                    event_name:"测试_活动名称",
+                    start_time:"2019.6.10 12:00:00",
+                    end_time:"2019.6.10 12:00:00",
+                    event_capacity:20,
+                    left_ticket:10
+                }],
             })
         },
         methods:{
             addEvent(){
+                this.$router.push('/AddEvent')
+            },
+            eventInfo(){
                 this.$router.push('/EventInfo')
+            },
+            changeEvent(){
+                this.$router.push('/ChangeEvent')
             },
             help(){
                 this.$router.push('/Help')

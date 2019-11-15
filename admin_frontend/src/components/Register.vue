@@ -38,6 +38,16 @@
             <el-col :span="8"><div align="left" class="login-main">6至32字符(字母、数字、特殊符号)</div></el-col>
           </el-row>
         </el-form-item>
+        <el-form-item prop="name">
+          <el-row :gutter="20">
+            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>机构/个人名称</div></el-col>
+            <el-col :span="11"><el-input
+                    type="text"
+                    v-model="name"
+                    auto-complete="off"
+            ></el-input></el-col>
+          </el-row>
+        </el-form-item>
         <el-form-item prop="email">
           <el-row :gutter="20">
             <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>电子邮箱</div></el-col>
@@ -54,16 +64,6 @@
             <el-col :span="11"><el-input
                     type="text"
                     v-model="phone"
-                    auto-complete="off"
-            ></el-input></el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item prop="name">
-          <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>机构/个人名称</div></el-col>
-            <el-col :span="11"><el-input
-                    type="text"
-                    v-model="name"
                     auto-complete="off"
             ></el-input></el-col>
           </el-row>
