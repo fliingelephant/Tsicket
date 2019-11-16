@@ -1,6 +1,6 @@
 use std::env;
-
-use actix_web::{Error, HttpRequest, HttpResponse, web::Query};
+use actix_identity::{Identity};
+use actix_web::{Error, HttpRequest, HttpResponse, web::Json};
 use futures::{Future, future::result};
 use md5::compute;
 use serde::Deserialize;
@@ -23,27 +23,25 @@ pub struct LoginAdmin {
 
 #[inline]
 pub fn login(
-    Query(login_admin): Query<LoginAdmin>
+    id: Identity,
+    login_admin: Json<LoginAdmin>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     let password = md5_with_salt(&login_admin.admin_id, &login_admin.password);
 
-    println!("{}",login_admin.admin_id);
-    println!("{}",password);
     if (login_admin.admin_id == *ADMIN_ID) && (password == *ADMIN_PASSWORD_WITH_SALT) {
-        // TODO: cookie
-        result(Ok(HttpResponse::Ok().json("Success.")))
+        id.remember(login_admin.admin_id.to_owned());
+        result(Ok(HttpResponse::Ok().json("Admin login success.")))
     } else {
-        // TODO: rejection
-        result(Ok(HttpResponse::Ok().json("Wrong!")))
+        result(Ok(HttpResponse::UnprocessableEntity().json("Wrong!")))
     }
 }
 
 #[inline]
 pub fn logout(
-    Query(login_admin): Query<LoginAdmin>
+    id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    // TODO
-    result(Ok(HttpResponse::Ok().json("Hello World!")))
+    id.forget();
+    result(Ok(HttpResponse::Ok().finish()))
 }
 
 pub fn get_all_events(

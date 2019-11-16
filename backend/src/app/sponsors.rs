@@ -1,6 +1,13 @@
 use std::convert::From;
 
-use actix_web::{Error, HttpRequest, HttpResponse, ResponseError, web::Data, web::Json, web::Query};
+use actix_identity::{Identity};
+use actix_web::{Error,
+    HttpRequest,
+    HttpResponse,
+    ResponseError,
+    web::Data,
+    web::Form,
+    web::Json};
 use futures::{Future, future::result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -28,31 +35,14 @@ pub struct TestResponse {
 
 #[derive(Debug, Validate, Deserialize)]
 pub struct RegisterSponsor {
-    #[validate(
-    length(
-    min = "1",
-    max = "20",
-    message = "账户名不能少于一个字符或者超过二十个字符。"
-    ),
-    regex(
-    path = "RE_SPONSORNAME",
-    message = "账户名必须由汉字、英文字母、数字或下划线构成。"
-    )
-    )]
     pub sponsorname: String,
-    #[validate(
-    length(
-    min = "8",
-    max = "72",
-    message = "密码不能少于七个字符或者超过七十二个字符。"
-    ))]
     pub password: String,
     pub id: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct LoginSponsor {
-    pub account_id: String,
+    pub id: String,
     pub password: String,
 }
 
@@ -62,7 +52,8 @@ pub struct QuerySponsor {
 }
 
 pub fn register(
-    Query(register_sponsor): Query<RegisterSponsor>,
+    id: Identity,
+    register_sponsor: Json<RegisterSponsor>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     /*
     result(register_sponsor.validate())
@@ -82,15 +73,27 @@ pub fn register(
         &register_sponsor.id,
         &register_sponsor.sponsorname,
         &register_sponsor.password) {
-        Ok(()) => Ok(HttpResponse::Ok().json("Hello World!")),
-        Err(e) => Ok(HttpResponse::Ok().json(e)),
+        Ok(()) => {
+            id.remember(register_sponsor.id.to_owned());
+            Ok(HttpResponse::Ok().finish())
+        },
+        Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
     })
 }
 
 pub fn login(
-    Query(login_user): Query<LoginSponsor>,
+    id: Identity,
+    login_sponsor: Json<LoginSponsor>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(Ok(HttpResponse::Ok().json("Hello World!")))
+    result(match sponsors::sponsor_log_in(
+        &login_sponsor.id,
+        &login_sponsor.password) {
+        Ok(()) => {
+            id.remember(login_sponsor.id.to_owned());
+            Ok(HttpResponse::Ok().finish())
+        },
+        Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
+    })
     /*
 match login_user.validate() {
     Ok(_) => format!("login request for client with username={} and password={}",
@@ -106,14 +109,14 @@ match login_user.validate() {
 
 #[inline]
 pub fn logout(
-    Query(login_sponsor): Query<LoginSponsor>
+    id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    // TODO
-    result(Ok(HttpResponse::Ok().json("Not implemented api.")))
+    id.forget();
+    result(Ok(HttpResponse::Ok().finish()))
 }
 
 pub fn get_events(
-    Query(sponsor): Query<QuerySponsor>,
+    sponsor: Json<QuerySponsor>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     let mut event_list: Vec<events::Event> = vec![];
     let t = events::get_sponsor_events(

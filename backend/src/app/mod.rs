@@ -1,17 +1,24 @@
+extern crate mysql;
+
 use std::env;
 
+use actix_identity::{Identity, CookieIdentityPolicy, IdentityService};
 use actix_web::{
     App,
     // http::header::{AUTHORIZATION, CONTENT_TYPE},
     HttpRequest,
     HttpServer,
+    middleware,
     web,
     //web::Data,
 };
-extern crate mysql;
 use mysql as my;
+use rand::FromEntropy;
+use rand::prelude::*;
 
 use crate::db;
+
+
 mod admins;
 mod events;
 mod sponsors;
@@ -29,20 +36,35 @@ lazy_static! {
     pub static ref POOL:my::Pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
 }
 
-fn index(_req: HttpRequest) -> &'static str {
-    "Hello World!"
+fn index(id: Identity) -> String {
+    println!("{:?}", id.identity());
+    if let Some(id) = id.identity() {
+        format!("Hello {}!", id)
+    } else {
+        "Hello World!".to_string()
+    }
 }
 
+pub async fn update() -> () {}
 
 pub fn start() -> () {
     //let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
 
-    HttpServer::new(|| {
+    let mut cookie_private_key = [0u8; 32];
+    let mut rng = rand::StdRng::from_entropy();
+    rng.fill(&mut cookie_private_key[..]);
+
+    HttpServer::new(move || {
         App::new()
             .configure(routes)
+            .wrap(IdentityService::new(
+                CookieIdentityPolicy::new(&cookie_private_key[..])
+                    .name("auth-cookie")
+                    .secure(false),
+            ))
     })
-        .bind("0.0.0.0:8080")
+        .bind(&bind_address)
         .unwrap_or_else(|_| panic!("Could not bind server to address {}", &bind_address))
         .start();
 }

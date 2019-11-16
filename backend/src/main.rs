@@ -14,14 +14,13 @@ mod db;
 mod utils;
 
 fn main() {
-    /*dotenv::dotenv().ok();
+    dotenv::dotenv().ok();
 
     let sys = actix::System::new("conduit");
 
     app::start();
 
-    let _ = sys.run();*/
-    println!("hello");
+    let _ = sys.run();
 
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 

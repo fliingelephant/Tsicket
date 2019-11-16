@@ -39,7 +39,7 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
                             -> Result<(), String> {
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
 
-    let password = md5_with_salt(&raw_password,  &id);
+    let password = md5_with_salt(&id, &raw_password);
     let command = format!("SELECT password FROM sponsor_account WHERE account_id='{id}';", id = id);
     //println!("{}", command);
 
@@ -51,6 +51,7 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
 
     for row in res.unwrap(){
         let pwd = format_string(&row.unwrap().unwrap()[0].as_sql(true));
+        println!("{}, {}", password,pwd);
         if password == pwd{
             return Ok(());
         } else {
