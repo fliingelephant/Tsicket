@@ -1,77 +1,73 @@
 <template>
-  <el-container class="login-container">
-    <el-header class="login-header">
+  <el-container class="container">
+    <el-header class="header">
       <el-row>
         <el-col :span="20"><div>活动列表</div></el-col>
         <el-col :span="4"><div class="add-event"><el-button>管理人员</el-button></div></el-col>
       </el-row>
     </el-header>
     <el-main>
-      <el-tabs v-model="activeName">
+      <el-tabs v-model="active_name">
         <el-tab-pane label="活动详情" name="first">
-          <el-form
-                  ref="usernameRegister"
-                  label-suffix="left"
-                  label-width="0px"
-          >
-            <el-form-item prop="name">
+          <el-form>
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动名称</div></el-col>
-                <el-col :span="12"><div class="login-main">{{event_name}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动名称</div></el-col>
+                <el-col :span="12"><div class="event-text">{{event_name}}</div></el-col>
               </el-row>
             </el-form-item>
-            <el-form-item prop="place">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动地点</div></el-col>
-                <el-col :span="12"><div class="login-main">{{event_place}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动地点</div></el-col>
+                <el-col :span="12"><div class="event-text">{{event_place}}</div></el-col>
               </el-row>
             </el-form-item>
-            <el-form-item prop="distributestart">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票开始时间</div></el-col>
-                <el-col :span="12"><div class="login-main">{{start_time}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票开始时间</div></el-col>
+                <el-col :span="12"><div class="event-text">{{start_time}}</div></el-col>
 
               </el-row>
             </el-form-item>
-            <el-form-item prop="distributeend">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>发票停止时间</div></el-col>
-                <el-col :span="12"><div class="login-main">{{end_time}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票停止时间</div></el-col>
+                <el-col :span="12"><div class="event-text">{{end_time}}</div></el-col>
 
               </el-row>
             </el-form-item>
 
-            <el-form-item prop="capacity">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动容量</div></el-col>
-                <el-col :span="12"><div class="login-main">{{event_capacity}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动容量</div></el-col>
+                <el-col :span="12"><div class="event-text">{{event_capacity}}</div></el-col>
               </el-row>
             </el-form-item>
 
-            <el-form-item prop="datetime">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动开始时间</div></el-col>
-                <el-col :span="12"><div class="login-main">{{event_start}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动开始时间</div></el-col>
+                <el-col :span="12"><div class="event-text">{{event_start}}</div></el-col>
 
               </el-row>
             </el-form-item>
-            <el-form-item prop="method">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动发票方式</div></el-col>
-                <el-col :span="12"><div class="login-main">{{distribute}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动发票方式</div></el-col>
+                <el-col :span="12"><div class="event-text">{{distribute}}</div></el-col>
               </el-row>
             </el-form-item>
-            <el-form-item prop="type">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动类别</div></el-col>
-                <el-col :span="12"><div class="login-main">{{event_type}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动类别</div></el-col>
+                <el-col :span="12"><div class="event-text">{{event_type}}</div></el-col>
               </el-row>
             </el-form-item>
 
-            <el-form-item prop="description">
+            <el-form-item>
               <el-row :gutter="20">
-                <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>活动简介</div></el-col>
-                <el-col :span="12"><div class="login-main">{{event_intro}}</div></el-col>
+                <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动简介</div></el-col>
+                <el-col :span="12"><div class="event-text">{{event_intro}}</div></el-col>
               </el-row>
             </el-form-item>
           </el-form>
@@ -86,7 +82,7 @@
         name: "EventInfo",
         data() {
             return {
-                activeName: 'first',
+                active_name: 'first',
                 event_name: '测试——活动名称',
                 event_place: '测试——活动地点',
                 event_start: '2019.6.18 12:00:00',
@@ -97,8 +93,6 @@
                 end_time:"2019.6.10 12:00:00",
                 event_capacity:20,
                 left_ticket:10,
-                events:[],
-                new_events:[]
             };
         },
         methods: {
@@ -108,8 +102,7 @@
 </script>
 
 <style scoped>
-  .login-container{
-
+  .container{
     margin: 10px;
     padding: 5px;
     font-weight: 600;
@@ -117,18 +110,17 @@
     text-align: left;
   }
 
-  .login-header {
+  .header {
     text-align: left;
     border-top: none;
     border-left: none;
     border-right: none;
 
   }
-
   .add-event{
     text-align: right;
   }
-  .login-main {
+  .event-text {
     font-weight: 400;
     font-size: 18px;
   }

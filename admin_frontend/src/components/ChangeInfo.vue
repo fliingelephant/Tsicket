@@ -1,13 +1,13 @@
 <template>
-  <el-container class="login-container">
-    <el-header class="login-header">
+  <el-container class="container">
+    <el-header class="header">
       <div>修改个人信息</div>
     </el-header>
     <el-main>
       <el-form ref="register">
         <el-form-item prop="username">
           <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>用户名</div></el-col>
+            <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>用户名</div></el-col>
             <el-col :span="11"><el-input
                     :disabled="true"
                     type="text"
@@ -18,7 +18,7 @@
         </el-form-item>
         <el-form-item prop="name">
           <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>机构/个人名称</div></el-col>
+            <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>机构/个人名称</div></el-col>
             <el-col :span="11"><el-input
                     :disabled="true"
                     type="text"
@@ -29,7 +29,7 @@
         </el-form-item>
         <el-form-item prop="email">
           <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>电子邮箱</div></el-col>
+            <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>电子邮箱</div></el-col>
             <el-col :span="11"><el-input
                     type="text"
                     v-model="email"
@@ -39,7 +39,7 @@
         </el-form-item>
         <el-form-item prop="phone">
           <el-row :gutter="20">
-            <el-col :span="5"><div align="left" class="login-main"><a class="compulsory">*</a>联系电话</div></el-col>
+            <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>联系电话</div></el-col>
             <el-col :span="11"><el-input
                     type="text"
                     v-model="phone"
@@ -47,7 +47,6 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
-
       </el-form>
       <el-row>
         <el-col>
@@ -67,7 +66,6 @@
                 email: '',
                 phone: '',
                 name: '',
-                regular:/^[\S]{6,32}$/
 
             }
         },
@@ -75,7 +73,7 @@
 </script>
 
 <style scoped>
-  .login-container{
+  .container{
     margin: 10px;
     padding: 5px;
     font-weight: 600;
@@ -83,11 +81,11 @@
     text-align: left;
   }
 
-  .login-header {
+  .header {
     display: flex;
     text-align: center;
   }
-  .login-main {
+  .info-text {
     font-weight: 400;
     font-size: 18px;
   }

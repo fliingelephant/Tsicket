@@ -1,6 +1,6 @@
 <template>
-  <el-container class="login-container">
-    <el-header class="login-header">
+  <el-container class="container">
+    <el-header class="header">
       <el-row>
         <el-col :span="20"><div>活动列表</div></el-col>
         <el-col :span="4"><div class="add-event"><el-button @click="addEvent">添加活动</el-button></div></el-col>
@@ -8,8 +8,7 @@
     </el-header>
     <el-main>
       <el-table
-          :data="tableData"
-          style="width: 100%">
+          :data="table_data">
         <el-table-column
           prop="event_name"
           label="活动名称">
@@ -36,7 +35,6 @@
           <el-button @click="changeEvent" type="text" size="small">编辑</el-button>
         </el-table-column>
       </el-table>
-
     </el-main>
     <el-footer>
       <div class="list-footer" @click="help">查看帮助</div>
@@ -49,7 +47,7 @@
         name: "Register",
         data() {
             return({
-                tableData: [{
+                table_data: [{
                     event_name:"测试_活动名称",
                     start_time:"2019.6.10 12:00:00",
                     end_time:"2019.6.10 12:00:00",
@@ -82,8 +80,7 @@
 </script>
 
 <style scoped>
-  .login-container{
-
+  .container{
     margin: 10px;
     padding: 5px;
     font-weight: 600;
@@ -91,8 +88,7 @@
     text-align: left;
   }
 
-  .login-header {
-
+  .header {
     text-align: left;
     border-top: none;
     border-left: none;
@@ -104,13 +100,6 @@
     font-size: 14px;
     color:#038bff;
     cursor: pointer;
-  }
-  .login-main {
-    font-weight: 400;
-    font-size: 18px;
-  }
-  .compulsory{
-    color:#ff0000
   }
   .add-event{
     text-align: right;

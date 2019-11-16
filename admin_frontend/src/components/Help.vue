@@ -1,11 +1,9 @@
 <template>
-  <el-container class="login-container">
-    <el-header class="login-header">
-      <div>
-        欢迎来到帮助界面
-      </div>
+  <el-container class="container">
+    <el-header class="header">
+      <div>欢迎来到帮助界面</div>
     </el-header>
-    <el-main class="login-main">
+    <el-main class="help-text">
       <div>第一次使用本系统进行活动信息发布，请先注册。</div>
       <div>注册并通过审核后可以进入活动界面发布活动信息。</div>
       <div>发布活动信息需要填写必填项，并通过审核</div>
@@ -21,8 +19,7 @@
 </script>
 
 <style scoped>
-  .login-container{
-
+  .container{
     margin: 10px;
     padding: 5px;
     font-weight: 600;
@@ -30,12 +27,12 @@
     text-align: left;
   }
 
-  .login-header {
+  .header {
     text-align: center;
     border-bottom: 1px solid silver;
   }
 
-  .login-main {
+  .help-text {
     font-weight: 400;
     font-size: 16px;
   }

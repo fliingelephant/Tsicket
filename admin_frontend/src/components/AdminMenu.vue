@@ -1,9 +1,7 @@
 <template>
-  <el-container class="login-container">
-    <el-header class="login-header">
-      <div>
-        管理员菜单
-      </div>
+  <el-container class="container">
+    <el-header class="header">
+      <div>管理员菜单</div>
     </el-header>
     <el-main>
     <el-tabs v-model="activeName">
@@ -70,7 +68,7 @@
         name: "AdminMenu",
         data() {
             return {
-                activeName: 'second',
+                activeName: 'first',
                 events:[],
                 new_events:[]
             };
@@ -82,7 +80,7 @@
 </script>
 
 <style scoped>
-  .login-container{
+  .container{
 
     margin: 10px;
     padding: 5px;
@@ -91,19 +89,12 @@
     text-align: left;
   }
 
-  .login-header {
+  .header {
     display: flex;
     text-align: center;
     border-top: none;
     border-left: none;
     border-right: none;
 
-  }
-  .login-main {
-    font-weight: 400;
-    font-size: 18px;
-  }
-  .compulsory{
-    color:#ff0000
   }
 </style>
