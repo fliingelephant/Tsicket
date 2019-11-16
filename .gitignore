@@ -1,7 +1,7 @@
 backend/target
 .idea
 **/*.rs.bk
-
+.DS_Store
 
 
 Cargo.lock
