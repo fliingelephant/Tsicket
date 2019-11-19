@@ -161,6 +161,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var _default =
 {
   data: function data() {
@@ -184,7 +195,33 @@ var _default =
       }],
       dotStyle: false,
       towerStart: 0,
-      direction: '' };
+      direction: '',
+      url: "/static/cardback0.jpg",
+      activity: {
+        id: 0,
+        name: '活动名',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true },
+
+      current: 0,
+      tabs: [
+      "介绍", "动态"],
+
+      sponsor: {
+        avatarUrl: '',
+        name: 'xx学生会' },
+
+      message: {} };
+
+
 
   },
   onLoad: function onLoad() {
@@ -194,10 +231,17 @@ var _default =
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
     },
-    activityPage: function activityPage(e) {
+    swiperActivity: function swiperActivity(e) {
+      this.activityPage(this.swiperList[this.cardCur].id);
+    },
+    activityPage: function activityPage(id) {
       uni.navigateTo({
-        url: "../activity/activity?id=" + this.swiperList[this.cardCur].id });
+        url: "../activity/activity?id=" + id });
 
+    },
+    like: function like(id) {
+      console.log("123");
+      this.activity.like = !this.activity.like;
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

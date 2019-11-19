@@ -187,6 +187,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 var app = getApp();var _default =
 
@@ -195,25 +200,50 @@ var app = getApp();var _default =
     return {
       userInfo: {},
       hasUserInfo: false,
+      hasTsinghuaInfo: false,
+      tsinghuaid: 2017010000,
       canIUse: uni.canIUse('button.open-type.getUserInfo'),
       like: 123,
       follow: 10,
       history: 23,
       current: 0,
       tabs: [
-      "活动日程", "报名中"] };
+      "活动日程", "报名中"],
+
+      activity: {
+        id: 0,
+        name: '活动名',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true },
+
+      sponsor: {
+        avatarUrl: '',
+        name: 'xx学生会' },
+
+      message: {} };
+
 
 
   },
   onLoad: function onLoad() {var _this = this;
     if (app.globalData.userInfo) {
       this.userInfo = app.globalData.userInfo;
+      console.log(this.userInfo);
       this.hasUserInfo = true;
     } else if (this.canIUse) {
       // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
       app.userInfoReadyCallback = function (res) {
         _this.userInfo = res.userInfo;
+        console.log(_this.userInfo);
         _this.hasUserInfo = true;
       };
     } else {
@@ -222,9 +252,34 @@ var app = getApp();var _default =
         success: function success(res) {
           app.globalData.userInfo = res.userInfo;
           _this.userInfo = res.userInfo;
+          console.log(_this.userInfo);
           _this.hasUserInfo = true;
         } });
 
+    }
+  },
+  onShow: function onShow() {var _this2 = this;
+    if (app.globalData.token) {
+      console.log(app.globalData.token),
+      uni.request({
+        url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+        data: {
+          openid: app.globalData.openid,
+          token: app.globalData.token },
+
+        header: {
+          'content-type': 'application/json' //自定义请求头信息
+        },
+        success: function success(res) {
+          console.log(res.data);
+          _this2.hasUserInfo = true;
+          _this2.hasTsinghuaInfo = true;
+        },
+        fail: function fail(res) {
+          console.log('绑定失败');
+        } });
+
+      app.globalData.token = undefined;
     }
   },
   methods: {
@@ -236,7 +291,7 @@ var app = getApp();var _default =
         url: "../activity/activity" });
 
     },
-    getUserInfo: function getUserInfo(e) {var _this2 = this;
+    getUserInfo: function getUserInfo(e) {var _this3 = this;
       console.log(e);
       app.globalData.userInfo = e.detail.userInfo;
       this.userInfo = e.detail.userInfo;
@@ -250,7 +305,7 @@ var app = getApp();var _default =
         },
         success: function success(res) {
           console.log(res.data);
-          _this2.hasUserInfo = true;
+          _this3.hasUserInfo = true;
         } });
 
     },
@@ -270,6 +325,25 @@ var app = getApp();var _default =
 
     },
     historyPage: function historyPage() {
+
+    },
+    identification: function identification() {
+      console.log(123);
+      uni.navigateToMiniProgram({
+        appId: "wx1ebe3b2266f4afe0",
+        path: "pages/index/index",
+        envVersion: "trial",
+        extraData: {
+          origin: "miniapp",
+          type: "id.tsinghua" },
+
+        success: function success(res) {
+          // 打开成功
+          console.log(res);
+        },
+        fail: function fail(res) {
+          console.log(res);
+        } });
 
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

@@ -54,6 +54,38 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*每个页面公共css */
 /*
   ColorUi for uniApp  v2.1.6 | by 文晓港 2019-05-31 10:44:24
@@ -4888,6 +4920,10 @@ image.card {
 .tab-scroll {
 	height: 100%;
 	padding: 30rpx 30rpx 0;
+}
+.bg-message {
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #F2F2F2;
 }
 .tab-intro {
 	height: auto;

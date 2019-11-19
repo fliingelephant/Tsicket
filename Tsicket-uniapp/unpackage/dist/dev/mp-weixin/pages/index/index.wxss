@@ -43,4 +43,8 @@
 .swiper-item {
 	background-color: #CCE6FF;
 }
+.activity-list {
+	width: 100%;
+	padding: 40rpx 40rpx 40rpx 40rpx;
+}
 

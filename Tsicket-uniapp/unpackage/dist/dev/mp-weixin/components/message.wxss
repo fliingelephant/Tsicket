@@ -1,0 +1,6 @@
+
+.toolbar {
+	height: 80rpx;
+	width: 100%;
+}
+

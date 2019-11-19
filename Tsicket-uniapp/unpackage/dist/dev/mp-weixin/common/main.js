@@ -9,8 +9,13 @@
 "use strict";
 /* WEBPACK VAR INJECTION */(function(createApp) {__webpack_require__(/*! uni-pages */ 4);__webpack_require__(/*! @dcloudio/uni-stat */ 5);
 var _vue = _interopRequireDefault(__webpack_require__(/*! vue */ 2));
-var _App = _interopRequireDefault(__webpack_require__(/*! ./App */ 9));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};var ownKeys = Object.keys(source);if (typeof Object.getOwnPropertySymbols === 'function') {ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {return Object.getOwnPropertyDescriptor(source, sym).enumerable;}));}ownKeys.forEach(function (key) {_defineProperty(target, key, source[key]);});}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}
+var _App = _interopRequireDefault(__webpack_require__(/*! ./App */ 9));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};var ownKeys = Object.keys(source);if (typeof Object.getOwnPropertySymbols === 'function') {ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {return Object.getOwnPropertyDescriptor(source, sym).enumerable;}));}ownKeys.forEach(function (key) {_defineProperty(target, key, source[key]);});}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var message = function message() {return __webpack_require__.e(/*! import() | components/message */ "components/message").then(__webpack_require__.bind(null, /*! ./components/message.vue */ 47));};var activityMiniCard = function activityMiniCard() {return __webpack_require__.e(/*! import() | components/activity-mini-card */ "components/activity-mini-card").then(__webpack_require__.bind(null, /*! ./components/activity-mini-card.vue */ 54));};var activityPrepare = function activityPrepare() {return __webpack_require__.e(/*! import() | components/activity-prepare */ "components/activity-prepare").then(__webpack_require__.bind(null, /*! @/components/activity-prepare.vue */ 61));};
 
+
+
+_vue.default.component('message', message);
+_vue.default.component('activity-mini-card', activityMiniCard);
+_vue.default.component('activity-prepare', activityPrepare);
 
 _vue.default.config.productionTip = false;
 
@@ -95,14 +100,28 @@ __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default =
 {
   globalData: {
-    hasuserInfo: false },
+    hasuserInfo: false,
+    openid: 0 },
 
   onLaunch: function onLaunch() {var _this = this;
     console.log('App Launch');
+    console.log(this.globalData.hasuserInfo);
     //登录
     uni.login({
       success: function success(res) {
-        console.log(res.code);
+        uni.request({
+          url: 'http://tsicket.xyz/apis/', //仅为示例，并非真实接口地址。
+          data: {
+            code: res.code },
+
+          header: {
+            'content-type': 'application/json' //自定义请求头信息
+          },
+          success: function success(res) {
+            //onsole.log(res.data);
+            _this.globalData.openid = res.openid;
+          } });
+
       } });
 
     /* uni.authorize({
@@ -138,8 +157,26 @@ __webpack_require__.r(__webpack_exports__);
       } });
 
   },
-  onShow: function onShow() {
-    console.log('App Show');
+  onShow: function onShow(res) {var _this2 = this;
+    if (res.referrerInfo && res.referrerInfo.appId) {
+      if (res.referrerInfo.extraData) {
+        this.globalData.token = res.referrerInfo.extraData.token;
+        uni.request({
+          url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+          data: {
+            token: this.globalData.token },
+
+          header: {
+            'content-type': 'application/json' //自定义请求头信息
+          },
+          success: function success(res) {
+            console.log(res.data);
+            _this2.hasUserInfo = true;
+            _this2.hasTsinghuaInfo = true;
+          } });
+
+      }
+    }
   },
   onHide: function onHide() {
     console.log('App Hide');

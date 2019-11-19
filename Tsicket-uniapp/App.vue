@@ -1,14 +1,28 @@
 <script>
 	export default {
 		globalData:{
-			hasuserInfo: false
+			hasuserInfo: false,
+			openid: 0
 		},
 		onLaunch: function() {
 			console.log('App Launch')
+			console.log(this.globalData.hasuserInfo)
 			//登录
 			uni.login({
 				success: res => {
-					console.log(res.code)
+					uni.request({
+					url: 'http://tsicket.xyz/apis/', //仅为示例，并非真实接口地址。
+					data: {
+						code: res.code
+					},
+					header: {
+						'content-type': 'application/json' //自定义请求头信息
+					},
+					success: (res) => {
+						//onsole.log(res.data);
+						this.globalData.openid = res.openid
+					}
+				})
 				}
 			})
 			/* uni.authorize({
@@ -44,8 +58,26 @@
 				}
 			})
 		},
-		onShow: function() {
-			console.log('App Show')
+		onShow: function(res) {
+			if(res.referrerInfo && res.referrerInfo.appId) {
+				if(res.referrerInfo.extraData) {
+					this.globalData.token = res.referrerInfo.extraData.token
+					uni.request({
+					url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+					data: {
+						token: this.globalData.token
+					},
+					header: {
+						'content-type': 'application/json' //自定义请求头信息
+					},
+					success: (res) => {
+						console.log(res.data);
+						this.hasUserInfo = true
+						this.hasTsinghuaInfo = true
+					}
+				})
+				}
+			}
 		},
 		onHide: function() {
 			console.log('App Hide')

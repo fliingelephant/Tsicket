@@ -33,6 +33,14 @@
       }
     ]
   },
-  "usingComponents": {},
-  "sitemapLocation": "sitemap71.json"
+  "permission": {},
+  "navigateToMiniProgramAppIdList": [
+    "wx1ebe3b2266f4afe0"
+  ],
+  "usingComponents": {
+    "message": "/components/message",
+    "activity-mini-card": "/components/activity-mini-card",
+    "activity-prepare": "/components/activity-prepare"
+  },
+  "sitemapLocation": "sitemap65.json"
 }

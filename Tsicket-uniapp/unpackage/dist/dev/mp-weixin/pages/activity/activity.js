@@ -192,6 +192,30 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var app = getApp();var _default =
 
@@ -208,31 +232,39 @@ var app = getApp();var _default =
         location: '活动地点',
         start: '2019年xx月xx日',
         end: '',
-        orgnizationid: 100,
-        orgnizationname: 'xx学生会',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
         type: 1,
         state: 200 },
 
+      like: false,
       current: 0,
       tabs: [
-      "介绍", "动态"] };
+      "介绍", "动态"],
+
+      sponsor: {
+        avatarUrl: '',
+        name: 'xx学生会' },
+
+      message: {} };
+
 
 
   },
   onLoad: function onLoad(option) {
     console.log(option);
-    uni.request({
-      url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-      data: {
-        id: option.id },
-
-      header: {
-        'content-type': 'application/json' //自定义请求头信息
-      },
-      success: function success(res) {
-        console.log(res.data);
-      } });
-
+    // uni.request({
+    // 	url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+    // 	data: {
+    // 		id: option.id
+    // 	},
+    // 	header: {
+    // 		'content-type': 'application/json' //自定义请求头信息
+    // 	},
+    // 	success: (res) => {
+    // 		console.log(res.data);
+    // 	}
+    // });
     return 0;
   },
   methods: {

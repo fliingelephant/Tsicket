@@ -1,0 +1,98 @@
+
+.activity-prepare {
+	margin-bottom: 40rpx;
+}
+.collapse {
+	width: 100%;
+	padding: 40rpx 40rpx 40rpx 40rpx;
+}
+.imgcard {
+	position: absolute;
+	width: 100%;
+	height: 300rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #007AFF;
+	z-index: -1;
+}
+.card-back {
+	position: absolute;
+	width: 100%;
+	height: 300rpx;
+	-webkit-transition: all 0.5s ease 0s;
+	-o-transition: all 0.5s ease 0s;
+	transition: all 0.5s ease 0s;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #F2F2F2;
+	z-index: -2;
+}
+.card-back.unfold {
+	height: 400rpx;
+	-webkit-transition: all 0.5s ease 0s;
+	-o-transition: all 0.5s ease 0s;
+	transition: all 0.5s ease 0s;
+}
+.line-round {
+	margin-top: 10rpx;
+	margin-bottom: 10rpx;
+	width: 70rpx;
+	height: 10rpx;
+	border-radius: 5rpx 5rpx 5rpx 5rpx;
+	background-color: gainsboro;
+}
+.info {
+	height: 300rpx;
+}
+.info-flex {
+	height: 240rpx;
+}
+.flex-column {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	    -ms-flex-direction: column;
+	        flex-direction: column;
+	-webkit-box-pack: justify;
+	-webkit-justify-content: space-between;
+	    -ms-flex-pack: justify;
+	        justify-content: space-between;
+}
+.toolbar-enter-active, .toolbar-leave-active {
+	-webkit-transition: all 0.5s ease-in 0s;
+	-o-transition: all 0.5s ease-in 0s;
+	transition: all 0.5s ease-in 0s;
+}
+.toolbar-enter, .toolbar-leave-to {
+	opacity: 0;
+	height: 1;
+}
+.toolbar {
+	opacity: 0;
+	width: 100%;
+	height: 0;
+	-webkit-transition: all 0.5s ease 0s;
+	-o-transition: all 0.5s ease 0s;
+	transition: all 0.5s ease 0s;
+}
+.toolbar.unfold {
+	opacity: 1;
+	height: 100rpx;
+	-webkit-transition: all 0.5s ease 0s;
+	-o-transition: all 0.5s ease 0s;
+	transition: all 0.5s ease 0s;
+}
+.tab-swiper-view {
+	height: calc(100vh - 480rpx - 80rpx)
+}
+.like {
+	font-size: 60rpx;
+}
+.cuIcon-likefill {
+	-webkit-transition: opacity 1s ease-in 0s;
+	-o-transition: opacity 1s ease-in 0s;
+	transition: opacity 1s ease-in 0s;
+}
+

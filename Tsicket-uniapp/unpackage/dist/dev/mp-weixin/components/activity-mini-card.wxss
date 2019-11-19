@@ -1,35 +1,39 @@
 
+.activity-mini-card{
+	margin-bottom: 40rpx;
+}
 .collapse {
 	width: 100%;
 	padding: 40rpx 40rpx 40rpx 40rpx;
 }
-.idcard {
+.imgcard {
 	position: absolute;
 	width: 670rpx;
-	height: 300rpx;
+	height: 250rpx;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
 	z-index: -1;
 }
 .card-back {
 	position: absolute;
 	width: 670rpx;
-	height: 400rpx;
+	height: 250rpx;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
-	background-color: #F2F2F2;
+	background-color: #007AFF;
 	z-index: -2;
 }
 .line-round {
-	margin-top: 10rpx;
+	margin-top: 5rpx;
+	margin-bottom: 15rpx;
 	width: 70rpx;
 	height: 10rpx;
 	border-radius: 5rpx 5rpx 5rpx 5rpx;
 	background-color: gainsboro;
 }
 .info {
-	height: 300rpx;
+	height: 250rpx;
 }
 .info-flex {
-	height: 240rpx;
+	height: 190rpx;
 }
 .flex-column {
 	display: -webkit-box;
@@ -53,4 +57,14 @@
 .tab-swiper-view {
 	height: calc(100vh - 480rpx - 80rpx)
 }
+.like {
+	font-size: 60rpx;
+}
+.cuIcon-likefill {
+	-webkit-transition: opacity 1s ease-in 0s;
+	-o-transition: opacity 1s ease-in 0s;
+	transition: opacity 1s ease-in 0s;
+}
+
+
 
