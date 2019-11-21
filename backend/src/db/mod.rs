@@ -26,3 +26,4 @@ pub mod admins;
 pub mod events;
 pub mod sponsors;
 pub mod users;
+pub mod records;

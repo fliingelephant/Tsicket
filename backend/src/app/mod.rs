@@ -17,6 +17,8 @@ use rand::FromEntropy;
 use rand::prelude::*;
 
 use crate::db;
+use crate::db::events::Event;
+use crate::db::records::Record;
 
 
 mod admins;
@@ -24,6 +26,7 @@ mod events;
 mod sponsors;
 mod users;
 mod update;
+mod init;
 
 lazy_static! {
     pub static ref ADMIN_ID: String
@@ -67,6 +70,22 @@ pub fn start() -> () {
         .bind(&bind_address)
         .unwrap_or_else(|_| panic!("Could not bind server to address {}", &bind_address))
         .start();
+    /*let mut events:Vec<Event> = Vec::new();
+    let mut records:Vec<Record> = Vec::new();
+    let dd = init::initiate(events.as_mut(), records.as_mut());
+    events[0].event_name = "!!!".to_string();
+    events[0].update_type = 1;
+    let re  = Record{
+        record_id: "0000".to_string(),
+        event_id: "999".to_string(),
+        sponsor_name: "zjr".to_string(),
+        user_id: "cba".to_string(),
+        start_time: "1970-02-26 20:47:46".to_string(),
+        end_time: "2019-11-18 20:47:46".to_string(),
+        update_type: 3
+    };
+    records.push(re);
+    update::update(events.as_mut(), records.as_mut());*///测试更新函数
 }
 
 fn routes(app: &mut web::ServiceConfig) {

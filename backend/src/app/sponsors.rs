@@ -119,7 +119,7 @@ pub fn get_events(
     sponsor: Json<QuerySponsor>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     let mut event_list: Vec<events::Event> = vec![];
-    let t = events::get_sponsor_events(
+    let t = sponsors::get_sponsor_events(
         &sponsor.sponsor_name, &mut event_list);
     result(match t {
         Ok(()) => Ok(HttpResponse::Ok().json(TestResponse {
