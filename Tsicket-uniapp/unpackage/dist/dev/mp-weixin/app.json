@@ -3,7 +3,11 @@
     "pages/index/index",
     "pages/user/user",
     "pages/discover/disover",
-    "pages/activity/activity"
+    "pages/activity/activity",
+    "pages/following/following",
+    "pages/sponsor/sponsor",
+    "pages/like/like",
+    "pages/history/history"
   ],
   "subPackages": [],
   "window": {
@@ -40,7 +44,8 @@
   "usingComponents": {
     "message": "/components/message",
     "activity-mini-card": "/components/activity-mini-card",
-    "activity-prepare": "/components/activity-prepare"
-  },
-  "sitemapLocation": "sitemap65.json"
+    "activity-prepare": "/components/activity-prepare",
+    "activity-check": "/components/activity-check",
+    "follow-list": "/components/follow-list"
+  }
 }

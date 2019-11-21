@@ -43,8 +43,23 @@
 .swiper-item {
 	background-color: #CCE6FF;
 }
+.flex-column {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	    -ms-flex-direction: column;
+	        flex-direction: column;
+	-webkit-box-pack: justify;
+	-webkit-justify-content: space-between;
+	    -ms-flex-pack: justify;
+	        justify-content: space-between;
+}
 .activity-list {
-	width: 100%;
-	padding: 40rpx 40rpx 40rpx 40rpx;
+
+	padding: 10rpx;
 }
 

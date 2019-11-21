@@ -2,25 +2,25 @@
 	<view class="bg-message">
 		<view class="padding-top padding-lr">
 		<view class="flex justify-between">
-			<view class="flex text-left" @click="sponsorPage">
+			<view class="flex text-left" @click="$emit('sponsorPage', sponsor.id)">
 				<view class="cu-avatar round" :style="{backgroundImage: 'url(' + sponsor.avatarUrl + ')'}"></view>
 				<view class="flex-column padding-left-sm">
 					<view class="text-sm text-bold">{{sponsor.name}}</view>
 					<view class="text-xs">{{activity.start}}</view>
 				</view>
 			</view>
-			<view class="text-right">{{activity.name}}</view>
+			<view class="text-right" @click="$emit('activityPage', activity.id)">{{activity.name}}</view>
 		</view>
-		<view class="message-content padding-tb-sm solid-bottom">123</view>
+		<view class="message-content padding-tb-sm solid-bottom">{{message.text}}</view>
 		</view>
 		<view class="toolbar flex align-stretch text-center text-xxl">
-			<view class="flex-sub flex align-center justify-center" @click="$emit('reserve', message.id)">
-				<text :class="appreciate ? 'cuIcon-appreciate' : 'cuIcon-appreciatefill'" @click.stop="appreciate=!appreciate"></text>
+			<view class="flex-sub flex align-center justify-center" @click="$emit('appreciate', message.id)">
+				<text :class="message.appreciate ? 'cuIcon-appreciatefill' : 'cuIcon-appreciate'"></text>
 			</view>
 			<view class="flex-sub flex align-center justify-center" @click="$emit('share', message.id)">
 				<text class="cuIcon-share" @click.stop=""></text>
 			</view>
-			<view class="flex-sub flex align-center justify-center" @click="like">
+			<view class="flex-sub flex align-center justify-center" @click="$emit('more', message.id)">
 				<text class="cuIcon-moreandroid" @click.stop=""></text>
 			</view>
 		</view>
@@ -30,11 +30,6 @@
 <script>
 	export default {
 		name: 'message',
-		data() {
-			return {
-				appreciate: true,
-			}
-		},
 		props: {
 			activity: {
 				type: Object

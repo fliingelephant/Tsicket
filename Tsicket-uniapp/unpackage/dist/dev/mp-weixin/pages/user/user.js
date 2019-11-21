@@ -192,16 +192,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 var app = getApp();var _default =
 
 {
   data: function data() {
     return {
+      loadinginfo: true,
       userInfo: {},
       hasUserInfo: false,
       hasTsinghuaInfo: false,
-      tsinghuaid: 2017010000,
+      tsinghuaid: '2017010000',
       canIUse: uni.canIUse('button.open-type.getUserInfo'),
       like: 123,
       follow: 10,
@@ -260,9 +263,10 @@ var app = getApp();var _default =
   },
   onShow: function onShow() {var _this2 = this;
     if (app.globalData.token) {
-      console.log(app.globalData.token),
+      console.log('token:' + app.globalData.token),
       uni.request({
-        url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+        url: 'http://2019-a18.iterator-traits.com:8080/apis/users/tsinghuaid', //仅为示例，并非真实接口地址。
+        method: 'POST',
         data: {
           openid: app.globalData.openid,
           token: app.globalData.token },
@@ -271,9 +275,12 @@ var app = getApp();var _default =
           'content-type': 'application/json' //自定义请求头信息
         },
         success: function success(res) {
+          console.log('调用绑定');
           console.log(res.data);
           _this2.hasUserInfo = true;
           _this2.hasTsinghuaInfo = true;
+          _this2.tsinghuaid = res.data.tsinghuaid;
+
         },
         fail: function fail(res) {
           console.log('绑定失败');
@@ -319,12 +326,21 @@ var app = getApp();var _default =
       this.current = e.detail.current;
     },
     likePage: function likePage() {
+      console.log("likepage");
+      uni.navigateTo({
+        url: "../like/like" });
 
     },
     followPage: function followPage() {
+      console.log("followpage");
+      uni.navigateTo({
+        url: "../following/following" });
 
     },
     historyPage: function historyPage() {
+      console.log("historypage");
+      uni.navigateTo({
+        url: "../history/history" });
 
     },
     identification: function identification() {

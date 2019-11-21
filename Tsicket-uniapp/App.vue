@@ -10,17 +10,21 @@
 			//登录
 			uni.login({
 				success: res => {
+					console.log(res)
 					uni.request({
-					url: 'http://tsicket.xyz/apis/', //仅为示例，并非真实接口地址。
+					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/login', //仅为示例，并非真实接口地址。
 					data: {
-						code: res.code
+						code: res.code,
+						
 					},
 					header: {
 						'content-type': 'application/json' //自定义请求头信息
 					},
 					success: (res) => {
 						//onsole.log(res.data);
-						this.globalData.openid = res.openid
+						this.globalData.openid = res.data.openid
+						console.log(res.data.openid)
+						console.log(res)
 					}
 				})
 				}
@@ -62,20 +66,20 @@
 			if(res.referrerInfo && res.referrerInfo.appId) {
 				if(res.referrerInfo.extraData) {
 					this.globalData.token = res.referrerInfo.extraData.token
-					uni.request({
-					url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-					data: {
-						token: this.globalData.token
-					},
-					header: {
-						'content-type': 'application/json' //自定义请求头信息
-					},
-					success: (res) => {
-						console.log(res.data);
-						this.hasUserInfo = true
-						this.hasTsinghuaInfo = true
-					}
-				})
+					// uni.request({
+					// url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+					// data: {
+					// 	token: this.globalData.token
+					// },
+					// header: {
+					// 	'content-type': 'application/json' //自定义请求头信息
+					// },
+					// success: (res) => {
+					// 	console.log(res.data);
+					// 	this.hasUserInfo = true
+					// 	this.hasTsinghuaInfo = true
+					// }
+				//})
 				}
 			}
 		},

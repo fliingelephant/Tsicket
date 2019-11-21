@@ -8415,7 +8415,7 @@ module.exports = {"_from":"@dcloudio/uni-stat@next","_id":"@dcloudio/uni-stat@2.
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "pages": { "pages/index/index": { "navigationBarTitleText": "清易票", "usingComponents": {} }, "pages/user/user": { "usingComponents": {} }, "pages/discover/disover": { "usingComponents": {} }, "pages/activity/activity": { "usingComponents": {} } }, "globalStyle": { "navigationBarTextStyle": "white", "navigationBarTitleText": "清易票", "navigationBarBackgroundColor": "#81D3F8", "backgroundTextStyle": "light", "backgroundColor": "#FFFFFF" } };exports.default = _default;
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "pages": { "pages/index/index": { "navigationBarTitleText": "清易票", "usingComponents": {} }, "pages/user/user": { "usingComponents": {} }, "pages/discover/disover": { "usingComponents": {} }, "pages/activity/activity": { "usingComponents": {} }, "pages/following/following": { "usingComponents": {} }, "pages/sponsor/sponsor": { "usingComponents": {} }, "pages/like/like": { "usingComponents": {} }, "pages/history/history": {} }, "globalStyle": { "navigationBarTextStyle": "white", "navigationBarTitleText": "清易票", "navigationBarBackgroundColor": "#81D3F8", "backgroundTextStyle": "light", "backgroundColor": "#FFFFFF" } };exports.default = _default;
 
 /***/ }),
 /* 8 */

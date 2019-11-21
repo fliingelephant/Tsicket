@@ -15,29 +15,20 @@
 				<swiper class="tab-swiper" :current="current" @change="swiperChange">
 					<swiper-item class="tab-swiper-item" style="height: 100%;">
 						<scroll-view scroll-y class="tab-scroll">
-							<view class="tab-intro padding">
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测
-							</view>
+							<message v-for="(item, index) in messagelist" :key="index" :activity="item.activity" :sponsor="item.sponsor"
+							 :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
 						</scroll-view>
 					</swiper-item>
 					<swiper-item>
 						<scroll-view scroll-y class="tab-scroll">
-							<view class="tab-intro padding">
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本
-							</view>
+							<message v-for="(item, index) in messagelist" :key="index" :activity="item.activity" :sponsor="item.sponsor"
+							 :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
 						</scroll-view>
 					</swiper-item>
 					<swiper-item>
 						<scroll-view scroll-y class="tab-scroll">
-							<view class="tab-intro padding">
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本
-							</view>
+							<message v-for="(item, index) in messagelist.slice(1,3)" :key="index" :activity="item.activity" :sponsor="item.sponsor"
+							 :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
 						</scroll-view>
 					</swiper-item>
 				</swiper>
@@ -52,12 +43,76 @@
 	export default {
 		data() {
 			return {
-				userInfo: {},
-				hasUserInfo: false,
-				canIUse: uni.canIUse('button.open-type.getUserInfo'),
-				like: 123,
-				follow: 10,
-				history: 23,
+				messagelist: [{
+						"id": 0,
+						text: "测试文本123412351123",
+						"appreciate": false,
+						activity: {
+							id: 0,
+							name: '活动名',
+							intro: '活动介绍语',
+							tickets: 80,
+							location: '活动地点',
+							start: '2019年xx月xx日',
+							end: '',
+							sponsorid: 100,
+							sponsorname: 'xx学生会',
+							type: 1,
+							state: 200
+						},
+						sponsor: {
+							id: 0,
+							avatarUrl: '',
+							name: 'xx学生会',
+						}
+					},
+					{
+						"id": 1,
+						text: "测试文本12341231231245124",
+						"appreciate": false,
+						activity: {
+							id: 1,
+							name: '活动名1',
+							intro: '活动介绍语',
+							tickets: 80,
+							location: '活动地点',
+							start: '2019年xx月xx日',
+							end: '',
+							sponsorid: 100,
+							sponsorname: 'xx学生会',
+							type: 1,
+							state: 200
+						},
+						sponsor: {
+							id: 1,
+							avatarUrl: '',
+							name: 'xx学生会2',
+						}
+					},
+					{
+						"id": 2,
+						text: "测试文本123532151212341233",
+						"appreciate": false,
+						activity: {
+							id: 2,
+							name: '活动名2',
+							intro: '活动介绍语',
+							tickets: 80,
+							location: '活动地点',
+							start: '2019年xx月xx日',
+							end: '',
+							sponsorid: 100,
+							sponsorname: 'xx学生会',
+							type: 1,
+							state: 200
+						},
+						sponsor: {
+							id: 2,
+							avatarUrl: '',
+							name: 'xx学生会3',
+						}
+					}
+				],
 				current: 0,
 				tabs: [
 					"参加", "关注收藏", "广场"
@@ -65,41 +120,11 @@
 			};
 		},
 		onLoad() {
-			if (app.globalData.userInfo) {
-				this.userInfo = app.globalData.userInfo
-				this.hasUserInfo = true
-			} else if (this.canIUse) {
-				// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-				// 所以此处加入 callback 以防止这种情况
-				app.userInfoReadyCallback = res => {
-					this.userInfo = res.userInfo
-					this.hasUserInfo = true
-				}
-			} else {
-				// 在没有 open-type=getUserInfo 版本的兼容处理
-				uni.getUserInfo({
-					success: res => {
-						app.globalData.userInfo = res.userInfo
-						this.userInfo = res.userInfo
-						this.hasUserInfo = true
-					}
-				})
-			}
+
 		},
 		methods: {
 			cardSwiper(e) {
 				this.cardCur = e.detail.current
-			},
-			activitydetail(e) {
-				uni.navigateTo({
-					url: "../activity/activity"
-				})
-			},
-			getUserInfo(e) {
-				console.log(e)
-				app.globalData.userInfo = e.detail.userInfo
-				this.userInfo = e.detail.userInfo,
-					this.hasUserInfo = true
 			},
 			tabSelect(e) {
 				this.current = e.currentTarget.dataset.id;
@@ -109,6 +134,40 @@
 			},
 			swiperChange(e) {
 				this.current = e.detail.current;
+			},
+			appreciate(e,id) {
+				console.log(e)
+				console.log(id)
+				uni.request({
+					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/appreciate',
+					method: 'POST',
+					data: {
+						openid: app.globalData.openid,
+						messageid: id,
+						session: '',
+					},
+					header: {
+						'content-type': 'application/json' //自定义请求头信息
+					},
+					success: (res) => {
+						console.log(res.data);
+					}
+				});
+				var index = this.messagelist.findIndex((item) => {
+					return item.id == id
+				})
+				console.log(index)
+				this.messagelist[index].appreciate = !this.messagelist[index].appreciate
+			},
+			activityPage(id) {
+				uni.navigateTo({
+					url: "../activity/activity?id=" + id
+				})
+			},
+			sponsorPage(id) {
+				uni.navigateTo({
+					url: "../sponsor/sponsor?id=" + id
+				})
 			}
 		}
 	}
@@ -145,7 +204,7 @@
 		text-overflow: ellipsis;
 		overflow: hidden;
 	}
-	
+
 	.tab-swiper-view {
 		height: calc(100vh - 30rpx - 80rpx)
 	}

@@ -168,11 +168,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-var _default =
+
+var app = getApp();var _default =
+
 {
   data: function data() {
     return {
@@ -197,7 +195,7 @@ var _default =
       towerStart: 0,
       direction: '',
       url: "/static/cardback0.jpg",
-      activity: {
+      activitylist: [{
         id: 0,
         name: '活动名',
         intro: '活动介绍语',
@@ -210,6 +208,91 @@ var _default =
         type: 1,
         state: 200,
         like: true },
+
+      {
+        id: 1,
+        name: '活动名1',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true },
+
+      {
+        id: 2,
+        name: '活动名2',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true },
+
+      {
+        id: 3,
+        name: '活动名3',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true },
+
+      {
+        id: 4,
+        name: '活动名4',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true },
+
+      {
+        id: 5,
+        name: '活动名5',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true },
+
+      {
+        id: 6,
+        name: '活动名6',
+        intro: '活动介绍语',
+        tickets: 80,
+        location: '活动地点',
+        start: '2019年xx月xx日',
+        end: '',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
+        type: 1,
+        state: 200,
+        like: true }],
+
 
       current: 0,
       tabs: [
@@ -240,8 +323,26 @@ var _default =
 
     },
     like: function like(id) {
-      console.log("123");
-      this.activity.like = !this.activity.like;
+      uni.request({
+        url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like',
+        method: 'POST',
+        data: {
+          openid: app.globalData.openid,
+          eventid: id,
+          session: '' },
+
+        header: {
+          'content-type': 'application/json' //自定义请求头信息
+        },
+        success: function success(res) {
+          console.log(res.data);
+        } });
+
+      var index = this.activitylist.findIndex(function (item) {
+        return item.id == id;
+      });
+      console.log(index);
+      this.activitylist[index].like = !this.activitylist[index].like;
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

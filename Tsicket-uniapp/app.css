@@ -57,6 +57,7 @@ image.card {
 .bg-message {
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
 	background-color: #F2F2F2;
+	margin-bottom: 40rpx;
 }
 
 .tab-intro {

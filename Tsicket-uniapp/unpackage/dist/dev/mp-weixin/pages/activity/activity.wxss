@@ -49,6 +49,7 @@
 .toolbar {
 	height: 100rpx;
 	width: 100%;
+	font-size: 48rpx;
 }
 .tab-swiper-view {
 	height: calc(100vh - 480rpx - 80rpx)

@@ -22,23 +22,23 @@
 				</view>
 			</view>
 		</view>
-			<view class="toolbar flex align-stretch text-center" :class="{'unfold':isUnfold}">
-				<view class="flex-sub flex align-center justify-center" @click="$emit('detail', message.id)">
-					<view class="">详情</view>
-				</view>
-				<view class="flex-sub flex align-center justify-center" @click="$emit('announcement', message.id)">
-					<view class="">公告</view>
-				</view>
-				<view class="flex-sub flex align-center justify-center" @click="$emit('QRcode', message.id)">
-					<text class="cuIcon-qr_code" @click.stop="$emit('qrcode', activity.id)"></text>
-				</view>
-				<view class="flex-sub flex align-center justify-center" @click="$emit('cancel', message.id)">
-					<view class="">删除</view>
-				</view>
-				<view class="flex-sub flex align-center justify-center" @click="$emit('like', message.id)">
-					<view class="">喜爱</view>
-				</view>
+		<view class="toolbar flex align-stretch text-center" :class="{'unfold':isUnfold}">
+			<view class="flex-sub flex align-center justify-center" @click="$emit('detail', message.id)">
+				<text class="cuIcon-news" @click.stop="$emit('detail', activity.id)"></text>
 			</view>
+			<view class="flex-sub flex align-center justify-center" @click="$emit('announcement', message.id)">
+				<text class="cuIcon-notice" @click.stop="$emit('notice', activity.id)"></text>
+			</view>
+			<view class="flex-sub flex align-center justify-center" @click="$emit('QRcode', message.id)">
+				<text class="cuIcon-qr_code" @click.stop="$emit('qrcode', activity.id)"></text>
+			</view>
+			<view class="flex-sub flex align-center justify-center" @click="$emit('cancel', message.id)">
+				<text class="cuIcon-delete" @click.stop="$emit('cancel', activity.id)"></text>
+			</view>
+			<view class="flex-sub flex align-center justify-center" @click="$emit('like', message.id)">
+				<text class="cuIcon-like" @click.stop="$emit('like', activity.id)"></text>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -125,12 +125,14 @@
 		flex-direction: column;
 		justify-content: space-between;
 	}
-	
-	.toolbar-enter-active, .toolbar-leave-active {
+
+	.toolbar-enter-active,
+	.toolbar-leave-active {
 		transition: all 0.5s ease-in 0s;
 	}
-	
-	.toolbar-enter, .toolbar-leave-to {
+
+	.toolbar-enter,
+	.toolbar-leave-to {
 		opacity: 0;
 		height: 1;
 	}
@@ -140,21 +142,18 @@
 		width: 100%;
 		height: 0;
 		transition: all 0.5s ease 0s;
+		font-size: 48rpx;
 	}
-	
+
 	.toolbar.unfold {
 		opacity: 1;
 		height: 100rpx;
 		transition: all 0.5s ease 0s;
 	}
-	
+
 
 	.tab-swiper-view {
 		height: calc(100vh - 480rpx - 80rpx)
-	}
-
-	.like {
-		font-size: 60rpx;
 	}
 
 	.cuIcon-likefill {

@@ -104,11 +104,11 @@
 /******/
 /******/
 /******/ 		// mini-css-extract-plugin CSS loading
-/******/ 		var cssChunks = {"components/activity-mini-card":1,"components/activity-prepare":1,"components/message":1};
+/******/ 		var cssChunks = {"components/activity-check":1,"components/activity-mini-card":1,"components/activity-prepare":1,"components/follow-list":1,"components/message":1};
 /******/ 		if(installedCssChunks[chunkId]) promises.push(installedCssChunks[chunkId]);
 /******/ 		else if(installedCssChunks[chunkId] !== 0 && cssChunks[chunkId]) {
 /******/ 			promises.push(installedCssChunks[chunkId] = new Promise(function(resolve, reject) {
-/******/ 				var href = "" + ({"components/activity-mini-card":"components/activity-mini-card","components/activity-prepare":"components/activity-prepare","components/message":"components/message"}[chunkId]||chunkId) + ".wxss";
+/******/ 				var href = "" + ({"components/activity-check":"components/activity-check","components/activity-mini-card":"components/activity-mini-card","components/activity-prepare":"components/activity-prepare","components/follow-list":"components/follow-list","components/message":"components/message"}[chunkId]||chunkId) + ".wxss";
 /******/ 				var fullhref = __webpack_require__.p + href;
 /******/ 				var existingLinkTags = document.getElementsByTagName("link");
 /******/ 				for(var i = 0; i < existingLinkTags.length; i++) {

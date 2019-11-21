@@ -24,24 +24,16 @@
 		props: {
 			activity: {
 				type: Object
-			}, // 标题
-			sponsor: {
-				type: Object
-			},
-			message: {
-				type: Object
 			}
 		},
 		methods: {
-			sponsorPage() {
-				return 0
-			}
 		}
 	}
 </script>
 
 <style>
 	.activity-mini-card{
+		width: 100%;
 		margin-bottom: 40rpx;
 	}
 	
@@ -52,7 +44,7 @@
 
 	.imgcard {
 		position: absolute;
-		width: 670rpx;
+		width: 100%;
 		height: 250rpx;
 		border-radius: 20rpx 20rpx 20rpx 20rpx;
 		z-index: -1;
@@ -60,7 +52,7 @@
 
 	.card-back {
 		position: absolute;
-		width: 670rpx;
+		width: 100%;
 		height: 250rpx;
 		border-radius: 20rpx 20rpx 20rpx 20rpx;
 		background-color: #007AFF;
