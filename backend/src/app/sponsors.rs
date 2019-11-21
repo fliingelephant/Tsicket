@@ -1,4 +1,5 @@
 use std::convert::From;
+use std::sync::{Mutex};
 
 use actix_identity::{Identity};
 use actix_web::{Error,
@@ -7,19 +8,18 @@ use actix_web::{Error,
     ResponseError,
     web::Data,
     web::Form,
-    web::Json};
+    web::Json,
+    web::Query};
 use futures::{Future, future::result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::db::events;
+use crate::db::events::Event;
 use crate::db::sponsors;
 
-/*
-use super::AppState;
-use crate::models::User;
-*/
+use super::EventState;
 
 lazy_static! {
     static ref RE_SPONSORNAME: Regex = Regex::new(r"^[_0-9a-zA-Z\u4e00-\u9f5]+$").unwrap();
@@ -33,7 +33,7 @@ pub struct TestResponse {
     pub status: u8,
 }
 
-#[derive(Debug, Validate, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct RegisterSponsor {
     pub sponsorname: String,
     pub password: String,
@@ -46,7 +46,7 @@ pub struct LoginSponsor {
     pub password: String,
 }
 
-#[derive(Debug)]
+#[derive(Deserialize)]
 pub struct QuerySponsor {
     pub sponsor_name: String,
 }
@@ -55,20 +55,6 @@ pub fn register(
     id: Identity,
     register_sponsor: Json<RegisterSponsor>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    /*
-    result(register_sponsor.validate())
-        .from_err()
-        .and_then(move |_| sponsors::sponsor_register(
-            &register_sponsor.id,
-            &register_sponsor.sponsorname,
-            &register_sponsor.password))
-        .and_then(|res| match res {
-            Ok(res) => Ok(HttpResponse::Ok().json("Hello World!")),
-            Err(e) => Err(e),
-            _ => {}
-        })*/
-    //result(Ok(HttpResponse::Ok().json("Hello World!")))
-
     result(match sponsors::sponsor_register(
         &register_sponsor.id,
         &register_sponsor.sponsorname,
@@ -94,17 +80,6 @@ pub fn login(
         },
         Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
     })
-    /*
-match login_user.validate() {
-    Ok(_) => format!("login request for client with username={} and password={}",
-                     login_user.username, login_user.password),
-    Err(e) => format!("{}", e),
-}*/
-    /*
-    let login_user = form.into_inner().user;
-
-    Ok(HttpResponse::Ok().finish())
-    */
 }
 
 #[inline]
@@ -115,22 +90,46 @@ pub fn logout(
     result(Ok(HttpResponse::Ok().finish()))
 }
 
-pub fn get_events(
-    sponsor: Json<QuerySponsor>,
+pub fn publish_event(
+    (event, id, state):
+        (Json<Event>, Identity, Data<Mutex<EventState>>),
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    let mut event_list: Vec<events::Event> = vec![];
-    let t = sponsors::get_sponsor_events(
-        &sponsor.sponsor_name, &mut event_list);
+    if let Some(id) = id.identity() {
+        let mut state = state.lock().unwrap();
+        let new_event = event.into_inner();
+        state.event_list.insert(new_event.event_name.clone(), new_event);
+        result(Ok(HttpResponse::Ok().finish()))
+    } else {
+        result(Ok(HttpResponse::NonAuthoritativeInformation().finish()))
+    }
+}
+
+pub fn get_events(
+    (Query(sponsor), id, state):
+        (Query<QuerySponsor>, Identity, Data<Mutex<EventState>>),
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    let mut sponsor_event_list: Vec<Event> = vec![];
+    let t = events::get_sponsor_events(
+        &sponsor.sponsor_name, &mut sponsor_event_list);
     result(match t {
-        Ok(()) => Ok(HttpResponse::Ok().json(TestResponse {
-            content: event_list,
-            msg: "".to_string(),
-            status: 0,
-        })),
-        Err(e) => Ok(HttpResponse::Ok().json(TestResponse {
-            content: event_list,
+        Ok(()) => 
+            if (sponsor_event_list.len() == 0) {
+                Ok(HttpResponse::Ok().json(TestResponse {
+                    content: sponsor_event_list,
+                    msg: "".to_string(),
+                    status: 0,
+            }))} else {
+                Ok(HttpResponse::Ok().json(TestResponse {
+                    content: sponsor_event_list,
+                    msg: "".to_string(),
+                    status: 1,
+            }))},
+        Err(e) => Ok(HttpResponse::Ok().
+        json(TestResponse {
+            content: sponsor_event_list,
             msg: e,
-            status: 1,
-        }))
+            status: 2,
+        })
+        )
     })
 }
