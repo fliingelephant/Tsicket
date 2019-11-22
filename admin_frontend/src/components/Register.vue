@@ -46,6 +46,7 @@
                     v-model="name"
                     auto-complete="off"
             ></el-input></el-col>
+            <el-col :span="8"><div class="hint-text">后期不可修改</div></el-col>
           </el-row>
         </el-form-item>
         <el-form-item>
@@ -91,11 +92,18 @@
                 name: '',
                 username_regular:/^[a-zA-z][0-9a-zA-Z_]{5,31}$/,
                 password_regular:/^[\S]{6,32}$/,
+                email_regular:/^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/,
+                phone_regular:/^\d{11}$|^\d{7,8}$|^(\d{4}|\d{3})-(\d{7,8})$|^(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})$|^(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})$/
             }
         },
         methods:{
             reg(){
-                if(this.password===this.confirm && this.password_regular.test(this.password)&& this.username_regular.test(this.username)){
+                let password_same=this.password===this.confirm
+                let password_available=this.password_regular.test(this.password)
+                let username_available=this.username_regular.test(this.username)
+                let email_available=this.email_regular.test(this.email)
+                let phone_available=this.phone_regular.test(this.phone)
+                if(password_same && password_available && username_available && email_available && phone_available ){
                     let data={
                         "sponsorname":this.name,
                         "id":this.username,
@@ -118,26 +126,38 @@
                     },err=>{
                         if(err.response.status===422)
                             this.$message({
-                                message: '登录失败：用户不存在',
+                                message: '注册失败：用户名被占用',
                                 type: 'error'
                             })
                     })
                 }
-                else if(!this.username_regular.test(this.username)){
+                else if(!username_available){
                     this.$message({
                         message:'用户名不符合要求',
                         type:'warning'
                     });
                 }
-                else if(!this.password_regular.test(this.password)){
+                else if(!password_available){
                     this.$message({
                         message:'密码不符合要求',
                         type:'warning'
                     });
                 }
-                else if(this.password!==this.confirm){
+                else if(!password_same){
                     this.$message({
                         message:'两次输入密码不对应',
+                        type:'warning'
+                    });
+                }
+                else if(!email_available){
+                    this.$message({
+                        message:'电子邮件不合规范',
+                        type:'warning'
+                    });
+                }
+                else if(!phone_available){
+                    this.$message({
+                        message:'电话号码不合规范',
                         type:'warning'
                     });
                 }

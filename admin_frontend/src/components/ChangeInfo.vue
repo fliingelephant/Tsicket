@@ -66,7 +66,6 @@
                 email: '',
                 phone: '',
                 name: '',
-
             }
         },
     }
