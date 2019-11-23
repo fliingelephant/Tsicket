@@ -13,7 +13,7 @@ use actix_web::{
     //web::Data,
 };
 use mysql as my;
-use rand::FromEntropy;
+//use rand::FromEntropy;
 use rand::prelude::*;
 
 use crate::db;
@@ -52,7 +52,7 @@ pub async fn update() -> () {}
 
 pub fn start() -> () {
     //let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
+    /*let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
 
     let mut cookie_private_key = [0u8; 32];
     let mut rng = rand::StdRng::from_entropy();
@@ -69,7 +69,7 @@ pub fn start() -> () {
     })
         .bind(&bind_address)
         .unwrap_or_else(|_| panic!("Could not bind server to address {}", &bind_address))
-        .start();
+        .start();*/
     /*let mut events:Vec<Event> = Vec::new();
     let mut records:Vec<Record> = Vec::new();
     let dd = init::initiate(events.as_mut(), records.as_mut());

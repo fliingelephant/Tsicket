@@ -88,9 +88,9 @@ pub fn login(
     result(match sponsors::sponsor_log_in(
         &login_sponsor.id,
         &login_sponsor.password) {
-        Ok(()) => {
+        Ok(name) => {
             id.remember(login_sponsor.id.to_owned());
-            Ok(HttpResponse::Ok().finish())
+            Ok(HttpResponse::Ok().json(name))
         },
         Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
     })

@@ -14,13 +14,13 @@ mod db;
 mod utils;
 
 fn main() {
-    dotenv::dotenv().ok();
+    /*dotenv::dotenv().ok();
 
     let sys = actix::System::new("conduit");
 
     app::start();
 
-    let _ = sys.run();
+    let _ = `sys.run();*/
 
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 
@@ -43,4 +43,10 @@ fn main() {
     events[0].start_time = "1988-09-10 23:11:28".to_string();
     events[0].update_type = 1;
     update(events);*/
+    //db::sponsors::sponsor_register(&"001".to_string(), &"zhh".to_string(), &"123".to_string());
+    let name = db::sponsors::sponsor_log_in(&"001".to_string(), &"123".to_string());
+    match name {
+        Ok(p)=>println!("{}", p),
+        _ =>{println!("wrong")},
+    }
 }

@@ -7,7 +7,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `user_account`;
 CREATE TABLE `user_account`  (
   `account_id` VARCHAR(32) NOT NULL,
-  `tsinghua_id` VARCHAR(32) NOT NULL,
+  `tsinghua_id` VARCHAR(32) ,
   `nickname` VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT '',
   PRIMARY KEY (`account_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
@@ -27,8 +27,8 @@ CREATE TABLE `sponsor_account`  (
                                     `account_id` VARCHAR(32) NOT NULL UNIQUE ,
                                     `sponsor_name` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
                                     `password` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
-                                    `email` VARCHAR(255) NOT NULL,
-                                    `phone_number` VARCHAR(255) NOT NULL,
+                                    `email` VARCHAR(255) ,
+                                    `phone_number` VARCHAR(255) ,
                                     PRIMARY KEY(`sponsor_name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 

@@ -31,16 +31,16 @@ pub fn sponsor_register(id: &String, name: &String, raw_password: &String)
 
     match pool.prep_exec(command, ()) {
         Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
+        Err(e) =>  Err(e.to_string()),
     }
 }
 
 pub fn sponsor_log_in(id: &String, raw_password: &String)
-                            -> Result<(), String> {
+                            -> Result<String, String> {
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
 
     let password = md5_with_salt(&id, &raw_password);
-    let command = format!("SELECT password FROM sponsor_account WHERE account_id='{id}';", id = id);
+    let command = format!("SELECT password, sponsor_name, email FROM sponsor_account WHERE account_id='{id}';", id = id);
     //println!("{}", command);
 
     let res = pool.prep_exec(command, ());
@@ -50,10 +50,12 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
     }
 
     for row in res.unwrap(){
-        let pwd = format_string(&row.unwrap().unwrap()[0].as_sql(true));
+        let result = row.unwrap().unwrap();
+        let pwd = format_string(&result[0].as_sql(true));
         println!("{}, {}", password,pwd);
         if password == pwd{
-            return Ok(());
+            let name = format_string(&result[1].as_sql(true));
+            return Ok(name);
         } else {
             return Err(String::from("Wrong password."));
         }
@@ -93,6 +95,5 @@ pub fn get_sponsor_events(name: &String, event_list: &mut Vec<Event>)
         };
         event_list.push(event);
     }
-
     return Ok(());
 }
