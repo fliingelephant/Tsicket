@@ -28,6 +28,19 @@ pub fn user_sign_up(id: &str, name: &str, password: &str)->bool{
 } */
 
 pub use crate::app::POOL;
+use crate::db::records::Record;
+
+#[inline]
+fn format_string(src: &String) -> String {
+    if src.len() <= 1{
+        return src.clone()
+    }
+    if src == "NULL"{
+        return "".to_string()
+    }
+    src[1..src.len() - 1].to_string()
+}
+
 
 pub fn check_user_by_id(id: &String)->Result<bool, String>{
     let command = format!("select count(*) from user_account where account_id='{id}'", id=id);
@@ -51,4 +64,32 @@ pub fn check_user_by_id(id: &String)->Result<bool, String>{
         }
     }
     return Ok(true);
+}
+
+pub fn get_user_records(id: &String)
+                          -> Result<Vec<Record>, String> {
+    let command = format!("SELECT * FROM ticket_record WHERE user_id='{id}'", id = id);
+    //println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+
+    let mut record_list:Vec<Record> = Vec::new();
+    for row in res.unwrap() {
+        let re = row.unwrap().unwrap();
+        let record = Record {
+            record_id: format_string(&re[0].as_sql(true)),
+            event_id: format_string(&re[1].as_sql(true)),
+            sponsor_name: format_string(&re[2].as_sql(true)),
+            user_id: format_string(&re[3].as_sql(true)),
+            start_time: format_string(&re[4].as_sql(true)),
+            end_time: format_string(&re[5].as_sql(true)),
+            update_type: -1,
+        };
+        record_list.push(record);
+    }
+    return Ok(record_list);
 }

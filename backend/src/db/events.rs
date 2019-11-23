@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use mysql as my;
-
 pub use crate::app::POOL;
 
 #[inline]

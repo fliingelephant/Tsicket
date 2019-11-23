@@ -52,7 +52,7 @@ fn update_events(events: &mut Vec<events::Event>){
 
 fn update_records(records: &mut Vec<records::Record>){
     for record in records{
-        if record.update_type == 1 { //修改
+        /*if record.update_type == 1 { //修改
             let command = format!("UPDATE ticket_record SET event_id='{event_id}', \
                                     sponsor_name='{sponsor_name}', user_id='{user_id}',\
                                      start_time='{start_time}', end_time='{end_time}'\
@@ -67,7 +67,8 @@ fn update_records(records: &mut Vec<records::Record>){
             }
             record.update_type = 0;
         }
-        else if record.update_type == 2 { //增加
+        else */
+        if record.update_type == 1 { //增加
             let command = format!("INSERT INTO ticket_record (record_id, event_id, sponsor_name, user_id,\
                                     start_time, end_time) VAlUES ('{record_id}', '{event_id}', \
                                     '{sponsor_name}', '{user_id}', '{start_time}', '{end_time}');",
@@ -82,7 +83,7 @@ fn update_records(records: &mut Vec<records::Record>){
             }
             record.update_type = 0;
         }
-        else if record.update_type == 3 { //删除
+        else if record.update_type == 2 { //删除
             let command = format!("DELETE FROM ticket_record WHERE record_id='{record_id}';", record_id=record.record_id);
             let req = POOL.prep_exec(command, ());
             match req {

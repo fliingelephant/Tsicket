@@ -3,18 +3,20 @@ extern crate lazy_static;
 extern crate serde_derive;
 extern crate serde_json;
 
+use crate::db::records::Record;
+
 mod app;
 mod db;
 mod utils;
 
 fn main() {
-    dotenv::dotenv().ok();
+    /*dotenv::dotenv().ok();
 
     let sys = actix::System::new("conduit");
 
     app::start();
 
-    let _ = sys.run();
+    let _ = sys.run();*/
 
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 
@@ -37,10 +39,21 @@ fn main() {
     events[0].start_time = "1988-09-10 23:11:28".to_string();
     events[0].update_type = 1;
     update(events);*/
+    let mut records = db::users::get_user_records(&"123".to_string()).ok().unwrap();
+    println!("{}", records.len());
+    println!("{}", records[0].event_id);
     //db::sponsors::sponsor_register(&"001".to_string(), &"zhh".to_string(), &"123".to_string());
-    /* let re = db::users::check_user_by_id(&"123".to_string());
+    /*let re = db::users::check_user_by_id(&"123".to_string());
     match re{
         Err(e)=> println!("{}", e.to_string()),
         Ok(o)=> println!("{}", o.to_string()),
-    } */
+    }*/
+    /*let s = db::sponsors::get_info_by_name(&"zhh".to_string());
+    let mut sp = s.ok().unwrap();
+    sp.email="123".to_string();
+    let ss = db::sponsors::alter_sponsor_info(&sp);
+    match ss{
+        Err(e)=>println!("{}", e.to_string()),
+        Ok(o)=>{},
+    }*/
 }

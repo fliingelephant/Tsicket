@@ -33,7 +33,7 @@ pub fn book_event(
         Some(mut event) => {
             if (event.left_tickets > 0) && (event.event_status == 1) {
                 event.left_tickets-=1;
-                if (event.left_tickets == 0) {
+                if event.left_tickets == 0 {
                     event.event_status = 2;
                 }
                 Ok(HttpResponse::Ok().finish()) // 200 Ok
@@ -68,7 +68,7 @@ pub fn get_broadcast_events(
     (event_state, id):
         (Data<Mutex<EventState>>, Identity)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    if (id.identity() == None) {
+    if id.identity() == None {
         return result(Ok(HttpResponse::Unauthorized().finish())); // 401 Unauthorized
     }
     

@@ -6,14 +6,25 @@ use std::result::Result;
 
 use serde::{Serialize};
 
-use mysql as my;
-
 use super::events::Event;
 
 pub use crate::app::POOL;
 
+pub struct Sponsor{
+    pub account_id: String,
+    pub sponsor_name: String,
+    pub email: String,
+    pub phone_number: String,
+}
+
 #[inline]
 fn format_string(src: &String) -> String {
+    if src.len() <= 1{
+        return src.clone()
+    }
+    if src == "NULL"{
+        return "".to_string()
+    }
     src[1..src.len() - 1].to_string()
 }
 
@@ -37,7 +48,7 @@ pub fn sponsor_register(id: &String, name: &String, raw_password: &String)
 pub fn sponsor_log_in(id: &String, raw_password: &String)
                             -> Result<String, String> {
     let password = md5_with_salt(&id, &raw_password);
-    let command = format!("SELECT password, sponsor_name, email FROM sponsor_account WHERE account_id='{id}';", id = id);
+    let command = format!("SELECT password, sponsor_name FROM sponsor_account WHERE account_id='{id}';", id = id);
     //println!("{}", command);
 
     let res = POOL.prep_exec(command, ());
@@ -61,8 +72,7 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
     return Err(String::from("Account does not exist."));
 }
 
-pub fn get_sponsor_events(name: &String, event_list: &mut Vec<Event>)
-    -> Result<(), String> {
+pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
     let command = format!("SELECT * FROM event WHERE sponsor_name='{name}'", name = name);
     //println!("{}", command);
 
@@ -72,6 +82,7 @@ pub fn get_sponsor_events(name: &String, event_list: &mut Vec<Event>)
         _ => {},
     }
 
+    let mut event_list:Vec<Event> = Vec::new();
     for row in res.unwrap() {
         let ev = row.unwrap().unwrap();
         let event = Event {
@@ -91,11 +102,11 @@ pub fn get_sponsor_events(name: &String, event_list: &mut Vec<Event>)
         };
         event_list.push(event);
     }
-    return Ok(());
+    return Ok(event_list);
 }
 
 pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
-    let command = format!("select count(*) from sponsor_account where account_id='{id}'", id=id);
+    let command = format!("SELECT count(*) FROM sponsor_account WHERE account_id='{id}'", id=id);
 
     let res = POOL.prep_exec(command, ());
     match res {
@@ -116,4 +127,38 @@ pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
         }
     }
     return Ok(true);
+}
+
+pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
+    let command = format!("SELECT account_id, sponsor_name, email, phone_number From sponsor_account \
+     WHERE sponsor_name='{name}';", name=name);
+    println!("{}", command);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => {println!("{}", e.to_string()); return Err(e.to_string())},
+        _ => {},
+    }
+    for row in res.unwrap(){
+        let info = row.unwrap().unwrap();
+        let sponsor = Sponsor{
+            account_id: format_string(&info[0].as_sql(true)),
+            sponsor_name: format_string(&info[1].as_sql(true)),
+            email: format_string(&info[2].as_sql(true)),
+            phone_number: format_string(&info[3].as_sql(true))
+        };
+        return Ok(sponsor);
+    }
+    return Err("No such sponsor".to_string());
+}
+
+pub fn alter_sponsor_info(sponsor: &Sponsor)->Result<(), String>{
+    let command = format!("UPDATE sponsor_account SET email='{email}', phone_number='{phone_number}' \
+    WHERE sponsor_name='{sponsor_name}';", email=sponsor.email, phone_number=sponsor.phone_number,
+                          sponsor_name=sponsor.sponsor_name);
+    println!("{}", command);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => {println!("{}", e.to_string()); return Err(e.to_string())},
+        Ok(o) =>Ok(()),
+    }
 }

@@ -29,8 +29,8 @@ CREATE TABLE `sponsor_account`  (
                                     `account_id` VARCHAR(32) NOT NULL UNIQUE ,
                                     `sponsor_name` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
                                     `password` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
-                                    `email` VARCHAR(255) ,
-                                    `phone_number` VARCHAR(255) ,
+                                    `email` VARCHAR(255) NOT NULL DEFAULT '',
+                                    `phone_number` VARCHAR(255) NOT NULL DEFAULT '',
                                     PRIMARY KEY(`sponsor_name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 
@@ -76,6 +76,7 @@ CREATE TABLE `event`  (
                           `left_tickets` INT(32) NOT NULL ,
                           `event_status` TINYINT NOT NULL ,
                           `event_location` VARCHAR(255) NOT NULL ,
+                          `event_time` VARCHAR(255) NOT NULL DEFAULT '',
                           PRIMARY KEY(`event_id`) USING BTREE,
                           CONSTRAINT fk_event_spo FOREIGN KEY (`sponsor_name`) REFERENCES `sponsor_account`(`sponsor_name`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
