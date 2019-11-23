@@ -33,10 +33,12 @@ fn md5_with_salt(id: &String, raw_password: &String) -> String {
     format!("{:x}", md5::compute(raw_password.to_owned() + id))
 }
 
-pub fn sponsor_register(id: &String, name: &String, raw_password: &String)
-                              -> Result<(), String> {
-    let command = format!("INSERT INTO sponsor_account (account_id, sponsor_name, password) VALUES\
-     ('{id}', '{name}', '{password}');", id = id, name = name, password = md5_with_salt(id, raw_password));
+pub fn sponsor_register(id: &String, name: &String, raw_password: &String,
+                        email: &String, phone_number: &String)-> Result<(), String> {
+    let command = format!("INSERT INTO sponsor_account (account_id, sponsor_name, password,\
+     email, phone_number) VALUES ('{id}', '{name}', '{password}', '{email}', '{phone_number}');",
+                          id = id, name = name, password = md5_with_salt(id, raw_password),
+                          email=email, phone_number=phone_number);
     println!("{}", command);
 
     match POOL.prep_exec(command, ()) {

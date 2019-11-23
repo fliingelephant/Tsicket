@@ -29,14 +29,14 @@ CREATE TABLE `sponsor_account`  (
                                     `account_id` VARCHAR(32) NOT NULL UNIQUE ,
                                     `sponsor_name` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
                                     `password` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
-                                    `email` VARCHAR(255) NOT NULL DEFAULT '',
-                                    `phone_number` VARCHAR(255) NOT NULL DEFAULT '',
+                                    `email` VARCHAR(255) NOT NULL ,
+                                    `phone_number` VARCHAR(255) NOT NULL ,
                                     PRIMARY KEY(`sponsor_name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 
 -- ----------------------------
 -- Records of sponsor account
--- ----------------------------
+-- ----------------------------+
 
 #INSERT INTO `sponsor_account` VALUES ('123', 'zjr', '123');
 

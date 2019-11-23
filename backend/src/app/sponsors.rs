@@ -20,6 +20,8 @@ pub struct RegisterSponsor {
     pub sponsorname: String,
     pub password: String,
     pub id: String,
+    pub email: String,
+    pub phone_number: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -63,7 +65,9 @@ pub fn register(
     result(match sponsors::sponsor_register(
         &register_sponsor.id,
         &register_sponsor.sponsorname,
-        &register_sponsor.password) {
+        &register_sponsor.password,
+        &register_sponsor.email,
+        &register_sponsor.phone_number) {
         Ok(()) => {
             id.remember(register_sponsor.sponsorname.to_owned());
             Ok(HttpResponse::Ok().finish())
