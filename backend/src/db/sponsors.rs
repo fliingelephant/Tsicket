@@ -38,7 +38,6 @@ pub fn sponsor_register(id: &String, name: &String, raw_password: &String)
 pub fn sponsor_log_in(id: &String, raw_password: &String)
                             -> Result<String, String> {
     let pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
-
     let password = md5_with_salt(&id, &raw_password);
     let command = format!("SELECT password, sponsor_name, email FROM sponsor_account WHERE account_id='{id}';", id = id);
     //println!("{}", command);

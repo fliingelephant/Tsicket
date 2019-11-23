@@ -1,109 +1,162 @@
 use std::convert::From;
-
-use actix_web::{Error, HttpRequest, HttpResponse, ResponseError, web::Data, web::Json, web::Query};
-use futures::{Future, future::result};
-use regex::Regex;
+use actix_identity::Identity;
+use actix_web::{client, Error, http::Method, HttpRequest, HttpResponse, ResponseError, web::Data, web::Json, web::Query};
+use futures::{Future, future::result, future::lazy};
+use reqwest::{get, Client};
 use serde::{Deserialize, Serialize};
-use validator::Validate;
+use std::env;
 
-use crate::utils::auth;
+use super::{APP_ID, SECRET};
+use super::sponsors::QuerySponsor;
+use super::events::QueryEvent;
 
-lazy_static! {
-    static ref RE_USERNAME: Regex = Regex::new(r"^[_0-9a-zA-Z]+$").unwrap();
+#[derive(Deserialize)]
+pub struct WechatLoginInfo {
+    code: String,
+}
+
+#[derive(Serialize)]
+pub struct WechatLoginReturn {
+    openid: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct In<U> {
-    user: U,
+pub struct MPLoginInfo {
+    openid: String,
+    session_key: String,
+}
+
+#[derive(Deserialize)]
+pub struct WechatTHUInfo {
+    openid: String,
+    token: String,
+}
+
+#[derive(Serialize)]
+pub struct MPTHUInfo {
+    token: String,
+}
+
+
+#[derive(Deserialize)]
+pub struct ErrorInTsinghuaUser {
+    code: i32,
+    message: String,
+}
+
+#[derive(Deserialize)]
+pub struct TsinghuaUser {
+    card: String,
+    name: String,
+    department: String,
+    cell: String,
+    mail: String,
+    //error: ErrorInTsinghuaUser,
+}
+
+#[derive(Deserialize)]
+pub struct TsinghuaInfo {
+    user: TsinghuaUser,
+}
+
+#[derive(Serialize)]
+pub struct WechatTHUReturn {
+    tsinghuaid: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct UserInfo {
-    pub username: String,
-    pub password: String,
-}
-
-#[derive(Debug, Validate, Deserialize)]
 pub struct RegisterUser {
-    #[validate(
-    length(
-    min = "1",
-    max = "20",
-    message = "fails validation - must be 1-20 characters long"
-    ),
-    )]
     pub username: String,
-    #[validate(length(
-    min = "8",
-    max = "72",
-    message = "fails validation - must be 8-72 characters long"
-    ))]
     pub password: String,
-}
-
-#[derive(Debug, Validate, Deserialize)]
-pub struct LoginUser {
-    #[validate(
-    length(
-    min = "1",
-    max = "20",
-    message = "fails validation - must be 1-20 characters long"
-    )
-    )]
-    pub username: String,
-    #[validate(length(
-    min = "8",
-    max = "72",
-    message = "fails validation - must be 8-72 characters long"
-    ))]
-    pub password: String,
-    #[validate(range(
-    min = "0",
-    max = "2",
-    message = "fails validation - must be one of {0, 1, 2}"
-    ))]
-    pub usertype: u8,
-}
-
-pub fn register(
-    /*
-    form: Json<In<RegisterUser>>,
-) -> impl Future<Item = HttpResponse, Error = Error> {*/
-    Query(register_user): Query<RegisterUser>
-) -> impl Future<Item=HttpResponse, Error=Error> {
-
-    result(Ok(HttpResponse::Ok().json("Hello World!")))
-    /*
-    match register_user.validate() {
-        Ok(_) => format!("register request for client with username={} and password={}",
-                         register_user.username, register_user.password),
-        Err(e) => format!("{}", e),
-    }*/
-
-    /*
-    result(register_user.validate())
-        .from_err()
-        .and_then(|res| match res {
-            Ok(res) => Ok(HttpResponse::Ok().json(res)),
-            Err(e) => Ok(e.error_response()),
-        })
-     */
 }
 
 pub fn login(
-    Query(login_user): Query<LoginUser>
+    id: Identity,
+    info: Json<WechatLoginInfo>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
+    let url = format!("https://api.weixin.qq.com/sns/jscode2session?\
+        appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code",
+        appid = env::var("APP_ID").unwrap(), secret = env::var("SECRET").unwrap(), code = info.code);
 
-    result(Ok(HttpResponse::Ok().json("Hello World!")))
-    /*
-match login_user.validate() {
-    Ok(_) => format!("login request for client with username={} and password={}",
-                     login_user.username, login_user.password),
-    Err(e) => format!("{}", e),
-}*/
-    /*
-    let login_user = form.into_inner().user;
+    let resp = reqwest::get(&url);
+    
+    let content = resp.unwrap().json::<MPLoginInfo>();
+    result(match content {
+        Ok(text)=> {
+            id.remember(text.openid.to_owned());
+            Ok(HttpResponse::Ok().json(WechatLoginReturn {
+                openid: text.openid.clone(),
+            }))
+        },
+        Err(e) => {
+            println!("{}", e.to_string());
+            Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
+        }
+    })
+    //result(Ok(HttpResponse::Ok().json(resp.unwrap().text().unwrap())))
+}
 
-    Ok(HttpResponse::Ok().finish())
-    */
+pub fn bind_tsinghua_id(
+    info: Json<WechatTHUInfo>,
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    let client = reqwest::Client::new();
+    let resp = client
+        .post("https://alumni-test.iterator-traits.com/fake-id-tsinghua-proxy/api/user/session/token")
+        .json(&MPTHUInfo {
+            token: info.token.clone(),
+        })
+        .send();
+
+    let content = resp.unwrap().json::<TsinghuaInfo>();
+    result(match content {
+        Ok(text)=> {
+            Ok(HttpResponse::Ok().json(WechatTHUReturn {
+                    tsinghuaid: text.user.card.clone(),
+            }))
+        },
+        Err(e) => {
+            println!("{:?}", e.to_string());
+            Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
+        }
+    })
+}
+
+#[derive(Serialize)]
+struct FollowFlag {
+    follow: bool,
+}
+
+pub fn check_follow(
+    (id, query_sponsor):
+    (Identity, Json<QuerySponsor>)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match id.identity() {
+        Some(id) => {
+            // TODO
+            Ok(HttpResponse::NotImplemented().json(FollowFlag{ // 501 Not Implemented
+                follow: false,
+            }))
+        },
+        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[derive(Serialize)]
+struct LikeFlag {
+    like: bool,
+}
+
+pub fn check_like(
+    (id, query_event):
+    (Identity, Json<QueryEvent>)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match id.identity() {
+        Some(id) => {
+            // TODO
+            Ok(HttpResponse::NotImplemented().json(LikeFlag{ // 501 Not Implemented
+                like: false,
+            }))
+        },
+        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
 }
