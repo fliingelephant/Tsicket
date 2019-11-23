@@ -1,19 +1,12 @@
-use std::convert::From;
 use std::sync::{Mutex};
 
 use actix_identity::{Identity};
 use actix_web::{Error,
-    HttpRequest,
     HttpResponse,
-    ResponseError,
     web::Data,
-    web::Form,
-    web::Json,
-    web::Query};
+    web::Json};
 use futures::{Future, future::result};
-use regex::Regex;
 use serde::{Deserialize, Serialize};
-use validator::Validate;
 
 use crate::db::events;
 use crate::db::events::Event;
@@ -21,17 +14,6 @@ use crate::db::sponsors;
 
 use super::EventState;
 
-lazy_static! {
-    static ref RE_SPONSORNAME: Regex = Regex::new(r"^[_0-9a-zA-Z\u4e00-\u9f5]+$").unwrap();
-}
-
-// TODO: trait
-#[derive(Serialize)]
-pub struct TestResponse {
-    pub content: Vec<events::Event>,
-    pub msg: String,
-    pub status: u8,
-}
 
 #[derive(Debug, Deserialize)]
 pub struct RegisterSponsor {
@@ -49,22 +31,6 @@ pub struct LoginSponsor {
 #[derive(Deserialize)]
 pub struct QuerySponsor {
     pub sponsor_name: String,
-}
-
-pub fn register(
-    id: Identity,
-    register_sponsor: Json<RegisterSponsor>,
-) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match sponsors::sponsor_register(
-        &register_sponsor.id,
-        &register_sponsor.sponsorname,
-        &register_sponsor.password) {
-        Ok(()) => {
-            id.remember(register_sponsor.id.to_owned());
-            Ok(HttpResponse::Ok().finish())
-        },
-        Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
-    })
 }
 
 pub fn login(
@@ -90,6 +56,23 @@ pub fn logout(
     result(Ok(HttpResponse::Ok().finish()))
 }
 
+pub fn register(
+    id: Identity,
+    register_sponsor: Json<RegisterSponsor>,
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match sponsors::sponsor_register(
+        &register_sponsor.id,
+        &register_sponsor.sponsorname,
+        &register_sponsor.password) {
+        Ok(()) => {
+            id.remember(register_sponsor.sponsorname.to_owned());
+            Ok(HttpResponse::Ok().finish())
+        },
+        Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
+    })
+}
+
+#[inline]
 pub fn publish_event(
     (event, id, state):
         (Json<Event>, Identity, Data<Mutex<EventState>>),
@@ -100,36 +83,44 @@ pub fn publish_event(
         state.event_list.insert(new_event.event_name.clone(), new_event);
         result(Ok(HttpResponse::Ok().finish()))
     } else {
-        result(Ok(HttpResponse::NonAuthoritativeInformation().finish()))
+        result(Ok(HttpResponse::Unauthorized().finish()))
     }
 }
 
+#[derive(Serialize)]
+pub struct EventRet {
+    events: Vec<Event>
+}
+
+#[inline]
 pub fn get_events(
-    (Query(sponsor), id, state):
-        (Query<QuerySponsor>, Identity, Data<Mutex<EventState>>),
+    (id, state):
+        (Identity, Data<Mutex<EventState>>),
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    let mut sponsor_event_list: Vec<Event> = vec![];
-    let t = sponsors::get_sponsor_events(
-        &sponsor.sponsor_name, &mut sponsor_event_list);
-    result(match t {
-        Ok(()) => 
-            if (sponsor_event_list.len() == 0) {
-                Ok(HttpResponse::Ok().json(TestResponse {
-                    content: sponsor_event_list,
-                    msg: "".to_string(),
-                    status: 0,
-            }))} else {
-                Ok(HttpResponse::Ok().json(TestResponse {
-                    content: sponsor_event_list,
-                    msg: "".to_string(),
-                    status: 1,
-            }))},
-        Err(e) => Ok(HttpResponse::Ok().
-        json(TestResponse {
-            content: sponsor_event_list,
-            msg: e,
-            status: 2,
-        })
-        )
-    })
+    if let Some(sponsor_name) = id.identity() {
+        let mut sponsor_event_list: Vec<Event> = vec![];
+        /*
+        let t = events::get_sponsor_events(
+            &sponsor_id, &mut sponsor_event_list);
+        result(match t {
+            Ok(()) => Ok(HttpResponse::Ok().json(
+                    EventRet {
+                        events: sponsor_event_list
+                    }
+                )),
+            Err(e) => Ok(HttpResponse::ServiceUnavailable().json(e))
+        })*/
+        let mut state = state.lock().unwrap();
+        for (name, event) in &state.event_list {
+            if (event.sponsor_name == sponsor_name) {
+                sponsor_event_list.push(event.clone())
+            }
+        }
+        result(Ok(HttpResponse::Ok().json(EventRet {
+                events: sponsor_event_list
+            }
+        )))
+    } else {
+        result(Ok(HttpResponse::Unauthorized().finish()))
+    }
 }

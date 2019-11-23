@@ -14,17 +14,24 @@ pub struct QueryEvent {
     event_name: String,
 }
 
+#[inline]
 pub fn book_event(
     (query_event, event_state, id):
         (Json<QueryEvent>, Data<Mutex<EventState>>, Identity)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
 
     let mut event_state = event_state.lock().unwrap();
-    result(match event_state.event_list.get(&query_event.event_name) {
-        Some(event) => {
-            //if (event.left_tickets > 0) && (event.status == )
-            //TODO
-            Ok(HttpResponse::NotImplemented().finish())
+    result(match event_state.event_list.get_mut(&query_event.event_name) {
+        Some(mut event) => {
+            if (event.left_tickets > 0) && (event.event_status == 1) {
+                event.left_tickets-=1;
+                if (event.left_tickets == 0) {
+                    event.event_status = 2;
+                }
+                Ok(HttpResponse::Ok().finish()) // 200 Ok
+            } else {
+                Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
+            }
         },
         None => Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
     })
