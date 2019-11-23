@@ -4,18 +4,11 @@ extern crate mysql;
 use std::*;
 use std::result::Result;
 
-use serde::{Serialize};
+use serde::{Deserialize, Serialize};
 
 use super::events::Event;
 
 pub use crate::app::POOL;
-
-pub struct Sponsor{
-    pub account_id: String,
-    pub sponsor_name: String,
-    pub email: String,
-    pub phone_number: String,
-}
 
 #[inline]
 fn format_string(src: &String) -> String {
@@ -33,8 +26,10 @@ fn md5_with_salt(id: &String, raw_password: &String) -> String {
     format!("{:x}", md5::compute(raw_password.to_owned() + id))
 }
 
-pub fn sponsor_register(id: &String, name: &String, raw_password: &String,
-                        email: &String, phone_number: &String)-> Result<(), String> {
+pub fn sponsor_register(
+    id: &String, name: &String, raw_password: &String,
+    email: &String, phone_number: &String
+)-> Result<(), String> {
     let command = format!("INSERT INTO sponsor_account (account_id, sponsor_name, password,\
      email, phone_number) VALUES ('{id}', '{name}', '{password}', '{email}', '{phone_number}');",
                           id = id, name = name, password = md5_with_salt(id, raw_password),
@@ -131,6 +126,14 @@ pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
     return Ok(true);
 }
 
+#[derive(Deserialize, Serialize)]
+pub struct Sponsor{
+    pub account_id: String,
+    pub sponsor_name: String,
+    pub email: String,
+    pub phone_number: String,
+}
+
 pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
     let command = format!("SELECT account_id, sponsor_name, email, phone_number From sponsor_account \
      WHERE sponsor_name='{name}';", name=name);
@@ -153,7 +156,9 @@ pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
     return Err("No such sponsor".to_string());
 }
 
-pub fn alter_sponsor_info(sponsor: &Sponsor)->Result<(), String>{
+pub fn alter_sponsor_info(
+    sponsor: &Sponsor
+) -> Result<(), String> {
     let command = format!("UPDATE sponsor_account SET email='{email}', phone_number='{phone_number}' \
     WHERE sponsor_name='{sponsor_name}';", email=sponsor.email, phone_number=sponsor.phone_number,
                           sponsor_name=sponsor.sponsor_name);

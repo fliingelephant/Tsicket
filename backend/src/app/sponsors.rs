@@ -125,3 +125,33 @@ pub fn get_events(
         result(Ok(HttpResponse::Unauthorized().finish()))
     }
 }
+
+pub fn alter_sponsor_info(
+    (alter_sponsor, id):
+        (Json<sponsors::Sponsor>, Identity)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match id.identity() {
+        Some(_) => {
+            let alter_sponsor = alter_sponsor.into_inner();
+            match sponsors::alter_sponsor_info(&alter_sponsor) {
+                Ok(()) => Ok(HttpResponse::Ok().finish()), // 200 Ok
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+pub fn get_sponsor_info (
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match id.identity() {
+        Some(name) => {
+            match sponsors::get_info_by_name(&name) {
+                Ok(sponsor) => Ok(HttpResponse::Ok().json(&sponsor)), // 200 Ok
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}

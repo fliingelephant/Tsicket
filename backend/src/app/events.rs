@@ -77,10 +77,14 @@ pub fn get_broadcast_events(
     result(Ok(HttpResponse::NotImplemented().finish()))
 }
 
+#[derive(Deserialize)]
+pub struct QueryEventByID {
+    id: String,
+}
 
 pub fn get_event_info(
     (event_state, id, query_event):
-        (Data<Mutex<EventState>>, Identity, Json<QueryEvent>)
+        (Data<Mutex<EventState>>, Identity, Json<QueryEventByID>)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     if (id.identity() == None) {
         return result(Ok(HttpResponse::Unauthorized().finish())); // 401 Unauthorized
@@ -89,7 +93,7 @@ pub fn get_event_info(
     
     let mut event_state = event_state.lock().unwrap();
     for event in &event_state.event_list {
-        if (event.event_name == query_event.event_name) {
+        if (event.event_id == query_event.id) {
             return result(Ok(HttpResponse::Ok().json(event.clone())));
         }
     }

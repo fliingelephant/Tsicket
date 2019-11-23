@@ -122,6 +122,10 @@ fn routes(app: &mut web::ServiceConfig) {
                      .service(web::resource("sponsors/logout")
                          .route(web::post().to_async(sponsors::logout))
                      )
+                     .service(web::resource("sponsors/view")
+                         .route(web::get().to_async(sponsors::get_sponsor_info))
+                         .route(web::put().to_async(sponsors::alter_sponsor_info))
+                     )
 
                      /* Administrator routes ↓ */
                      .service(web::resource("admins")
