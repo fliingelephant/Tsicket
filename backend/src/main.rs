@@ -43,10 +43,18 @@ fn main() {
     events[0].start_time = "1988-09-10 23:11:28".to_string();
     events[0].update_type = 1;
     update(events);*/
-    //db::sponsors::sponsor_register(&"001".to_string(), &"zhh".to_string(), &"123".to_string());
-    let re = db::users::check_user_by_id(&"123".to_string());
+    db::sponsors::sponsor_register(&"001".to_string(), &"zhh".to_string(), &"123".to_string());
+    /*let re = db::users::check_user_by_id(&"123".to_string());
     match re{
         Err(e)=> println!("{}", e.to_string()),
         Ok(o)=> println!("{}", o.to_string()),
-    }
+    }*/
+    /*let s = db::sponsors::get_info_by_name(&"zhh".to_string());
+    let mut sp = s.ok().unwrap();
+    sp.email="123".to_string();
+    let ss = db::sponsors::alter_sponsor_info(&sp);
+    match ss{
+        Err(e)=>println!("{}", e.to_string()),
+        Ok(o)=>{},
+    }*/
 }

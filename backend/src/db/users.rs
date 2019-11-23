@@ -29,6 +29,18 @@ pub fn user_sign_up(id: &str, name: &str, password: &str)->bool{
 
 pub use crate::app::POOL;
 
+#[inline]
+fn format_string(src: &String) -> String {
+    if src.len() <= 1{
+        return src.clone()
+    }
+    if src == "NULL"{
+        return "".to_string()
+    }
+    src[1..src.len() - 1].to_string()
+}
+
+
 pub fn check_user_by_id(id: &String)->Result<bool, String>{
     let command = format!("select count(*) from user_account where account_id='{id}'", id=id);
 
