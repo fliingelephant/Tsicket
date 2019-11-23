@@ -9,7 +9,7 @@ fn format_string(src: &String) -> String {
     src[1..src.len() - 1].to_string()
 }
 
-pub fn initiate(event_list: &mut Vec<Event>, record_list: &mut Vec<Record>)-> Result<(), String> {
+pub fn initiate(event_list: &mut Vec<Event>)-> Result<(), String> {
     let command_event = "SELECT * FROM event;".to_string();
     let res = POOL.prep_exec(command_event, ());
     match res {
@@ -36,7 +36,7 @@ pub fn initiate(event_list: &mut Vec<Event>, record_list: &mut Vec<Record>)-> Re
         event_list.push(event);
     }
 
-    let command_record = "SELECT * FROM ticket_record;".to_string();
+    /*let command_record = "SELECT * FROM ticket_record;".to_string();
     let res = POOL.prep_exec(command_record, ());
     match res {
         Err(e) => return Err(e.to_string()),
@@ -54,7 +54,7 @@ pub fn initiate(event_list: &mut Vec<Event>, record_list: &mut Vec<Record>)-> Re
             update_type: 0
         };
         record_list.push(record);
-    }
+    }*/
 
     return Ok(());
 }

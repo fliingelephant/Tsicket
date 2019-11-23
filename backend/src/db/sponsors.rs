@@ -6,8 +6,6 @@ use std::result::Result;
 
 use serde::{Serialize};
 
-use mysql as my;
-
 use super::events::Event;
 
 pub use crate::app::POOL;
@@ -74,8 +72,7 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
     return Err(String::from("Account does not exist."));
 }
 
-pub fn get_sponsor_events(name: &String, event_list: &mut Vec<Event>)
-    -> Result<(), String> {
+pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
     let command = format!("SELECT * FROM event WHERE sponsor_name='{name}'", name = name);
     //println!("{}", command);
 
@@ -85,6 +82,7 @@ pub fn get_sponsor_events(name: &String, event_list: &mut Vec<Event>)
         _ => {},
     }
 
+    let mut event_list:Vec<Event> = Vec::new();
     for row in res.unwrap() {
         let ev = row.unwrap().unwrap();
         let event = Event {
@@ -104,7 +102,7 @@ pub fn get_sponsor_events(name: &String, event_list: &mut Vec<Event>)
         };
         event_list.push(event);
     }
-    return Ok(());
+    return Ok(event_list);
 }
 
 pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
