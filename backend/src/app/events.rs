@@ -14,6 +14,11 @@ pub struct QueryEvent {
     event_name: String,
 }
 
+#[derive(Serialize)]
+pub struct EventsRet {
+    pub events: Vec<Event>
+}
+
 #[inline]
 pub fn book_event(
     (query_event, event_state, id):
@@ -21,6 +26,9 @@ pub fn book_event(
 ) -> impl Future<Item=HttpResponse, Error=Error> {
 
     let mut event_state = event_state.lock().unwrap();
+
+    result(Ok(HttpResponse::Ok().finish()))
+    /*
     result(match event_state.event_list.get_mut(&query_event.event_name) {
         Some(mut event) => {
             if (event.left_tickets > 0) && (event.event_status == 1) {
@@ -34,7 +42,7 @@ pub fn book_event(
             }
         },
         None => Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
-    })
+    })*/
 }
 
 #[inline]
@@ -69,7 +77,7 @@ pub fn get_broadcast_events(
     result(Ok(HttpResponse::NotImplemented().finish()))
 }
 
-#[inline]
+
 pub fn get_event_info(
     (event_state, id, query_event):
         (Data<Mutex<EventState>>, Identity, Json<QueryEvent>)
@@ -77,13 +85,14 @@ pub fn get_event_info(
     if (id.identity() == None) {
         return result(Ok(HttpResponse::Unauthorized().finish())); // 401 Unauthorized
     }
+
     
     let mut event_state = event_state.lock().unwrap();
-    result(match event_state.event_list.get(&query_event.event_name) {
-        Some(event) => {
-            // TODO
-            Ok(HttpResponse::NotImplemented().finish())
-        },
-        None => Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
-    })
+    for event in &event_state.event_list {
+        if (event.event_name == query_event.event_name) {
+            return result(Ok(HttpResponse::Ok().json(event.clone())));
+        }
+    }
+
+    result(Ok(HttpResponse::BadRequest().finish()))
 }
