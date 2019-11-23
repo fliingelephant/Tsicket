@@ -1,6 +1,6 @@
 extern crate mysql;
 
-use std::collections::HashMap;
+
 use std::env;
 use std::sync::{Mutex};
 
@@ -42,7 +42,7 @@ lazy_static! {
 }
 
 pub struct EventState {
-    pub event_list: HashMap<String, db::events::Event>,
+    pub event_list: Vec<db::events::Event>,
     //pub record: 
 }
 
@@ -57,7 +57,7 @@ fn index(id: Identity) -> String {
 
 pub fn start() -> () {
     //let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    /*let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
+    let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
 
     let mut cookie_private_key = [0u8; 32];
     thread_rng().fill(&mut cookie_private_key[..]);
@@ -65,7 +65,7 @@ pub fn start() -> () {
     HttpServer::new(move || {
         App::new()
             .register_data(Data::new(Mutex::new(EventState {
-                event_list: HashMap::new(),
+                event_list: Vec::new(),
             })))
             .configure(routes)
             .wrap(IdentityService::new(
@@ -125,7 +125,7 @@ fn routes(app: &mut web::ServiceConfig) {
 
                      /* Administrator routes ↓ */
                      .service(web::resource("admins")
-                         .route(web::get().to_async(events::get_all_events))
+                         .route(web::get().to_async(admins::get_all_events))
                      )
                      .service(web::resource("admins/login")
                          .route(web::post().to_async(admins::login))
@@ -135,18 +135,14 @@ fn routes(app: &mut web::ServiceConfig) {
                      )
 
                      
-                     .service(web::resource("events")
+                     .service(web::resource("events/view")
                          .route(web::get().to_async(events::get_event_info))
                      )
 
                  /* Events routes */
-                 /* TODO
+                 /*
                  .service(web::resource("events")
                      .route(web::post().to_async(events::bookEvent))
-                 )
-                 .service(web::resource("events/view")
-                     .route(web::get().to_async(events::eventInfo))
-                 ) */
+                 )*/
         );
-*/
 }

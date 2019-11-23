@@ -1,14 +1,23 @@
-use std::env;
+use std::sync::{Mutex};
+
 use actix_identity::{Identity};
-use actix_web::{Error, HttpRequest, HttpResponse, web::Json};
+use actix_web::{
+    Error,
+    HttpRequest, 
+    HttpResponse,
+    web::Data,
+    web::Json
+};
 use futures::{Future, future::result};
 use md5::compute;
 use serde::Deserialize;
 
 use crate::app::ADMIN_ID;
 use crate::app::ADMIN_PASSWORD_WITH_SALT;
-
+use super::events::EventsRet;
+use super::EventState;
 use crate::db::events;
+use crate::db::events::Event;
 
 #[inline]
 fn md5_with_salt(id: &String, raw_password: &String) -> String {
@@ -45,8 +54,26 @@ pub fn logout(
 }
 
 pub fn get_all_events(
-    _req: HttpRequest
+    (id, state):
+        (Identity, Data<Mutex<EventState>>),
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(Ok(HttpResponse::Ok().json("Hello World!")))
-
+    if let Some(admin_id) = id.identity() {
+        if (admin_id == *ADMIN_ID) {
+            let mut all_event_list: Vec<Event> = vec![];
+            
+            let mut state = state.lock().unwrap();
+            println!("{}",state.event_list.len());
+            for event in &state.event_list {
+                all_event_list.push(event.clone())
+            }
+            result(Ok(HttpResponse::Ok().json(EventsRet {
+                    events: all_event_list
+                }
+            )))
+        } else {
+            result(Ok(HttpResponse::Unauthorized().finish()))
+        }
+    } else {
+        result(Ok(HttpResponse::Unauthorized().finish()))
+    }
 }

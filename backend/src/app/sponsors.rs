@@ -13,7 +13,7 @@ use crate::db::events::Event;
 use crate::db::sponsors;
 
 use super::EventState;
-
+use super::events::EventsRet;
 
 #[derive(Debug, Deserialize)]
 pub struct RegisterSponsor {
@@ -43,7 +43,7 @@ pub fn login(
         &login_sponsor.id,
         &login_sponsor.password) {
         Ok(name) => {
-            id.remember(login_sponsor.id.to_owned());
+            id.remember(name.to_owned());
             Ok(HttpResponse::Ok().json(name))
         },
         Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
@@ -76,7 +76,6 @@ pub fn register(
     })
 }
 
-#[inline]
 pub fn publish_event(
     (event, id, state):
         (Json<Event>, Identity, Data<Mutex<EventState>>),
@@ -84,19 +83,14 @@ pub fn publish_event(
     if let Some(id) = id.identity() {
         let mut state = state.lock().unwrap();
         let new_event = event.into_inner();
-        state.event_list.insert(new_event.event_name.clone(), new_event);
+        //println!("{:?}",state.event_list.len());
+        state.event_list.push(new_event.clone());
         result(Ok(HttpResponse::Ok().finish()))
     } else {
         result(Ok(HttpResponse::Unauthorized().finish()))
     }
 }
 
-#[derive(Serialize)]
-pub struct EventRet {
-    events: Vec<Event>
-}
-
-#[inline]
 pub fn get_events(
     (id, state):
         (Identity, Data<Mutex<EventState>>),
@@ -114,13 +108,16 @@ pub fn get_events(
                 )),
             Err(e) => Ok(HttpResponse::ServiceUnavailable().json(e))
         })*/
+
+        println!("{:?}", sponsor_name);
         let mut state = state.lock().unwrap();
-        for (name, event) in &state.event_list {
+        for event in &state.event_list {
+            println!("{:?}",event);
             if (event.sponsor_name == sponsor_name) {
                 sponsor_event_list.push(event.clone())
             }
         }
-        result(Ok(HttpResponse::Ok().json(EventRet {
+        result(Ok(HttpResponse::Ok().json(EventsRet {
                 events: sponsor_event_list
             }
         )))
