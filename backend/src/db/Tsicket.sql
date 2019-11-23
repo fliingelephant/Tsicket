@@ -9,6 +9,8 @@ CREATE TABLE `user_account`  (
   `account_id` VARCHAR(32) NOT NULL,
   `tsinghua_id` VARCHAR(32) ,
   `nickname` VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT '',
+  `like_events` TEXT,
+  `follow_sponsors` TEXT,
   PRIMARY KEY (`account_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 
@@ -16,7 +18,7 @@ CREATE TABLE `user_account`  (
 -- ----------------------------
 -- Records of user account
 -- ----------------------------
-INSERT INTO `user_account` (`account_id`) VALUES ('123');
+INSERT INTO `user_account` (`account_id`, `like_events`) VALUES ('123', 'aaa');
 
 -- ----------------------------
 -- Table structure for sponsor account

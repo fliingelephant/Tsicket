@@ -44,9 +44,9 @@ fn main() {
     events[0].update_type = 1;
     update(events);*/
     //db::sponsors::sponsor_register(&"001".to_string(), &"zhh".to_string(), &"123".to_string());
-    let name = db::sponsors::sponsor_log_in(&"001".to_string(), &"123".to_string());
-    match name {
-        Ok(p)=>println!("{}", p),
-        _ =>{println!("wrong")},
+    let re = db::users::check_user_by_id(&"123".to_string());
+    match re{
+        Err(e)=> println!("{}", e.to_string()),
+        Ok(o)=> println!("{}", o.to_string()),
     }
 }

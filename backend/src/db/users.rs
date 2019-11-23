@@ -28,3 +28,27 @@ pub fn user_sign_up(id: &str, name: &str, password: &str)->bool{
 } */
 
 pub use crate::app::POOL;
+
+pub fn check_user_by_id(id: &String)->Result<bool, String>{
+    let command = format!("select count(*) from user_account where account_id='{id}'", id=id);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => {println!("{}", e.to_string()); return Err(e.to_string())},
+        _ => {},
+    }
+    for row in res.unwrap(){
+        let result = row.unwrap().unwrap();
+        let num = result[0].as_sql(true);
+        if num == "0"{
+            return Ok(false);
+        }
+        else if  num == "1"{
+            return Ok(true);
+        }
+        else{
+            return Err("Something wrong in database".to_string());
+        }
+    }
+    return Ok(true);
+}

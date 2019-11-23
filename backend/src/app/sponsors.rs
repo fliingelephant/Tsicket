@@ -109,7 +109,7 @@ pub fn get_events(
         (Query<QuerySponsor>, Identity, Data<Mutex<EventState>>),
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     let mut sponsor_event_list: Vec<Event> = vec![];
-    let t = events::get_sponsor_events(
+    let t = sponsors::get_sponsor_events(
         &sponsor.sponsor_name, &mut sponsor_event_list);
     result(match t {
         Ok(()) => 

@@ -148,4 +148,5 @@ fn routes(app: &mut web::ServiceConfig) {
                      .route(web::get().to_async(events::eventInfo))
                  ) */
         );
+*/
 }
