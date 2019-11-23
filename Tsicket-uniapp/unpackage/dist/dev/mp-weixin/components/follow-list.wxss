@@ -1,0 +1,77 @@
+
+.listitem{
+	margin-bottom: 20rpx;
+	width: 100%;
+	height: 100rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #F2F2F2;
+}
+.collapse {
+	width: 100%;
+	padding: 40rpx 40rpx 40rpx 40rpx;
+}
+.imgcard {
+	position: absolute;
+	width: 670rpx;
+	height: 250rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	z-index: -1;
+}
+.card-back {
+	position: absolute;
+	width: 670rpx;
+	height: 250rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #007AFF;
+	z-index: -2;
+}
+.line-round {
+	margin-top: 5rpx;
+	margin-bottom: 15rpx;
+	width: 70rpx;
+	height: 10rpx;
+	border-radius: 5rpx 5rpx 5rpx 5rpx;
+	background-color: gainsboro;
+}
+.info {
+	height: 250rpx;
+}
+.info-flex {
+	height: 190rpx;
+}
+.flex-column {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	    -ms-flex-direction: column;
+	        flex-direction: column;
+	-webkit-box-pack: justify;
+	-webkit-justify-content: space-between;
+	    -ms-flex-pack: justify;
+	        justify-content: space-between;
+}
+.toolbar {
+	height: 100rpx;
+	width: 100%;
+}
+.tab-swiper-view {
+	height: calc(100vh - 480rpx - 80rpx)
+}
+.like {
+	font-size: 60rpx;
+}
+.follow-icon {
+	font-size: 48rpx;
+}
+.cuIcon-likefill {
+	-webkit-transition: opacity 1s ease-in 0s;
+	-o-transition: opacity 1s ease-in 0s;
+	transition: opacity 1s ease-in 0s;
+}
+
+
+

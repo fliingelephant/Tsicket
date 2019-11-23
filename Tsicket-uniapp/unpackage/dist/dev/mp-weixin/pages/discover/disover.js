@@ -161,69 +161,94 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 var app = getApp();var _default =
 
 {
   data: function data() {
     return {
-      userInfo: {},
-      hasUserInfo: false,
-      canIUse: uni.canIUse('button.open-type.getUserInfo'),
-      like: 123,
-      follow: 10,
-      history: 23,
+      messagelist: [{
+        "id": 0,
+        text: "测试文本123412351123",
+        "appreciate": false,
+        activity: {
+          id: 0,
+          name: '活动名',
+          intro: '活动介绍语',
+          tickets: 80,
+          location: '活动地点',
+          start: '2019年xx月xx日',
+          end: '',
+          sponsorid: 100,
+          sponsorname: 'xx学生会',
+          type: 1,
+          state: 200 },
+
+        sponsor: {
+          id: 0,
+          avatarUrl: '',
+          name: 'xx学生会' } },
+
+
+      {
+        "id": 1,
+        text: "测试文本12341231231245124",
+        "appreciate": false,
+        activity: {
+          id: 1,
+          name: '活动名1',
+          intro: '活动介绍语',
+          tickets: 80,
+          location: '活动地点',
+          start: '2019年xx月xx日',
+          end: '',
+          sponsorid: 100,
+          sponsorname: 'xx学生会',
+          type: 1,
+          state: 200 },
+
+        sponsor: {
+          id: 1,
+          avatarUrl: '',
+          name: 'xx学生会2' } },
+
+
+      {
+        "id": 2,
+        text: "测试文本123532151212341233",
+        "appreciate": false,
+        activity: {
+          id: 2,
+          name: '活动名2',
+          intro: '活动介绍语',
+          tickets: 80,
+          location: '活动地点',
+          start: '2019年xx月xx日',
+          end: '',
+          sponsorid: 100,
+          sponsorname: 'xx学生会',
+          type: 1,
+          state: 200 },
+
+        sponsor: {
+          id: 2,
+          avatarUrl: '',
+          name: 'xx学生会3' } }],
+
+
+
       current: 0,
       tabs: [
       "参加", "关注收藏", "广场"] };
 
 
   },
-  onLoad: function onLoad() {var _this = this;
-    if (app.globalData.userInfo) {
-      this.userInfo = app.globalData.userInfo;
-      this.hasUserInfo = true;
-    } else if (this.canIUse) {
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = function (res) {
-        _this.userInfo = res.userInfo;
-        _this.hasUserInfo = true;
-      };
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      uni.getUserInfo({
-        success: function success(res) {
-          app.globalData.userInfo = res.userInfo;
-          _this.userInfo = res.userInfo;
-          _this.hasUserInfo = true;
-        } });
+  onLoad: function onLoad() {
 
-    }
   },
   methods: {
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
-    },
-    activitydetail: function activitydetail(e) {
-      uni.navigateTo({
-        url: "../activity/activity" });
-
-    },
-    getUserInfo: function getUserInfo(e) {
-      console.log(e);
-      app.globalData.userInfo = e.detail.userInfo;
-      this.userInfo = e.detail.userInfo,
-      this.hasUserInfo = true;
     },
     tabSelect: function tabSelect(e) {
       this.current = e.currentTarget.dataset.id;
@@ -233,6 +258,40 @@ var app = getApp();var _default =
     },
     swiperChange: function swiperChange(e) {
       this.current = e.detail.current;
+    },
+    appreciate: function appreciate(e, id) {
+      console.log(e);
+      console.log(id);
+      uni.request({
+        url: 'http://2019-a18.iterator-traits.com:8080/apis/users/appreciate',
+        method: 'POST',
+        data: {
+          openid: app.globalData.openid,
+          messageid: id,
+          session: '' },
+
+        header: {
+          'content-type': 'application/json' //自定义请求头信息
+        },
+        success: function success(res) {
+          console.log(res.data);
+        } });
+
+      var index = this.messagelist.findIndex(function (item) {
+        return item.id == id;
+      });
+      console.log(index);
+      this.messagelist[index].appreciate = !this.messagelist[index].appreciate;
+    },
+    activityPage: function activityPage(id) {
+      uni.navigateTo({
+        url: "../activity/activity?id=" + id });
+
+    },
+    sponsorPage: function sponsorPage(id) {
+      uni.navigateTo({
+        url: "../sponsor/sponsor?id=" + id });
+
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

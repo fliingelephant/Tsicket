@@ -11,6 +11,10 @@
 								<text class="text-bold">{{userInfo.nickName}}</text>
 							</view>
 						</view>
+						<view class="text-right">
+							<button v-if="!hasTsinghuaInfo" class="cu-btn round light bg-blue" @click="identification">清华身份认证</button>
+							<text v-else>{{tsinghuaid}}</text>
+						</view>
 						<view class="text-left flex justify-start text-sm padding">
 							<view class="padding-right-xl" @click="likePage">
 								<view class="text-xl text-bold">{{like}}</view>
@@ -47,14 +51,17 @@
 				<swiper class="tab-swiper" :current="current" @change="swiperChange">
 					<swiper-item>
 						<scroll-view scroll-y class="tab-scroll padding">
-							<view class="tab-intro padding">
-								测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本测试文本
-							</view>
+							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
+							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
+							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
+							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
+
+
 						</scroll-view>
 					</swiper-item>
 					<swiper-item>
-						<scroll-view scroll-y class="tab-scroll">
-
+						<scroll-view scroll-y class="tab-scroll padding">
+							<activity-check :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-check>
 						</scroll-view>
 					</swiper-item>
 				</swiper>
@@ -69,8 +76,11 @@
 	export default {
 		data() {
 			return {
+				loadinginfo: true,
 				userInfo: {},
 				hasUserInfo: false,
+				hasTsinghuaInfo: false,
+				tsinghuaid: '2017010000',
 				canIUse: uni.canIUse('button.open-type.getUserInfo'),
 				like: 123,
 				follow: 10,
@@ -78,18 +88,41 @@
 				current: 0,
 				tabs: [
 					"活动日程", "报名中"
-				]
+				],
+				activity: {
+					id: 0,
+					name: '活动名',
+					intro: '活动介绍语',
+					tickets: 80,
+					location: '活动地点',
+					start: '2019年xx月xx日',
+					end: '',
+					sponsorid: 100,
+					sponsorname: 'xx学生会',
+					type: 1,
+					state: 200,
+					like: true
+				},
+				sponsor: {
+					avatarUrl: '',
+					name: 'xx学生会'
+				},
+				message: {
+
+				}
 			};
 		},
 		onLoad() {
 			if (app.globalData.userInfo) {
 				this.userInfo = app.globalData.userInfo
+				console.log(this.userInfo)
 				this.hasUserInfo = true
 			} else if (this.canIUse) {
 				// 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
 				// 所以此处加入 callback 以防止这种情况
 				app.userInfoReadyCallback = res => {
 					this.userInfo = res.userInfo
+					console.log(this.userInfo)
 					this.hasUserInfo = true
 				}
 			} else {
@@ -98,9 +131,38 @@
 					success: res => {
 						app.globalData.userInfo = res.userInfo
 						this.userInfo = res.userInfo
+						console.log(this.userInfo)
 						this.hasUserInfo = true
 					}
 				})
+			}
+		},
+		onShow() {
+			if (app.globalData.token) {
+				console.log('token:' + app.globalData.token),
+					uni.request({
+						url: 'http://2019-a18.iterator-traits.com:8080/apis/users/tsinghuaid', //仅为示例，并非真实接口地址。
+						method: 'POST',
+						data: {
+							openid: app.globalData.openid,
+							token: app.globalData.token
+						},
+						header: {
+							'content-type': 'application/json' //自定义请求头信息
+						},
+						success: (res) => {
+							console.log('调用绑定')
+							console.log(res.data);
+							this.hasUserInfo = true
+							this.hasTsinghuaInfo = true
+							this.tsinghuaid = res.data.tsinghuaid
+
+						},
+						fail: (res) => {
+							console.log('绑定失败')
+						}
+					})
+				app.globalData.token = undefined
 			}
 		},
 		methods: {
@@ -117,17 +179,17 @@
 				app.globalData.userInfo = e.detail.userInfo
 				this.userInfo = e.detail.userInfo
 				uni.request({
-				    url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-				    data: {
-				        id: this.userInfo.id
-				    },
-				    header: {
-				        'content-type': 'application/json' //自定义请求头信息
-				    },
-				    success: (res) => {
-				        console.log(res.data);
+					url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+					data: {
+						id: this.userInfo.id
+					},
+					header: {
+						'content-type': 'application/json' //自定义请求头信息
+					},
+					success: (res) => {
+						console.log(res.data);
 						this.hasUserInfo = true
-				    }
+					}
 				});
 			},
 			tabSelect(e) {
@@ -140,13 +202,41 @@
 				this.current = e.detail.current;
 			},
 			likePage() {
-				
+				console.log("likepage")
+				uni.navigateTo({
+					url: "../like/like"
+				})
 			},
 			followPage() {
-				
+				console.log("followpage")
+				uni.navigateTo({
+					url: "../following/following"
+				})
 			},
 			historyPage() {
-				
+				console.log("historypage")
+				uni.navigateTo({
+					url: "../history/history"
+				})
+			},
+			identification() {
+				console.log(123)
+				uni.navigateToMiniProgram({
+					appId: "wx1ebe3b2266f4afe0",
+					path: "pages/index/index",
+					envVersion: "trial",
+					extraData: {
+						origin: "miniapp",
+						type: "id.tsinghua"
+					},
+					success(res) {
+						// 打开成功
+						console.log(res)
+					},
+					fail(res) {
+						console.log(res)
+					}
+				})
 			}
 		}
 	}

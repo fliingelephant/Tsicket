@@ -208,32 +208,51 @@ var app = getApp();var _default =
         location: '活动地点',
         start: '2019年xx月xx日',
         end: '',
-        orgnizationid: 100,
-        orgnizationname: 'xx学生会',
+        sponsorid: 100,
+        sponsorname: 'xx学生会',
         type: 1,
-        state: 200 },
+        state: 200,
+        reserved: false,
+        like: false },
 
       current: 0,
       tabs: [
-      "介绍", "动态"] };
+      "介绍", "动态"],
+
+      sponsor: {
+        avatarUrl: '',
+        name: 'xx学生会',
+        id: 0 },
+
+      messagelist: [{
+        "id": 0,
+        "text": '1231241524',
+        "appreciate": false },
+      {
+        "id": 1,
+        "text": '1231241524124125',
+        "appreciate": false }] };
 
 
   },
   onLoad: function onLoad(option) {
     console.log(option);
-    uni.request({
-      url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-      data: {
-        id: option.id },
-
-      header: {
-        'content-type': 'application/json' //自定义请求头信息
-      },
-      success: function success(res) {
-        console.log(res.data);
-      } });
-
+    // uni.request({
+    // 	url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+    // 	data: {
+    // 		id: option.id
+    // 	},
+    // 	header: {
+    // 		'content-type': 'application/json' //自定义请求头信息
+    // 	},
+    // 	success: (res) => {
+    // 		console.log(res.data);
+    // 	}
+    // });
     return 0;
+  },
+  onShow: function onShow() {
+    console.log(getCurrentPages());
   },
   methods: {
     tabSelect: function tabSelect(e) {
@@ -247,10 +266,11 @@ var app = getApp();var _default =
     },
     reserve: function reserve() {
       uni.request({
-        url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
+        url: 'http://2019-a18.iterator-traits.com:8080/apis/users/reserve', //仅为示例，并非真实接口地址。
+        method: 'POST',
         data: {
-          activityid: this.id,
-          userid: app.globalData.userInfo },
+          openid: app.globalData.openid,
+          eventid: this.id },
 
         header: {
           'content-type': 'application/json' //自定义请求头信息
@@ -259,12 +279,60 @@ var app = getApp();var _default =
           console.log(res.data);
         } });
 
+      this.activity.reserved = !this.activity.reserved;
     },
     share: function share() {
-
+      return 0;
     },
     like: function like() {
+      uni.request({
+        url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like',
+        method: 'POST',
+        data: {
+          openid: app.globalData.openid,
+          eventid: this.activity.id,
+          session: '' },
 
+        header: {
+          'content-type': 'application/json' //自定义请求头信息
+        },
+        success: function success(res) {
+          console.log(res.data);
+        } });
+
+      this.activity.like = !this.activity.like;
+
+    },
+    appreciate: function appreciate(id) {
+      uni.request({
+        url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like',
+        method: 'POST',
+        data: {
+          openid: app.globalData.openid,
+          messageid: id,
+          session: '' },
+
+        header: {
+          'content-type': 'application/json' //自定义请求头信息
+        },
+        success: function success(res) {
+          console.log(res.data);
+        } });
+
+      var index = this.messagelist.findIndex(function (item) {return item.id == id;});
+      console.log(index);
+      this.messagelist[index].appreciate = !this.messagelist[index].appreciate;
+    },
+    sponsorPage: function sponsorPage(id) {
+      var page = getCurrentPages();
+      page = page[page.length - 2];
+      if (page.route == 'pages/sponsor/sponsor' && page.options.id == id) {
+        uni.navigateBack();
+      } else {
+        uni.navigateTo({
+          url: "../sponsor/sponsor?id=" + id });
+
+      }
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

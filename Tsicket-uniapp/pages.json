@@ -17,6 +17,22 @@
 		{
 			"path": "pages/activity/activity",
 			"style": {}
+		},
+		{
+			"path":"pages/following/following",
+			"style":{}
+		},
+		{
+			"path":"pages/sponsor/sponsor",
+			"style":{}
+		},
+		{
+			"path":"pages/like/like",
+			"style":{}
+		},
+		{
+			"path":"pages/history/history",
+			"style":{}
 		}
 	],
 	"globalStyle": {

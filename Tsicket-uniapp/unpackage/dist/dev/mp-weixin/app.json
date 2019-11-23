@@ -3,7 +3,11 @@
     "pages/index/index",
     "pages/user/user",
     "pages/discover/disover",
-    "pages/activity/activity"
+    "pages/activity/activity",
+    "pages/following/following",
+    "pages/sponsor/sponsor",
+    "pages/like/like",
+    "pages/history/history"
   ],
   "subPackages": [],
   "window": {
@@ -33,6 +37,15 @@
       }
     ]
   },
-  "usingComponents": {},
-  "sitemapLocation": "sitemap71.json"
+  "permission": {},
+  "navigateToMiniProgramAppIdList": [
+    "wx1ebe3b2266f4afe0"
+  ],
+  "usingComponents": {
+    "message": "/components/message",
+    "activity-mini-card": "/components/activity-mini-card",
+    "activity-prepare": "/components/activity-prepare",
+    "activity-check": "/components/activity-check",
+    "follow-list": "/components/follow-list"
+  }
 }
