@@ -9,7 +9,7 @@ fn format_string(src: &String) -> String {
     src[1..src.len() - 1].to_string()
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Event {
     pub event_id: String,
     pub sponsor_name: String,
