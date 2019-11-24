@@ -9,7 +9,7 @@
     <el-main>
       <el-table
               stripe
-              :data="table_data.slice((currentPage-1)*pageSize,currentPage*pageSize)">
+              :data="events.slice((currentPage-1)*pageSize,currentPage*pageSize)">
         <el-table-column
           prop="event_name"
           label="活动名称">
@@ -27,14 +27,18 @@
           label="活动容量">
         </el-table-column>
         <el-table-column
-          prop="left_ticket"
+          prop="left_tickets"
           label="剩余票数">
         </el-table-column>
+
         <el-table-column
                 label="操作">
-          <el-button @click="eventInfo" type="text" size="small">查看</el-button>
-          <el-button @click="changeEvent" type="text" size="small">编辑</el-button>
+          <template slot-scope="scope">
+            <el-button @click="eventInfo(scope.row)" type="text" size="small">查看</el-button>
+            <el-button @click="changeEvent(scope.row)" type="text" size="small">编辑</el-button>
+          </template>
         </el-table-column>
+
       </el-table>
       <el-pagination
       @size-change="handleSizeChange"
@@ -42,7 +46,7 @@
       :current-page="currentPage"
       :page-sizes="[10, 20]"
       :page-size="pageSize"
-      :total="table_data.length"
+      :total="events.length"
       layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
     </el-main>
@@ -57,236 +61,24 @@
         name: "Register",
         data() {
             return({
-                table_data: [{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                },{
-                    event_name:"测试_活动名称",
-                    start_time:"2019.6.10 12:00:00",
-                    end_time:"2019.6.10 12:00:00",
-                    event_capacity:20,
-                    left_ticket:10
-                }],
+                events: [],
                 currentPage:1,
                 pageSize:10
             })
+        },
+        mounted(){
+            this.testLogIn()
+            this.getEvents()
         },
         methods:{
             addEvent(){
                 this.$router.push('/AddEvent')
             },
-            eventInfo(){
-                this.$router.push('/EventInfo')
+            eventInfo(row){
+                this.$router.push('/EventInfo/'+row.event_id)
             },
-            changeEvent(){
-                this.$router.push('/ChangeEvent')
+            changeEvent(row){
+                this.$router.push('/ChangeEvent/'+row.event_id)
             },
             help(){
                 this.$router.push('/Help')
@@ -297,7 +89,39 @@
             handleCurrentChange: function(page) {
                 this.currentPage = page;
             },
-        }
+            testLogIn(){
+                if(!this.$store.state.username){
+                    this.$message({
+                        message: '请登录',
+                        type: 'error'
+                    })
+                    this.$router.push('/')
+                }
+            },
+            getEvents(){
+                if(!!this.$store.state.username){
+                    this.$axios.get("/sponsors").then(response => {
+                        if(response.status===200) {
+                            this.events=response.data.events
+                        }
+                        else{
+                            this.$message({
+                                message: '获取失败',
+                                type: 'error'
+                            })
+                        }
+                    },err=>{
+
+                            this.$message({
+                                message: '获取失败',
+                                type: 'error'
+                            })
+                    })
+                }
+
+            }
+        },
+
     }
 </script>
 

@@ -103,11 +103,13 @@
                 let username_available=this.username_regular.test(this.username)
                 let email_available=this.email_regular.test(this.email)
                 let phone_available=this.phone_regular.test(this.phone)
-                if(password_same && password_available && username_available && email_available && phone_available ){
+                if(password_same && password_available && username_available && email_available && phone_available && this.name!==""){
                     let data={
                         "sponsorname":this.name,
                         "id":this.username,
                         "password": this.password,
+                        "email": this.email,
+                        "phone_number": this.phone
                     }
                     this.$axios.post("/sponsors/register", data).then(response => {
                         if(response.status===200) {
@@ -158,6 +160,12 @@
                 else if(!phone_available){
                     this.$message({
                         message:'电话号码不合规范',
+                        type:'warning'
+                    });
+                }
+                else if(this.name===""){
+                    this.$message({
+                        message:'个人/机构名称不合规范',
                         type:'warning'
                     });
                 }

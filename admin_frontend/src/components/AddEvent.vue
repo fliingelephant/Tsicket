@@ -149,7 +149,22 @@
         },
         methods:{
             post(){
-                this.$router.push('/EventList')
+                let data={
+                    "sponsor_name":this.$store.state.username,
+                    "event_name":this.name,
+                    "start_time":this.distributestart,
+                    "end_time":this.distributeend,
+                    "event_type":this.method,
+                    "event_introduction":this.description,
+                    "event_capacity":this.capacity,
+                    "current_participants": 0,
+                    "left_tickets": this.capacity,
+                    "event_status":0,
+                    "event_location":this.place,
+                    "update_type":0
+                }
+                console.log(data)
+                //this.$router.push('/EventList')
             }
         }
     }

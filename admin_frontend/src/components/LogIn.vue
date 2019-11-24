@@ -52,9 +52,8 @@
                 }
                 this.$axios.post("/sponsors/login", data).then(response => {
                     if (response.status === 200) {
-
                         let resdata = {
-                            username: this.username,
+                            username: response.data,
                             admin: false
                         }
                         this.$store.commit('login', resdata)

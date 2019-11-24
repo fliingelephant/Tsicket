@@ -50,7 +50,7 @@
       </el-form>
       <el-row>
         <el-col>
-          <el-button type="primary" style="width: 10%">修改</el-button>
+          <el-button @click="changeInfo" type="primary" style="width: 10%">修改</el-button>
         </el-col>
       </el-row>
     </el-main>
@@ -66,8 +66,75 @@
                 email: '',
                 phone: '',
                 name: '',
+                email_regular:/^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/,
+                phone_regular:/^\d{11}$|^\d{7,8}$|^(\d{4}|\d{3})-(\d{7,8})$|^(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})$|^(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})$/
             }
         },
+        mounted(){
+            this.testLogIn()
+            this.getInfo()
+        },
+        methods:{
+            getInfo() {
+                this.$axios.get("/sponsors/view").then(response => {
+                    let userInfo=response.data
+                    this.username=userInfo.id
+                    this.email=userInfo.email
+                    this.phone=userInfo.phone_number
+                    this.name=userInfo.sponsor_name
+
+                })
+            },
+            changeInfo(){
+                let email_available=this.email_regular.test(this.email)
+                let phone_available=this.phone_regular.test(this.phone)
+                if(email_available&&phone_available){
+                    let data={
+                        "id":this.username,
+                        "sponsor_name":this.name,
+                        "email":this.email,
+                        "phone_number":this.phone
+                    }
+                    this.$axios.put("/sponsors/view", data).then(response => {
+                        if(response.status===200) {
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            })
+                            this.$router.push('/EventList')
+                        }
+                        else{
+                            this.$message({
+                                message: '修改失败',
+                                type: 'error'
+                            })
+                        }
+
+                    })
+                }
+                else if(!email_available){
+                    this.$message({
+                        message:'电子邮件不合规范',
+                        type:'warning'
+                    });
+                }
+                else if(!phone_available){
+                    this.$message({
+                        message:'电话号码不合规范',
+                        type:'warning'
+                    });
+                }
+            },
+            testLogIn(){
+                if(!this.$store.state.username){
+                    this.$message({
+                        message: '请登录',
+                        type: 'error'
+                    })
+                    this.$router.push('/')
+                }
+            }
+        }
     }
 </script>
 

@@ -40,7 +40,7 @@ export default new Router({
                 title:'编辑活动'
             }
         },        {
-            path:'/ChangeEvent',
+            path:'/ChangeEvent/:id',
             name: 'ChangeEvent',
             component: ChangeEvent,
             meta:{
@@ -56,7 +56,7 @@ export default new Router({
                 title:'活动列表'
             }
         },{
-            path:'/EventInfo',
+            path:'/EventInfo/:id',
             name: 'EventInfo',
             component: EventInfo,
             meta:{
