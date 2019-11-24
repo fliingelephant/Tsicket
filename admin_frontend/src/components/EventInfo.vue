@@ -13,26 +13,26 @@
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动名称</div></el-col>
-                <el-col :span="12"><div class="event-text">{{event_name}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{info.event_name}}</div></el-col>
               </el-row>
             </el-form-item>
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动地点</div></el-col>
-                <el-col :span="12"><div class="event-text">{{event_place}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{info.event_location}}</div></el-col>
               </el-row>
             </el-form-item>
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票开始时间</div></el-col>
-                <el-col :span="12"><div class="event-text">{{start_time}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{info.start_time}}</div></el-col>
 
               </el-row>
             </el-form-item>
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票停止时间</div></el-col>
-                <el-col :span="12"><div class="event-text">{{end_time}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{info.end_time}}</div></el-col>
 
               </el-row>
             </el-form-item>
@@ -40,7 +40,7 @@
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动容量</div></el-col>
-                <el-col :span="12"><div class="event-text">{{event_capacity}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{info.event_capacity}}</div></el-col>
               </el-row>
             </el-form-item>
 
@@ -54,7 +54,7 @@
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动发票方式</div></el-col>
-                <el-col :span="12"><div class="event-text">{{distribute}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{info.event_type}}</div></el-col>
               </el-row>
             </el-form-item>
             <el-form-item>
@@ -67,7 +67,7 @@
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动简介</div></el-col>
-                <el-col :span="12"><div class="event-text">{{event_intro}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{info.event_introduction}}</div></el-col>
               </el-row>
             </el-form-item>
           </el-form>
@@ -102,12 +102,13 @@
         methods: {
             getInfo(){
                 let data={
-                    "event_id":this.$route.params.id
+                    "id":this.$route.params.id
                 }
-                /*
-                this.$axios.get("/events/view",data).then(response => {
+
+                this.$axios.post("/events/view",data).then(response => {
                     if(response.status===200) {
                         this.info=response.data
+                        console.log(this.info)
                     }
                     else{
                         this.$message({
@@ -122,10 +123,11 @@
                         type: 'error'
                     })
                 })
-                console.log(this.info)
 
-                 */
-            }
+
+
+            },
+
 
 
         },
