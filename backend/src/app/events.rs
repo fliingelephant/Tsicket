@@ -99,3 +99,25 @@ pub fn get_event_info(
 
     result(Ok(HttpResponse::BadRequest().finish()))
 }
+
+pub fn alter_event_info(
+    (id, event_info):
+        (Identity, Json<Event>)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match id.identity() {
+        Some(name) => {
+            let alter_event = event_info.into_inner();
+            if (alter_event.sponsor_name != name) {
+                return result(Ok(HttpResponse::Unauthorized().finish()));
+            }
+            for mut event in &(*EVENT_LIST.lock().unwrap()) {
+                if ((event.event_id == alter_event.event_id) 
+                    && (event.sponsor_name == name)) {
+                    event = &alter_event;
+                }
+            }
+            Ok(HttpResponse::BadRequest().finish())
+        },
+        None => Ok(HttpResponse::Unauthorized().finish())
+    })
+}

@@ -141,7 +141,8 @@ fn routes(app: &mut web::ServiceConfig) {
 
                      
                      .service(web::resource("events/view")
-                         .route(web::get().to_async(events::get_event_info))
+                         .route(web::post().to_async(events::get_event_info))
+                         .route(web::put().to_async(events::alter_event_info))
                      )
 
                  /* Events routes */
