@@ -75,7 +75,6 @@
                             type: 'error'
                         })})
 
-
             },
             toRegister(){
                 this.$router.push('/Register')

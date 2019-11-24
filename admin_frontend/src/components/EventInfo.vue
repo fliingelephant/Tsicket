@@ -82,6 +82,7 @@
         name: "EventInfo",
         data() {
             return {
+                info:'',
                 active_name: 'first',
                 event_name: '测试——活动名称',
                 event_place: '测试——活动地点',
@@ -95,9 +96,40 @@
                 left_ticket:10,
             };
         },
+        mounted(){
+            this.getInfo()
+        },
         methods: {
+            getInfo(){
+                let data={
+                    "event_id":this.$route.params.id
+                }
+                /*
+                this.$axios.get("/events/view",data).then(response => {
+                    if(response.status===200) {
+                        this.info=response.data
+                    }
+                    else{
+                        this.$message({
+                            message: '查询失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
 
-        }
+                    this.$message({
+                        message: '查询失败',
+                        type: 'error'
+                    })
+                })
+                console.log(this.info)
+
+                 */
+            }
+
+
+        },
+
     }
 </script>
 
