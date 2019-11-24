@@ -1,14 +1,14 @@
 module.exports = {
     //axios域代理，解决axios跨域问题
-    baseUrl: '/',
+
+    publicPath: '/',
     devServer: {
         proxy: {
             '': {
-                target: 'http://127.0.0.1:8000',
+                target: 'http://154.8.167.168',
                 changeOrigin: true,
                 ws: true,
                 pathRewrite: {
-
                 }
             }
         }

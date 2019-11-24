@@ -9,7 +9,7 @@ import store from './store';
 Vue.use(ElementUI);
 
 Vue.prototype.$axios = axios
-axios.defaults.baseURL = '/api'
+axios.defaults.baseURL = '/apis'
 
 new Vue({
   el: '#app',

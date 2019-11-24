@@ -1,19 +1,19 @@
 <template>
-  <el-container class="login-container">
-    <el-header class="login-header">
+  <el-container class="container">
+    <el-header class="header">
       <div>登录</div>
     </el-header>
     <el-main>
       <el-form>
-        <el-form-item prop="username">
-          <div align="left" class="login-main">用户名：</div>
+        <el-form-item>
+          <div align="left" class="login-text">用户名：</div>
           <el-input
                   v-model="username"
                   type="text"
           ></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <div align="left" class="login-main">密码：</div>
+          <div align="left" class="login-text">密码：</div>
           <el-input
                   v-model="password"
                   type="password"
@@ -36,51 +36,55 @@
 </template>
 
 <script>
-export default {
-  name: "LogIn",
-  data() {
-    return {
-      username: '',
-      password: ''
-    }
-  },
-  methods:{
-    login(){
-      this.params = new URLSearchParams()
-      this.params.append("username", this.username)
-      this.params.append("password", this.password)
-        this.$axios.post("/login", this.params).then(response => {
-          if(response.status===200) {
-            if ('error' in response.data) {
-              this.$message({
-                message: '登录失败',
-                type: 'error'
-              })
-            } else {
-              let resdata = {
-                username: this.username,
-                admin: false
-              }
-              this.$store.commit('login', resdata)
-              this.$message({
-                message: '登录成功',
-                type: 'success'
-              })
-              this.$router.push('/EventList')
+    export default {
+        name: "LogIn",
+        data() {
+            return {
+                username: '',
+                password: ''
             }
-          }
-        })
+        },
+        methods:{
+            login(){
+                let data={
+                    "id":this.username,
+                    "password":this.password
+                }
+                this.$axios.post("/sponsors/login", data).then(response => {
+                    if (response.status === 200) {
+                        let resdata = {
+                            username: response.data,
+                            admin: false
+                        }
+                        this.$store.commit('login', resdata)
+                        this.$message({
+                            message: '登录成功',
+                            type: 'success'
+                        })
+                        this.$router.push('/EventList')
+                    } else {
+                        this.$message({
+                            message: '登录失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+                    if(err.response.status===422)
+                        this.$message({
+                            message: '登录失败：用户不存在',
+                            type: 'error'
+                        })})
 
-    },
-    toRegister(){
-      this.$router.push('/Register')
-      }
+            },
+            toRegister(){
+                this.$router.push('/Register')
+            }
+        }
     }
-  }
 </script>
 
 <style scoped>
-  .login-container{
+  .container{
     border-radius: 20px;
     background-clip: padding-box;
     margin: 100px auto;
@@ -92,7 +96,7 @@ export default {
     text-align: center;
   }
 
-  .login-header {
+  .header {
     text-align: center;
     border-bottom: 1px solid silver;
   }
@@ -101,7 +105,7 @@ export default {
     margin:5px
   }
 
-  .login-main {
+  .login-text {
     font-weight: 400;
     font-size: 16px;
   }
