@@ -5,7 +5,7 @@ use actix_web::{Error, HttpRequest, HttpResponse, web::Data, web::Json};
 use futures::{Future, future::result};
 use serde::{Deserialize, Serialize};
 
-use super::ADMIN_ID;
+use super::{ADMIN_ID, EVENT_LIST};
 use super::EventState;
 use crate::db::events::Event;
 
@@ -83,16 +83,15 @@ pub struct QueryEventByID {
 }
 
 pub fn get_event_info(
-    (event_state, id, query_event):
-        (Data<Mutex<EventState>>, Identity, Json<QueryEventByID>)
+    (id, query_event):
+        (Identity, Json<QueryEventByID>)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     if (id.identity() == None) {
         return result(Ok(HttpResponse::Unauthorized().finish())); // 401 Unauthorized
     }
 
     
-    let mut event_state = event_state.lock().unwrap();
-    for event in &event_state.event_list {
+    for event in &(*EVENT_LIST.lock().unwrap()) {
         if (event.event_id == query_event.id) {
             return result(Ok(HttpResponse::Ok().json(event.clone())));
         }

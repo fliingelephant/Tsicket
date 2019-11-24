@@ -14,6 +14,8 @@ use crate::db::sponsors;
 
 use super::EventState;
 use super::events::EventsRet;
+use super::EVENT_LIST;
+
 
 #[derive(Debug, Deserialize)]
 pub struct RegisterSponsor {
@@ -77,14 +79,16 @@ pub fn register(
 }
 
 pub fn publish_event(
-    (event, id, state):
-        (Json<Event>, Identity, Data<Mutex<EventState>>),
+    (event, id):
+        (Json<Event>, Identity,
+            // Data<Mutex<EventState>>
+        ),
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     if let Some(id) = id.identity() {
-        let mut state = state.lock().unwrap();
+        //let mut state = state.lock().unwrap();
         let new_event = event.into_inner();
-        //println!("{:?}",state.event_list.len());
-        state.event_list.push(new_event.clone());
+        //state.event_list.push(new_event.clone());
+        EVENT_LIST.lock().unwrap().push(new_event.clone());
         result(Ok(HttpResponse::Ok().finish()))
     } else {
         result(Ok(HttpResponse::Unauthorized().finish()))
@@ -92,8 +96,8 @@ pub fn publish_event(
 }
 
 pub fn get_events(
-    (id, state):
-        (Identity, Data<Mutex<EventState>>),
+    (id):
+        (Identity),
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     if let Some(sponsor_name) = id.identity() {
         let mut sponsor_event_list: Vec<Event> = vec![];
@@ -109,9 +113,8 @@ pub fn get_events(
             Err(e) => Ok(HttpResponse::ServiceUnavailable().json(e))
         })*/
 
-        println!("{:?}", sponsor_name);
-        let mut state = state.lock().unwrap();
-        for event in &state.event_list {
+        //let mut state = state.lock().unwrap();
+        for event in &(*EVENT_LIST.lock().unwrap()) {
             println!("{:?}",event);
             if (event.sponsor_name == sponsor_name) {
                 sponsor_event_list.push(event.clone())

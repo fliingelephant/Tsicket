@@ -36,9 +36,10 @@ lazy_static! {
     pub static ref DATABASE_URL: String
         = env::var("DATABASE_URL").expect("Database URL must be set!");
     pub static ref EVENTS_TO_CHECK: Vec<db::events::Event> = Vec::new();
-    pub static ref POOL:my::Pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
+    pub static ref POOL: my::Pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     pub static ref SECRET: String
         = env::var("SECRET").expect("Wechat secret must be set!");
+    pub static ref EVENT_LIST: Mutex<Vec<db::events::Event>> = Mutex::new(vec![]);
 }
 
 pub struct EventState {
@@ -64,9 +65,9 @@ pub fn start() -> () {
 
     HttpServer::new(move || {
         App::new()
-            .register_data(Data::new(Mutex::new(EventState {
-                event_list: Vec::new(),
-            })))
+            //.register_data(Data::new(EventState {
+            //    event_list: Vec::new(),
+            //}))
             .configure(routes)
             .wrap(IdentityService::new(
                 CookieIdentityPolicy::new(&cookie_private_key[..])

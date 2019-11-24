@@ -16,6 +16,7 @@ use crate::app::ADMIN_ID;
 use crate::app::ADMIN_PASSWORD_WITH_SALT;
 use super::events::EventsRet;
 use super::EventState;
+use super::EVENT_LIST;
 use crate::db::events;
 use crate::db::events::Event;
 
@@ -54,16 +55,16 @@ pub fn logout(
 }
 
 pub fn get_all_events(
-    (id, state):
-        (Identity, Data<Mutex<EventState>>),
+    (id):
+        (Identity),
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     if let Some(admin_id) = id.identity() {
         if (admin_id == *ADMIN_ID) {
             let mut all_event_list: Vec<Event> = vec![];
             
-            let mut state = state.lock().unwrap();
-            println!("{}",state.event_list.len());
-            for event in &state.event_list {
+            //let mut state = state.lock().unwrap();
+            //println!("{}",state.event_list.len());
+            for event in &(*EVENT_LIST.lock().unwrap()) {
                 all_event_list.push(event.clone())
             }
             result(Ok(HttpResponse::Ok().json(EventsRet {

@@ -128,7 +128,7 @@ pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
 
 #[derive(Deserialize, Serialize)]
 pub struct Sponsor{
-    pub account_id: String,
+    pub id: String,
     pub sponsor_name: String,
     pub email: String,
     pub phone_number: String,
@@ -146,7 +146,7 @@ pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
     for row in res.unwrap(){
         let info = row.unwrap().unwrap();
         let sponsor = Sponsor{
-            account_id: format_string(&info[0].as_sql(true)),
+            id: format_string(&info[0].as_sql(true)),
             sponsor_name: format_string(&info[1].as_sql(true)),
             email: format_string(&info[2].as_sql(true)),
             phone_number: format_string(&info[3].as_sql(true))
