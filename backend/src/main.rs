@@ -10,13 +10,13 @@ mod db;
 mod utils;
 
 fn main() {
-    dotenv::dotenv().ok();
+    /*dotenv::dotenv().ok();
 
     let sys = actix::System::new("conduit");
 
     app::start();
 
-    let _ = sys.run();
+    let _ = sys.run();*/
 
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 
@@ -48,12 +48,47 @@ fn main() {
         Err(e)=> println!("{}", e.to_string()),
         Ok(o)=> println!("{}", o.to_string()),
     }*/
-    /*let s = db::sponsors::get_info_by_name(&"zhh".to_string());
-    let mut sp = s.ok().unwrap();
+    //let s = db::sponsors::get_info_by_name(&"2".to_string());
+    //println!("{}", s.ok().unwrap().head_portrait);
+    /*let mut sp = s.ok().unwrap();
     sp.email="123".to_string();
     let ss = db::sponsors::alter_sponsor_info(&sp);
     match ss{
         Err(e)=>println!("{}", e.to_string()),
         Ok(o)=>{},
     }*/
+    /*let s = db::users::get_user_follows(&"123".to_string());
+    match s{
+        Err(e)=>println!("{}", e.to_string()),
+        Ok(o)=>{for i in o{
+            println!("{}", i)
+        }},
+    }*/
+    /*let s = db::users::check_user_follow(&"13".to_string(), &"7".to_string());
+    match s{
+        Err(e)=>println!("{}", e.to_string()),
+        Ok(o)=>{println!("{}", o)},
+    }*/
+    /*let s = db::sponsors::get_sponsor_events(&"2".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(el) => {
+            for i in el{
+                println!("{:?}", i);
+            }
+        }
+    }*/
+    /*let pic1 = "123".to_string();
+    let pic2 = "456".to_string();
+    let pic = vec![pic1, pic2];
+    let s = db::sponsors::publish_moment(&"2".to_string(), &"0".to_string(), &"jjj".to_string(), &pic);
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {},
+    }*/
+    let s = db::sponsors::release_push(&"2".to_string(), &"0".to_string(), &"活动延期".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {},
+    }
 }

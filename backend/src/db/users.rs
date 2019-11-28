@@ -43,11 +43,11 @@ fn format_string(src: &String) -> String {
 
 
 pub fn check_user_by_id(id: &String)->Result<bool, String>{
-    let command = format!("select count(*) from user_account where account_id='{id}'", id=id);
+    let command = format!("select count(*) from user_account where account_id='{id}';", id=id);
 
     let res = POOL.prep_exec(command, ());
     match res {
-        Err(e) => {println!("{}", e.to_string()); return Err(e.to_string())},
+        Err(e) => return Err(e.to_string()),
         _ => {},
     }
     for row in res.unwrap(){
@@ -68,7 +68,7 @@ pub fn check_user_by_id(id: &String)->Result<bool, String>{
 
 pub fn get_user_records(id: &String)
                           -> Result<Vec<Record>, String> {
-    let command = format!("SELECT * FROM ticket_record WHERE user_id='{id}'", id = id);
+    let command = format!("SELECT * FROM ticket_record WHERE user_id='{id}';", id = id);
     //println!("{}", command);
 
     let res = POOL.prep_exec(command, ());
@@ -92,4 +92,80 @@ pub fn get_user_records(id: &String)
         record_list.push(record);
     }
     return Ok(record_list);
+}
+
+pub fn get_user_likes(id: &String) -> Result<Vec<String>, String>{
+    let command = format!("SELECT event_id FROM `like` WHERE user_id='{id}';", id = id);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+
+    let mut event_list:Vec<String> = Vec::new();
+    for row in res.unwrap() {
+        let re = row.unwrap().unwrap();
+        let event = format_string(&re[0].as_sql(true));
+        event_list.push(event);
+    }
+    return Ok(event_list);
+}
+
+pub fn check_user_like(user_id: &String, event_id: &String) -> Result<bool, String> {
+    let res = get_user_likes(user_id);
+    match res{
+        Err(e) => return Err(e.to_string()),
+        Ok(likes) => {
+            return Ok(likes.contains(event_id))
+        },
+    }
+}
+
+pub fn get_user_follows(id: &String) -> Result<Vec<String>, String>{
+    let command = format!("SELECT sponsor_name FROM `follow` WHERE user_id='{id}';", id = id);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+
+    let mut sponsor_list:Vec<String> = Vec::new();
+    for row in res.unwrap() {
+        let re = row.unwrap().unwrap();
+        let sponsor = format_string(&re[0].as_sql(true));
+        sponsor_list.push(sponsor);
+    }
+    return Ok(sponsor_list);
+}
+
+pub fn check_user_follow(user_id: &String, sponsor_name: &String) -> Result<bool, String> {
+    let res = get_user_follows(user_id);
+    match res{
+        Err(e) => return Err(e.to_string()),
+        Ok(likes) => {
+            return Ok(likes.contains(sponsor_name))
+        },
+    }
+}
+
+pub fn get_users_by_event_id(event_id: &String) -> Result<Vec<String>, String>{
+    let command = format!("SELECT user_id From ticket_record WHERE event_id='{id}';", id=event_id);
+    println!("{}", command);
+    let mut users:Vec<String> = Vec::new();
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) => {
+            for row in o {
+                let elements = row.unwrap().unwrap();
+                let user = format_string(&elements[0].as_sql(true));
+                users.push(user);
+            }
+            return Ok(users);
+        }
+    }
 }

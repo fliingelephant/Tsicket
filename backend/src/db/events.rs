@@ -16,6 +16,7 @@ pub struct Event {
     pub end_time: String,
     pub event_type: i8,
     pub event_introduction: String,
+    pub event_picture: String,
     pub event_capacity: i32,
     pub current_participants: i32,
     pub left_tickets: i32,

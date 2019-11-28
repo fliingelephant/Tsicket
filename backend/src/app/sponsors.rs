@@ -116,7 +116,7 @@ pub fn get_events(
         //let mut state = state.lock().unwrap();
         for event in &(*EVENT_LIST.lock().unwrap()) {
             println!("{:?}",event);
-            if (event.sponsor_name == sponsor_name) {
+            if event.sponsor_name == sponsor_name {
                 sponsor_event_list.push(event.clone())
             }
         }

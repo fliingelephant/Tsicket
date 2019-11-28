@@ -107,12 +107,12 @@ pub fn alter_event_info(
     result(match id.identity() {
         Some(name) => {
             let alter_event = event_info.into_inner();
-            if (alter_event.sponsor_name != name) {
+            if alter_event.sponsor_name != name {
                 return result(Ok(HttpResponse::Unauthorized().finish()));
             }
             for mut event in &(*EVENT_LIST.lock().unwrap()) {
-                if ((event.event_id == alter_event.event_id) 
-                    && (event.sponsor_name == name)) {
+                if (event.event_id == alter_event.event_id)
+                    && (event.sponsor_name == name) {
                     event = &alter_event;
                 }
             }

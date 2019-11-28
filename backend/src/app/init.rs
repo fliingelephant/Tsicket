@@ -26,11 +26,12 @@ pub fn initiate(event_list: &mut Vec<Event>)-> Result<(), String> {
             end_time: format_string(&ev[4].as_sql(true)),
             event_type: ev[5].as_sql(true).parse().unwrap(),
             event_introduction: format_string(&ev[6].as_sql(true)),
-            event_capacity: ev[7].as_sql(true).parse().unwrap(),
-            current_participants: ev[8].as_sql(true).parse().unwrap(),
-            left_tickets: ev[9].as_sql(true).parse().unwrap(),
-            event_status: ev[10].as_sql(true).parse().unwrap(),
-            event_location: format_string(&ev[11].as_sql(true)),
+            event_picture: format_string(&ev[7].as_sql(true)),
+            event_capacity: ev[8].as_sql(true).parse().unwrap(),
+            current_participants: ev[9].as_sql(true).parse().unwrap(),
+            left_tickets: ev[10].as_sql(true).parse().unwrap(),
+            event_status: ev[11].as_sql(true).parse().unwrap(),
+            event_location: format_string(&ev[12].as_sql(true)),
             update_type: 0
         };
         event_list.push(event);

@@ -7,6 +7,7 @@ use std::result::Result;
 use serde::{Deserialize, Serialize};
 
 use super::events::Event;
+use super::users;
 
 pub use crate::app::POOL;
 
@@ -90,11 +91,12 @@ pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
             end_time: format_string(&ev[4].as_sql(true)),
             event_type: ev[5].as_sql(true).parse().unwrap(),
             event_introduction: format_string(&ev[6].as_sql(true)),
-            event_capacity: ev[7].as_sql(true).parse().unwrap(),
-            current_participants: ev[8].as_sql(true).parse().unwrap(),
-            left_tickets: ev[9].as_sql(true).parse().unwrap(),
-            event_status: ev[10].as_sql(true).parse().unwrap(),
-            event_location: format_string(&ev[11].as_sql(true)),
+            event_picture: format_string(&ev[7].as_sql(true)),
+            event_capacity: ev[8].as_sql(true).parse().unwrap(),
+            current_participants: ev[9].as_sql(true).parse().unwrap(),
+            left_tickets: ev[10].as_sql(true).parse().unwrap(),
+            event_status: ev[11].as_sql(true).parse().unwrap(),
+            event_location: format_string(&ev[12].as_sql(true)),
             update_type: 0
         };
         event_list.push(event);
@@ -107,7 +109,7 @@ pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
 
     let res = POOL.prep_exec(command, ());
     match res {
-        Err(e) => {println!("{}", e.to_string()); return Err(e.to_string())},
+        Err(e) => return Err(e.to_string()),
         _ => {},
     }
     for row in res.unwrap(){
@@ -130,17 +132,18 @@ pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
 pub struct Sponsor{
     pub id: String,
     pub sponsor_name: String,
+    pub head_portrait: String,
     pub email: String,
     pub phone_number: String,
 }
 
 pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
-    let command = format!("SELECT account_id, sponsor_name, email, phone_number From sponsor_account \
+    let command = format!("SELECT account_id, sponsor_name, head_portrait, email, phone_number From sponsor_account \
      WHERE sponsor_name='{name}';", name=name);
     println!("{}", command);
     let res = POOL.prep_exec(command, ());
     match res {
-        Err(e) => {println!("{}", e.to_string()); return Err(e.to_string())},
+        Err(e) => return Err(e.to_string()),
         _ => {},
     }
     for row in res.unwrap(){
@@ -148,8 +151,9 @@ pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
         let sponsor = Sponsor{
             id: format_string(&info[0].as_sql(true)),
             sponsor_name: format_string(&info[1].as_sql(true)),
-            email: format_string(&info[2].as_sql(true)),
-            phone_number: format_string(&info[3].as_sql(true))
+            head_portrait: format_string(&info[2].as_sql(true)),
+            email: format_string(&info[3].as_sql(true)),
+            phone_number: format_string(&info[4].as_sql(true))
         };
         return Ok(sponsor);
     }
@@ -165,7 +169,51 @@ pub fn alter_sponsor_info(
     println!("{}", command);
     let res = POOL.prep_exec(command, ());
     match res {
-        Err(e) => {println!("{}", e.to_string()); return Err(e.to_string())},
+        Err(e) => return Err(e.to_string()),
         Ok(o) =>Ok(()),
     }
+}
+
+pub fn publish_moment(sponsor_name: &String, event_id: &String, text: &String, pictures: &Vec<String>)
+                       -> Result<(), String>{
+    let mut picture_str = "".to_string();
+    for pic in pictures{
+        if picture_str == ""{
+            picture_str = picture_str + &pic;
+        }
+        else{
+            picture_str = picture_str + "&" + &pic;
+        }
+    }
+    let command = format!("INSERT INTO moment (sponsor_name, event_id, text, pictures) VALUES \
+     ('{sponsor_name}', '{event_id}', '{text}', '{pictures}');", sponsor_name=sponsor_name,
+                          event_id=event_id, text=text, pictures=picture_str);
+    println!("{}", command);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) =>Ok(()),
+    }
+}
+
+pub fn release_push(sponsor_name: &String, event_id: &String, text: &String)
+                      -> Result<(), String>{
+    let res = users::get_users_by_event_id(event_id);
+    match res{
+        Err(e) => return Err(e),
+        _  => {},
+    }
+    let users = res.ok().unwrap();
+    for user in users{
+        let command = format!("INSERT INTO push (sponsor_name, event_id, user_id, text) VALUES \
+     ('{sponsor_name}', '{event_id}', '{user_id}', '{text}');", sponsor_name=sponsor_name,
+                              event_id=event_id, user_id=user, text=text);
+        println!("{}", command);
+        let res = POOL.prep_exec(command, ());
+        match res {
+            Err(e) => return Err(e.to_string()),
+            Ok(o) => {},
+        }
+    }
+    return Ok(());
 }
