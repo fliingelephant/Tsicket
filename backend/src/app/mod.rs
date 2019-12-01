@@ -18,6 +18,7 @@ use mysql as my;
 use rand::{thread_rng, Rng};
 
 use crate::db;
+use init::initiate;
 
 mod admins;
 mod events;
@@ -63,6 +64,8 @@ pub fn start() -> () {
     let mut cookie_private_key = [0u8; 32];
     thread_rng().fill(&mut cookie_private_key[..]);
 
+    initiate(& mut *EVENT_LIST.lock().unwrap()).unwrap();
+
     HttpServer::new(move || {
         App::new()
             //.register_data(Data::new(EventState {
@@ -85,11 +88,11 @@ fn routes(app: &mut web::ServiceConfig) {
         .service(web::resource("/").to(index))
         .service(web::scope("/apis")
                      /* User routes ↓ */
-                     /* TODO
-                     .service(web::resource("users")
-                         .route(web::get().to_async(users::get_personal_data))
-                         .route(web::post().to_async(users::get_enrolled_events))
-                     ) */
+                    
+                    .service(web::resource("users")
+                        .route(web::get().to_async(users::get_personal_info))
+                        //.route(web::post().to_async(users::get_enrolled_events))
+                    )
                     .service(web::resource("users/book")
                         .route(web::post().to_async(events::book_event))
                     )
@@ -97,10 +100,14 @@ fn routes(app: &mut web::ServiceConfig) {
                         .route(web::get().to_async(events::get_broadcast_events))
                     )
                     .service(web::resource("users/follow")
-                        .route(web::post().to_async(users::check_follow))
+                        .route(web::get().to_async(users::get_follow_list))
+                        .route(web::post().to_async(users::follow_or_unfo))
+                        .route(web::put().to_async(users::check_follow))
                     )
                     .service(web::resource("users/like")
-                        .route(web::post().to_async(users::check_like))
+                        .route(web::get().to_async(users::get_like_list))
+                        .route(web::post().to_async(users::like_or_dislike))
+                        .route(web::put().to_async(users::check_like))
                     )
                     .service(web::resource("users/login")
                         .route(web::post().to_async(users::login))

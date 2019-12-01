@@ -15,6 +15,7 @@ use crate::db::sponsors;
 use super::EventState;
 use super::events::EventsRet;
 use super::EVENT_LIST;
+use super::update::update_events;
 
 
 #[derive(Debug, Deserialize)]
@@ -89,6 +90,8 @@ pub fn publish_event(
         let new_event = event.into_inner();
         //state.event_list.push(new_event.clone());
         EVENT_LIST.lock().unwrap().push(new_event.clone());
+        let events = EVENT_LIST.lock().unwrap().clone();
+        update_events(&events);
         result(Ok(HttpResponse::Ok().finish()))
     } else {
         result(Ok(HttpResponse::Unauthorized().finish()))
@@ -96,8 +99,7 @@ pub fn publish_event(
 }
 
 pub fn get_events(
-    (id):
-        (Identity),
+    id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     if let Some(sponsor_name) = id.identity() {
         let mut sponsor_event_list: Vec<Event> = vec![];
