@@ -48,10 +48,10 @@ fn main() {
         Err(e)=> println!("{}", e.to_string()),
         Ok(o)=> println!("{}", o.to_string()),
     }*/
-    //let s = db::sponsors::get_info_by_name(&"2".to_string());
+    /*let s = db::sponsors::get_info_by_name(&"2".to_string());
     //println!("{}", s.ok().unwrap().head_portrait);
-    /*let mut sp = s.ok().unwrap();
-    sp.email="123".to_string();
+    let mut sp = s.ok().unwrap();
+    sp.head_portrait="dafadsfad".to_string();
     let ss = db::sponsors::alter_sponsor_info(&sp);
     match ss{
         Err(e)=>println!("{}", e.to_string()),
@@ -86,9 +86,19 @@ fn main() {
         Err(e) => println!("{}", e),
         Ok(o) => {},
     }*/
-    let s = db::sponsors::release_push(&"2".to_string(), &"0".to_string(), &"活动延期".to_string());
+    /*let s = db::sponsors::release_push(&"2".to_string(), &"0".to_string(), &"活动延期".to_string());
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {},
+    }*/
+    /*let s = db::users::check_tsinghua_id(&"132".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => println!("{}", o),
+    }*/
+    let s = db::users::cancel_user_follow(&"123".to_string(), &"7".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(_) => {},
     }
 }

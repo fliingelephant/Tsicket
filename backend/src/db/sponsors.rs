@@ -163,9 +163,9 @@ pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
 pub fn alter_sponsor_info(
     sponsor: &Sponsor
 ) -> Result<(), String> {
-    let command = format!("UPDATE sponsor_account SET email='{email}', phone_number='{phone_number}' \
+    let command = format!("UPDATE sponsor_account SET head_portrait='{head}', email='{email}', phone_number='{phone_number}' \
     WHERE sponsor_name='{sponsor_name}';", email=sponsor.email, phone_number=sponsor.phone_number,
-                          sponsor_name=sponsor.sponsor_name);
+                          head=sponsor.head_portrait, sponsor_name=sponsor.sponsor_name);
     println!("{}", command);
     let res = POOL.prep_exec(command, ());
     match res {

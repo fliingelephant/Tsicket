@@ -41,6 +41,26 @@ fn format_string(src: &String) -> String {
     src[1..src.len() - 1].to_string()
 }
 
+pub fn add_user(id: &String)->Result<(), String>{
+    let command = format!("INSERT INTO user_account (account_id) VALUES ('{id}');", id=id);
+    println!("{}", command);
+
+    match POOL.prep_exec(command, ()) {
+        Ok(_) => Ok(()),
+        Err(e) =>  Err(e.to_string()),
+    }
+}
+
+pub fn set_tsinghua_id(id: &String, tsinghua_id: &String)->Result<(), String>{
+    let command = format!("UPDATE user_account SET tsinghua_id='{tsinghua_id}' \
+    WHERE account_id='{id}';", tsinghua_id=tsinghua_id, id=id);
+    println!("{}", command);
+
+    match POOL.prep_exec(command, ()) {
+        Ok(_) => Ok(()),
+        Err(e) =>  Err(e.to_string()),
+    }
+}
 
 pub fn check_user_by_id(id: &String)->Result<bool, String>{
     let command = format!("select count(*) from user_account where account_id='{id}';", id=id);
@@ -64,6 +84,28 @@ pub fn check_user_by_id(id: &String)->Result<bool, String>{
         }
     }
     return Ok(true);
+}
+
+pub fn check_tsinghua_id(id: &String)->Result<bool, String>{
+    let command = format!("SELECT tsinghua_id FROM user_account WHERE account_id='{id}';", id=id);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    for row in res.unwrap(){
+        let result = row.unwrap().unwrap();
+        let tsinghua_id = format_string(&result[0].as_sql(true));
+        if tsinghua_id.is_empty(){
+            return Ok(false);
+        }
+        else {
+            return Ok(true);
+        }
+    }
+    return Err("No such user".to_string());
 }
 
 pub fn get_user_records(id: &String)
@@ -123,6 +165,28 @@ pub fn check_user_like(user_id: &String, event_id: &String) -> Result<bool, Stri
     }
 }
 
+pub fn set_user_like(user_id: &String, event_id: &String) -> Result<(), String> {
+    let command = format!("INSERT INTO `like` (user_id, event_id) VALUES \
+    ('{user_id}', '{event_id}');", user_id=user_id, event_id=event_id);
+    println!("{}", command);
+
+    match POOL.prep_exec(command, ()){
+        Err(e) => return Err(e.to_string()),
+        Ok(_) => return Ok(()),
+    }
+}
+
+pub fn cancel_user_like(user_id: &String, event_id: &String) -> Result<(), String> {
+    let command = format!("DELETE FROM `like` WHERE (user_id, event_id)=\
+    ('{user_id}', '{event_id}');", user_id=user_id, event_id=event_id);
+    println!("{}", command);
+
+    match POOL.prep_exec(command, ()){
+        Err(e) => return Err(e.to_string()),
+        Ok(_) => return Ok(()),
+    }
+}
+
 pub fn get_user_follows(id: &String) -> Result<Vec<String>, String>{
     let command = format!("SELECT sponsor_name FROM `follow` WHERE user_id='{id}';", id = id);
     println!("{}", command);
@@ -149,6 +213,28 @@ pub fn check_user_follow(user_id: &String, sponsor_name: &String) -> Result<bool
         Ok(likes) => {
             return Ok(likes.contains(sponsor_name))
         },
+    }
+}
+
+pub fn set_user_follow(user_id: &String, sponsor_name: &String) -> Result<(), String> {
+    let command = format!("INSERT INTO `follow` (user_id, sponsor_name) VALUES \
+    ('{user_id}', '{sponsor_name}');", user_id=user_id, sponsor_name=sponsor_name);
+    println!("{}", command);
+
+    match POOL.prep_exec(command, ()){
+        Err(e) => return Err(e.to_string()),
+        Ok(_) => return Ok(()),
+    }
+}
+
+pub fn cancel_user_follow(user_id: &String, sponsor_name: &String) -> Result<(), String> {
+    let command = format!("DELETE FROM `follow` WHERE (user_id, sponsor_name)=\
+    ('{user_id}', '{sponsor_name}');", user_id=user_id, sponsor_name=sponsor_name);
+    println!("{}", command);
+
+    match POOL.prep_exec(command, ()){
+        Err(e) => return Err(e.to_string()),
+        Ok(_) => return Ok(()),
     }
 }
 
