@@ -110,28 +110,47 @@ pub fn login(
 
 #[allow(dead_code)]
 pub fn bind_tsinghua_id(
+    id: Identity,
     info: Json<WechatTHUInfo>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    let client = reqwest::Client::new();
-    let resp = client
-        .post("https://alumni-test.iterator-traits.com/fake-id-tsinghua-proxy/api/user/session/token")
-        .json(&MPTHUInfo {
-            token: info.token.clone(),
-        })
-        .send();
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            let client = reqwest::Client::new();
+            let resp = client
+                .post("https://alumni-test.iterator-traits.com/fake-id-tsinghua-proxy/api/user/session/token")
+                .json(&MPTHUInfo {
+                    token: info.token.clone(),
+                })
+                .send();
 
-    let content = resp.unwrap().json::<TsinghuaInfo>();
-    result(match content {
-        Ok(text)=> {
-
-            Ok(HttpResponse::Ok().json(WechatTHUReturn {
-                    tsinghuaid: text.user.card.clone(),
-            }))
+            let content = resp.unwrap().json::<TsinghuaInfo>();
+            match content {
+                Ok(text)=> {
+                    users::set_tsinghua_id(&openid, &text.user.card).unwrap();
+                    Ok(HttpResponse::Ok().json(WechatTHUReturn {
+                            tsinghuaid: text.user.card.clone(),
+                    }))
+                },
+                Err(e) => {
+                    println!("{:?}", e.to_string());
+                    Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
+                }
+            }
         },
-        Err(e) => {
-            println!("{:?}", e.to_string());
-            Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn get_tsinghua_id(
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            // TODO
+            Ok(HttpResponse::NotImplemented().finish())
         }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })
 }
 
@@ -164,6 +183,7 @@ struct FollowRet {
     follow: bool,
 }
 
+#[allow(dead_code)]
 pub fn check_follow(
     (id, query_sponsor):
     (Identity, Json<QuerySponsor>)
@@ -182,6 +202,34 @@ pub fn check_follow(
 }
 
 #[allow(dead_code)]
+pub fn follow_or_unfo(
+    (id, query_sponsor):
+    (Identity, Json<QuerySponsor>)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match users::check_user_follow(&openid, &query_sponsor.sponsor_name) {
+                Ok(flag) => {
+                    if flag == false {
+                        match users::set_user_follow(&openid, &query_sponsor.sponsor_name) {
+                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+                        }
+                    } else {
+                        match users::cancel_user_follow(&openid, &query_sponsor.sponsor_name) {
+                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+                        }
+                    }
+                }
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
 pub fn follow(
     (id, query_sponsor):
     (Identity, Json<QuerySponsor>)
@@ -190,7 +238,7 @@ pub fn follow(
         Ok(openid) => {
             match users::set_user_follow(&openid, &query_sponsor.sponsor_name) {
                 Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
-                Err(_) => Ok(HttpResponse::UnprocessableEntity().json("Already following.")) // 422 Unprocessable Entity
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
             }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
@@ -206,7 +254,7 @@ pub fn unfo(
         Ok(openid) => {
             match users::cancel_user_follow(&openid, &query_sponsor.sponsor_name) {
                 Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
-                Err(_) => Ok(HttpResponse::UnprocessableEntity().json("Already not following.")) // 422 Unprocessable Entity
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
             }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
@@ -323,6 +371,34 @@ pub fn dislike(
             match users::cancel_user_like(&openid, &query_event.event_id) {
                 Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
                 Err(_) => Ok(HttpResponse::UnprocessableEntity().json("Already not liking.")) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
+pub fn like_or_dislike(
+    id: Identity,
+    query_event: Json<QueryEventByID>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match users::check_user_like(&openid, &query_event.event_id) {
+                Ok(flag) => {
+                    if flag == false {
+                        match users::set_user_like(&openid, &query_event.event_id) {
+                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+                        }
+                    } else {
+                        match users::cancel_user_like(&openid, &query_event.event_id) {
+                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+                        }
+                    }
+                }
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
             }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized

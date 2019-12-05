@@ -113,7 +113,6 @@ pub fn publish_event(
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn get_available_events(
     id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
@@ -136,7 +135,27 @@ pub fn get_available_events(
 }
 
 #[allow(dead_code)]
-#[inline]
+pub fn get_all_events(
+    id: Identity,
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            match sponsors::get_sponsor_events(&sponsor_name) {
+                Ok(sponsor_event_list) => Ok(HttpResponse::Ok().json(EventsRet {
+                    events: sponsor_event_list
+                })),
+                Err(e) => {
+                    println!("{}", e);
+                    Ok(HttpResponse::InternalServerError().finish())
+                }
+            }
+            
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
 pub fn alter_sponsor_info(
     alter_sponsor: Json<sponsors::Sponsor>,
     id: Identity
@@ -158,7 +177,6 @@ pub fn alter_sponsor_info(
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn get_sponsor_info (
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {

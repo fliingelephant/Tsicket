@@ -97,7 +97,7 @@ fn routes(app: &mut web::ServiceConfig) {
                     )
                     .service(web::resource("users/follow")
                         .route(web::get().to_async(users::get_follow_list))
-                        //.route(web::post().to_async(users::follow_or_unfo))
+                        .route(web::post().to_async(users::follow_or_unfo))
                         .route(web::put().to_async(users::check_follow))
                     )
                     .service(web::resource("users/like")
@@ -109,6 +109,7 @@ fn routes(app: &mut web::ServiceConfig) {
                         .route(web::post().to_async(users::login))
                     )
                      .service(web::resource("users/tsinghuaid")
+                        .route(web::get().to_async(users::get_tsinghua_id))
                         .route(web::post().to_async(users::bind_tsinghua_id))
                     )
 
