@@ -1,36 +1,30 @@
-use std::sync::{Mutex};
-
 use actix_identity::{Identity};
 use actix_web::{
-    Error,
-    HttpRequest, 
+    Error, 
     HttpResponse,
-    web::Data,
     web::Json
 };
 use futures::{Future, future::result};
 use md5::compute;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use crate::app::ADMIN_ID;
-use crate::app::ADMIN_PASSWORD_WITH_SALT;
-use super::events::EventsRet;
-use super::EventState;
-use super::EVENT_LIST;
-use crate::db::events;
-use crate::db::events::Event;
+use super::{ADMIN_ID, ADMIN_PASSWORD_WITH_SALT};
+use crate::db::admins;
+
+use crate::utils::auth::{identify_admin};
 
 #[inline]
 fn md5_with_salt(id: &String, raw_password: &String) -> String {
-    format!("{:x}", md5::compute(raw_password.to_owned() + id))
+    format!("{:x}", compute(raw_password.to_owned() + id))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 pub struct LoginAdmin {
     pub admin_id: String,
     pub password: String,
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn login(
     id: Identity,
@@ -39,42 +33,62 @@ pub fn login(
     let password = md5_with_salt(&login_admin.admin_id, &login_admin.password);
 
     if (login_admin.admin_id == *ADMIN_ID) && (password == *ADMIN_PASSWORD_WITH_SALT) {
-        id.remember(login_admin.admin_id.to_owned());
-        result(Ok(HttpResponse::Ok().json("Admin login success.")))
+        id.remember("0".to_owned() + &login_admin.admin_id);
+        result(Ok(HttpResponse::Ok().json("Admin login success."))) // 200 OK
     } else {
-        result(Ok(HttpResponse::UnprocessableEntity().json("Wrong!")))
+        result(Ok(HttpResponse::UnprocessableEntity().json("Failed to log in."))) // 422 Unprocessable Entity
     }
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn logout(
-    id: Identity,
+    id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    id.forget();
-    result(Ok(HttpResponse::Ok().finish()))
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            id.forget();
+            Ok(HttpResponse::Ok().finish()) // 200 OK
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
 }
 
+#[derive(Serialize)]
+pub struct EventInfoRetToAdmin {
+    pub event_id: String,
+    pub sponsor_name: String,
+    pub event_name: String,
+    pub start_time: String,
+    pub end_time: String,
+    pub event_type: i8,
+    pub event_introduction: String,
+    pub event_picture: String,
+    pub event_capacity: i32,
+    pub current_participants: i32,
+    pub left_tickets: i32,
+    pub event_status: i8,
+    pub event_location: String,
+}
+
+#[derive(Serialize)]
+struct AllEventsRet {
+    events: Vec<EventInfoRetToAdmin>
+}
+
+#[allow(dead_code)]
+#[inline]
 pub fn get_all_events(
-    (id):
-        (Identity),
+    id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    if let Some(admin_id) = id.identity() {
-        if (admin_id == *ADMIN_ID) {
-            let mut all_event_list: Vec<Event> = vec![];
-            
-            //let mut state = state.lock().unwrap();
-            //println!("{}",state.event_list.len());
-            for event in &(*EVENT_LIST.lock().unwrap()) {
-                all_event_list.push(event.clone())
-            }
-            result(Ok(HttpResponse::Ok().json(EventsRet {
-                    events: all_event_list
-                }
-            )))
-        } else {
-            result(Ok(HttpResponse::Unauthorized().finish()))
-        }
-    } else {
-        result(Ok(HttpResponse::Unauthorized().finish()))
-    }
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            let mut all_event_list: Vec<EventInfoRetToAdmin> = vec![];
+            admins::get_all_events(&mut all_event_list).unwrap();
+            Ok(HttpResponse::Ok().json(AllEventsRet { // 200 OK
+                events: all_event_list
+            }))
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
 }

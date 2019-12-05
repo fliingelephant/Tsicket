@@ -1,17 +1,18 @@
 use std::convert::From;
 use actix_identity::Identity;
 use actix_web::{client, Error, http::Method, HttpRequest, HttpResponse, ResponseError, web::Data, web::Json, web::Query};
-use futures::{Future, future::result, future::lazy};
+use futures::{Future, future::result};
 use reqwest::{get, Client};
 use serde::{Deserialize, Serialize};
 use std::env;
 
 use super::{APP_ID, SECRET};
-use super::sponsors::QuerySponsor;
-use super::events::{QueryEvent, QueryEventByID};
+use super::sponsors::{QuerySponsor, QuerySponsorByID};
+use super::events::{QueryEvent, QueryEventByID, EventsRet};
 use crate::db::events;
 use crate::db::sponsors;
 use crate::db::users;
+use crate::utils::auth::{identify_user};
 
 #[derive(Deserialize)]
 pub struct WechatLoginInfo {
@@ -78,6 +79,7 @@ pub struct QueryList {
     pub index: usize,
 }
 
+#[allow(dead_code)]
 pub fn login(
     id: Identity,
     info: Json<WechatLoginInfo>
@@ -91,19 +93,22 @@ pub fn login(
     let content = resp.unwrap().json::<MPLoginInfo>();
     result(match content {
         Ok(text)=> {
-            id.remember(text.openid.to_owned());
-            Ok(HttpResponse::Ok().json(WechatLoginReturn {
-                openid: text.openid.clone(),
-            }))
+            id.remember("2".to_owned() + &text.openid);
+            match users::add_user(&text.openid) {
+                Ok(()) => Ok(HttpResponse::Ok().json(WechatLoginReturn {
+                                openid: text.openid.clone(),
+                            })),
+                Err(_) => Ok(HttpResponse::InternalServerError().finish())
+            }
         },
         Err(e) => {
             println!("{}", e.to_string());
             Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
         }
     })
-    //result(Ok(HttpResponse::Ok().json(resp.unwrap().text().unwrap())))
 }
 
+#[allow(dead_code)]
 pub fn bind_tsinghua_id(
     info: Json<WechatTHUInfo>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
@@ -118,6 +123,7 @@ pub fn bind_tsinghua_id(
     let content = resp.unwrap().json::<TsinghuaInfo>();
     result(match content {
         Ok(text)=> {
+
             Ok(HttpResponse::Ok().json(WechatTHUReturn {
                     tsinghuaid: text.user.card.clone(),
             }))
@@ -175,18 +181,35 @@ pub fn check_follow(
     })
 }
 
-pub fn follow_or_unfo(
+#[allow(dead_code)]
+pub fn follow(
     (id, query_sponsor):
     (Identity, Json<QuerySponsor>)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(id) => {
-            // TODO
-            Ok(HttpResponse::NotImplemented().json(FollowRet {
-                follow: true,
-            }))
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match users::set_user_follow(&openid, &query_sponsor.sponsor_name) {
+                Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                Err(_) => Ok(HttpResponse::UnprocessableEntity().json("Already following.")) // 422 Unprocessable Entity
+            }
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
+pub fn unfo(
+    (id, query_sponsor):
+    (Identity, Json<QuerySponsor>)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match users::cancel_user_follow(&openid, &query_sponsor.sponsor_name) {
+                Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                Err(_) => Ok(HttpResponse::UnprocessableEntity().json("Already not following.")) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
@@ -274,23 +297,40 @@ pub fn check_like(
     })
 }
 
-pub fn like_or_dislike(
+#[allow(dead_code)]
+pub fn like(
     (id, query_event):
     (Identity, Json<QueryEventByID>)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(id) => {
-            // TODO
-            Ok(HttpResponse::NotImplemented().json(LikeRet {
-                like: true,
-            }))
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match users::set_user_like(&openid, &query_event.event_id) {
+                Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                Err(_) => Ok(HttpResponse::UnprocessableEntity().json("Already liking.")) // 422 Unprocessable Entity
+            }
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
+pub fn dislike(
+    (id, query_event):
+    (Identity, Json<QueryEventByID>)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match users::cancel_user_like(&openid, &query_event.event_id) {
+                Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                Err(_) => Ok(HttpResponse::UnprocessableEntity().json("Already not liking.")) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
 #[derive(Serialize)]
-struct EventInfo {
+pub struct EventInfo {
     event_id: String,
     event_name: String,
     img_url: String,
@@ -299,17 +339,18 @@ struct EventInfo {
 }
 
 #[derive(Serialize)]
-struct LikeListRet {
+pub struct LikeListRet {
     more: bool,
     list: Vec<EventInfo>,
 }
 
+#[allow(dead_code)]
 pub fn get_like_list(
-    (id, query_list):
-    (Identity, Query<QueryList>)
+    id: Identity,
+    query_list: Query<QueryList>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(openid) => {
+    result(match identify_user(&id) {
+        Ok(openid) => {
             match users::get_user_likes(&openid) {
                 Ok(id_list) => {
                     let index = query_list.index;
@@ -323,10 +364,10 @@ pub fn get_like_list(
                             more = false;
                         }
                         for i in index..(index + 5) {
-                            match events::get_info_by_id(&id_list[index]) {
+                            match events::get_info_by_id(&id_list[i]) {
                                 Ok(event) => {
                                     list.push(EventInfo {
-                                        event_id: id_list[index].clone(),
+                                        event_id: id_list[i].clone(),
                                         event_name: event.event_name.clone(),
                                         img_url: event.event_picture.clone(),
                                         intro: event.event_introduction.clone(),
@@ -351,6 +392,83 @@ pub fn get_like_list(
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
             }
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[inline]
+pub fn book_event(
+    (query_event, id):
+        (Json<QueryEvent>, Identity)
+) -> impl Future<Item=HttpResponse, Error=Error> {
+
+
+    result(Ok(HttpResponse::Ok().finish()))
+    /*
+    result(match event_state.event_list.get_mut(&query_event.event_name) {
+        Some(mut event) => {
+            if (event.left_tickets > 0) && (event.event_status == 1) {
+                event.left_tickets-=1;
+                if event.left_tickets == 0 {
+                    event.event_status = 2;
+                }
+                Ok(HttpResponse::Ok().finish()) // 200 Ok
+            } else {
+                Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
+            }
+        },
+        None => Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
+    })*/
+}
+
+#[allow(dead_code)]
+pub fn get_sponsor_info(
+    query_sponsor: QuerySponsor,
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(_) => {
+            let sponsor: SponsorInfo;
+            match sponsors::get_info_by_name(&query_sponsor.sponsor_name) {
+                Ok(sponsor) => Ok(HttpResponse::Ok().json(sponsor)),
+                Err(e) => {
+                    println!("{}", e);
+                    Ok(HttpResponse::InternalServerError().finish()) // 500 Internal Server Error
+                }
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[derive(Serialize)]
+pub struct EventsRetToUser {
+    pub list: Vec<EventInfo>
+}
+
+#[allow(dead_code)]
+pub fn get_available_enrolled_events(
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            let mut events: Vec<EventInfo> = vec![];
+            // record
+            Ok(HttpResponse::Unauthorized().finish())
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn get_all_enrolled_events(
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            // TODO
+            Ok(HttpResponse::NotImplemented().finish())
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })
 }

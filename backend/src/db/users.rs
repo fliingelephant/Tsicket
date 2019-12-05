@@ -41,6 +41,7 @@ fn format_string(src: &String) -> String {
     src[1..src.len() - 1].to_string()
 }
 
+#[inline]
 pub fn add_user(id: &String)->Result<(), String>{
     let command = format!("INSERT INTO user_account (account_id) VALUES ('{id}');", id=id);
     println!("{}", command);
@@ -51,6 +52,7 @@ pub fn add_user(id: &String)->Result<(), String>{
     }
 }
 
+#[inline]
 pub fn set_tsinghua_id(id: &String, tsinghua_id: &String)->Result<(), String>{
     let command = format!("UPDATE user_account SET tsinghua_id='{tsinghua_id}' \
     WHERE account_id='{id}';", tsinghua_id=tsinghua_id, id=id);

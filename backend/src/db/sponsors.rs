@@ -212,7 +212,7 @@ pub fn release_push(sponsor_name: &String, event_id: &String, text: &String)
         let res = POOL.prep_exec(command, ());
         match res {
             Err(e) => return Err(e.to_string()),
-            Ok(o) => {},
+            Ok(_) => {},
         }
     }
     return Ok(());

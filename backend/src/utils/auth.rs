@@ -1,51 +1,52 @@
-/*use actix_web::{http::header::AUTHORIZATION, HttpRequest, web::Data};
-use futures::{future::result, Future};
-use http::header::HeaderValue;
+use actix_identity::{Identity};
 
-use crate::app::AppState;
-//use crate::models::User;
-//use crate::prelude::*;
+use crate::app::{ADMIN_ID};
 
-const TOKEN_PREFIX: &str = "Token ";
-
-// expand this as needed
-#[derive(Debug)]
-pub struct Auth {
-    pub user: User,
-    pub token: String,
-}
-
-// create auth message
-#[derive(Debug)]
-pub struct GenerateAuth {
-    pub token: String,
-}
-
-pub fn authenticate(state: &Data<AppState>, req: &HttpRequest) -> impl Future<Item = Auth, Error = Error> {
-    let db = state.db.clone();
-
-    result(preprocess_authz_token(req.headers().get(AUTHORIZATION)))
-        .and_then(move |token| db.send(GenerateAuth { token }).from_err())
-        .flatten()
-}
-
-fn preprocess_authz_token(token: Option<&HeaderValue>) -> Result<String> {
-    let token = match token {
-        Some(token) => token.to_str().unwrap(),
-        None => {
-            return Err(Error::Unauthorized(json!({
-                "error": "No authorization was provided",
-            })))
-        }
-    };
-
-    if !token.starts_with(TOKEN_PREFIX) {
-        return Err(Error::Unauthorized(json!({
-            "error": "Invalid authorization method",
-        })));
+#[inline]
+pub fn identify_admin(
+    id: &Identity
+) -> Result<(), ()>{
+    match id.identity() {
+        Some(id) => 
+            if (&id[0..0] != "0")
+                || (&id[1..] != *ADMIN_ID) { // not an administrator
+                Err(())
+            }
+            else {
+                Ok(())
+            }
+        None => Err(())
     }
+}
 
-    let token = token.replacen(TOKEN_PREFIX, "", 1);
+#[inline]
+pub fn identify_sponsor(
+    id: &Identity
+) -> Result<String, ()>{
+    match id.identity() {
+        Some(id) => 
+            if &id[0..0] != "1" {
+                Err(())
+            }
+            else {
+                Ok(id[1..].to_string())
+            }
+        None => Err(())
+    }
+}
 
-    Ok(token)
-}*/
+#[inline]
+pub fn identify_user(
+    id: &Identity
+) -> Result<String, ()>{
+    match id.identity() {
+        Some(id) => 
+            if &id[0..0] != "2" {
+                Err(())
+            }
+            else {
+                Ok(id[1..].to_string())
+            }
+        None => Err(())
+    }
+}

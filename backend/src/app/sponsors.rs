@@ -8,17 +8,15 @@ use actix_web::{Error,
 use futures::{Future, future::result};
 use serde::{Deserialize, Serialize};
 
-use crate::db::events;
-use crate::db::events::Event;
+use crate::db::events::{Event};
 use crate::db::sponsors;
-
-use super::EventState;
 use super::events::EventsRet;
 use super::EVENT_LIST;
 use super::update::update_events;
+use crate::utils::auth::{identify_sponsor};
 
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 pub struct RegisterSponsor {
     pub sponsorname: String,
     pub password: String,
@@ -38,6 +36,13 @@ pub struct QuerySponsor {
     pub sponsor_name: String,
 }
 
+#[derive(Deserialize)]
+pub struct QuerySponsorByID {
+    pub sponsor_id: String,
+}
+
+#[allow(dead_code)]
+#[inline]
 pub fn login(
     id: Identity,
     login_sponsor: Json<LoginSponsor>,
@@ -46,21 +51,29 @@ pub fn login(
         &login_sponsor.id,
         &login_sponsor.password) {
         Ok(name) => {
-            id.remember(name.to_owned());
-            Ok(HttpResponse::Ok().json(name))
+            id.remember("1".to_owned() + &name);
+            Ok(HttpResponse::Ok().json(name)) // 200 OK
         },
-        Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
+        Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)), // 422 Unprocessable Entity
     })
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn logout(
     id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    id.forget();
-    result(Ok(HttpResponse::Ok().finish()))
+    result(match identify_sponsor(&id) {
+        Ok(_) => {
+            id.forget();
+            Ok(HttpResponse::Ok().finish()) // 200 OK
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
 }
 
+#[allow(dead_code)]
+#[inline]
 pub fn register(
     id: Identity,
     register_sponsor: Json<RegisterSponsor>,
@@ -72,91 +85,90 @@ pub fn register(
         &register_sponsor.email,
         &register_sponsor.phone_number) {
         Ok(()) => {
-            id.remember(register_sponsor.sponsorname.to_owned());
+            id.remember("1".to_owned() + &register_sponsor.sponsorname);
             Ok(HttpResponse::Ok().finish())
         },
         Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)),
     })
 }
 
+#[allow(dead_code)]
+#[inline]
 pub fn publish_event(
-    (event, id):
-        (Json<Event>, Identity,
-            // Data<Mutex<EventState>>
-        ),
-) -> impl Future<Item=HttpResponse, Error=Error> {
-    if let Some(id) = id.identity() {
-        //let mut state = state.lock().unwrap();
-        let new_event = event.into_inner();
-        //state.event_list.push(new_event.clone());
-        EVENT_LIST.lock().unwrap().push(new_event.clone());
-        let events = EVENT_LIST.lock().unwrap().clone();
-        update_events(&events);
-        result(Ok(HttpResponse::Ok().finish()))
-    } else {
-        result(Ok(HttpResponse::Unauthorized().finish()))
-    }
-}
-
-pub fn get_events(
+    event: Json<Event>,
     id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    if let Some(sponsor_name) = id.identity() {
-        let mut sponsor_event_list: Vec<Event> = vec![];
-        /*
-        let t = events::get_sponsor_events(
-            &sponsor_id, &mut sponsor_event_list);
-        result(match t {
-            Ok(()) => Ok(HttpResponse::Ok().json(
-                    EventRet {
-                        events: sponsor_event_list
-                    }
-                )),
-            Err(e) => Ok(HttpResponse::ServiceUnavailable().json(e))
-        })*/
+    result(match identify_sponsor(&id) {
+        Ok(_) => {
+            let new_event = event.into_inner();
+            EVENT_LIST.lock().unwrap()
+                .entry(new_event.event_id.clone())
+                .or_insert(new_event.clone());
+            //update_events(&events);
 
-        //let mut state = state.lock().unwrap();
-        for event in &(*EVENT_LIST.lock().unwrap()) {
-            println!("{:?}",event);
-            if event.sponsor_name == sponsor_name {
-                sponsor_event_list.push(event.clone())
-            }
+            Ok(HttpResponse::Ok().finish()) // 200 OK
         }
-        result(Ok(HttpResponse::Ok().json(EventsRet {
-                events: sponsor_event_list
-            }
-        )))
-    } else {
-        result(Ok(HttpResponse::Unauthorized().finish()))
-    }
-}
-
-pub fn alter_sponsor_info(
-    (alter_sponsor, id):
-        (Json<sponsors::Sponsor>, Identity)
-) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(_) => {
-            let alter_sponsor = alter_sponsor.into_inner();
-            match sponsors::alter_sponsor_info(&alter_sponsor) {
-                Ok(()) => Ok(HttpResponse::Ok().finish()), // 200 Ok
-                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
-            }
-        },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
+#[allow(dead_code)]
+#[inline]
+pub fn get_available_events(
+    id: Identity,
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            let mut sponsor_event_list: Vec<Event> = vec![];
+
+            for (_, event) in &*EVENT_LIST.lock().unwrap() {
+                if event.sponsor_name == sponsor_name {
+                    sponsor_event_list.push(event.clone())
+                }
+            }
+            Ok(HttpResponse::Ok().json(EventsRet {
+                    events: sponsor_event_list
+                }
+            ))
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+#[inline]
+pub fn alter_sponsor_info(
+    alter_sponsor: Json<sponsors::Sponsor>,
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            let alter_sponsor = alter_sponsor.into_inner();
+            if sponsor_name != alter_sponsor.sponsor_name {
+                Ok(HttpResponse::Unauthorized().finish())
+            } else {
+                match sponsors::alter_sponsor_info(&alter_sponsor) {
+                    Ok(()) => Ok(HttpResponse::Ok().finish()), // 200 Ok
+                    Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+                }
+            }
+        }
+        Err(()) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+#[inline]
 pub fn get_sponsor_info (
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(name) => {
-            match sponsors::get_info_by_name(&name) {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            match sponsors::get_info_by_name(&sponsor_name) {
                 Ok(sponsor) => Ok(HttpResponse::Ok().json(&sponsor)), // 200 Ok
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
             }
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(()) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }

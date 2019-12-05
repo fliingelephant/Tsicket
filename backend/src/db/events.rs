@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-pub use crate::app::POOL;
+use crate::app::POOL;
 
 #[inline]
 fn format_string(src: &String) -> String {
@@ -56,4 +56,38 @@ pub fn get_info_by_id(id: &String)-> Result<Event, String> {
     }
 
     Err("No such sponsor".to_string())
+}
+
+pub fn get_all_events(
+    event_list: &mut Vec<Event>
+) -> Result<(), String> {
+    let command_event = "SELECT * FROM event;".to_string();
+    let res = POOL.prep_exec(command_event, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+
+    for row in res.unwrap() {
+        let ev = row.unwrap().unwrap();
+        let event = Event {
+            event_id: format_string(&ev[0].as_sql(true)),
+            sponsor_name: format_string(&ev[1].as_sql(true)),
+            event_name: format_string(&ev[2].as_sql(true)),
+            start_time: format_string(&ev[3].as_sql(true)),
+            end_time: format_string(&ev[4].as_sql(true)),
+            event_type: ev[5].as_sql(true).parse().unwrap(),
+            event_introduction: format_string(&ev[6].as_sql(true)),
+            event_picture: format_string(&ev[7].as_sql(true)),
+            event_capacity: ev[8].as_sql(true).parse().unwrap(),
+            current_participants: ev[9].as_sql(true).parse().unwrap(),
+            left_tickets: ev[10].as_sql(true).parse().unwrap(),
+            event_status: ev[11].as_sql(true).parse().unwrap(),
+            event_location: format_string(&ev[12].as_sql(true)),
+            update_type: 0
+        };
+        event_list.push(event);
+    }
+
+    Ok(())
 }

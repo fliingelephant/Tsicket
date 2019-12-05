@@ -1,32 +1,31 @@
-extern crate mysql;
-
-
+use std::collections::{HashMap};
 use std::env;
 use std::sync::{Mutex};
 
 use actix_identity::{Identity, CookieIdentityPolicy, IdentityService};
 use actix_web::{
     App,
-    // http::header::{AUTHORIZATION, CONTENT_TYPE},
     HttpRequest,
     HttpServer,
     middleware,
     web,
     web::Data,
 };
-use mysql as my;
+use mysql::{Pool};
 use rand::{thread_rng, Rng};
 
 use crate::db;
+use crate::db::events::Event;
 use init::initiate;
 
-mod admins;
+pub mod admins;
 mod events;
 mod init;
 mod sponsors;
 mod users;
 mod update;
 
+/* Configuration String */
 lazy_static! {
     pub static ref ADMIN_ID: String
         = env::var("ADMIN_ID").expect("Admin's id must be set!");
@@ -36,16 +35,14 @@ lazy_static! {
         = env::var("APP_ID").expect("App id must be set!");
     pub static ref DATABASE_URL: String
         = env::var("DATABASE_URL").expect("Database URL must be set!");
-    pub static ref EVENTS_TO_CHECK: Vec<db::events::Event> = Vec::new();
-    pub static ref POOL: my::Pool = my::Pool::new("mysql://root:T%i8c3k8E%23t5@localhost:3306/tsicket").unwrap();
     pub static ref SECRET: String
         = env::var("SECRET").expect("Wechat secret must be set!");
-    pub static ref EVENT_LIST: Mutex<Vec<db::events::Event>> = Mutex::new(vec![]);
 }
 
-pub struct EventState {
-    pub event_list: Vec<db::events::Event>,
-    //pub record: 
+/* Static Data */
+lazy_static! {
+    pub static ref EVENT_LIST: Mutex<HashMap<String, Event>> = Mutex::new(HashMap::new());
+    pub static ref POOL: Pool = Pool::new(&*DATABASE_URL).unwrap();
 }
 
 fn index(id: Identity) -> String {
@@ -58,13 +55,12 @@ fn index(id: Identity) -> String {
 }
 
 pub fn start() -> () {
-    //let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let bind_address = env::var("BIND_ADDRESS").expect("BIND_ADDRESS is not set");
 
     let mut cookie_private_key = [0u8; 32];
     thread_rng().fill(&mut cookie_private_key[..]);
 
-    initiate(& mut *EVENT_LIST.lock().unwrap()).unwrap();
+    //initiate(& mut *EVENT_LIST.lock().unwrap()).unwrap();
 
     HttpServer::new(move || {
         App::new()
@@ -94,19 +90,19 @@ fn routes(app: &mut web::ServiceConfig) {
                         //.route(web::post().to_async(users::get_enrolled_events))
                     )
                     .service(web::resource("users/book")
-                        .route(web::post().to_async(events::book_event))
+                        .route(web::post().to_async(users::book_event))
                     )
                     .service(web::resource("users/broadcast")
                         .route(web::get().to_async(events::get_broadcast_events))
                     )
                     .service(web::resource("users/follow")
                         .route(web::get().to_async(users::get_follow_list))
-                        .route(web::post().to_async(users::follow_or_unfo))
+                        //.route(web::post().to_async(users::follow_or_unfo))
                         .route(web::put().to_async(users::check_follow))
                     )
                     .service(web::resource("users/like")
                         .route(web::get().to_async(users::get_like_list))
-                        .route(web::post().to_async(users::like_or_dislike))
+                        //.route(web::post().to_async(users::like_or_dislike))
                         .route(web::put().to_async(users::check_like))
                     )
                     .service(web::resource("users/login")
@@ -118,7 +114,7 @@ fn routes(app: &mut web::ServiceConfig) {
 
                      /* Sponsor routes ↓ */
                      .service(web::resource("sponsors")
-                         .route(web::get().to_async(sponsors::get_events))
+                         .route(web::get().to_async(sponsors::get_available_events))
                          .route(web::post().to_async(sponsors::publish_event))
                      )
                      .service(web::resource("sponsors/register")

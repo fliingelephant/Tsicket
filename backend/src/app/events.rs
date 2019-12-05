@@ -6,9 +6,9 @@ use futures::{Future, future::result};
 use serde::{Deserialize, Serialize};
 
 use super::{ADMIN_ID, EVENT_LIST};
-use super::EventState;
 use super::update::{update_events};
 use crate::db::events::Event;
+use crate::utils::auth::{identify_user};
 
 #[derive(Deserialize)]
 pub struct QueryEvent {
@@ -25,50 +25,6 @@ pub struct EventsRet {
     pub events: Vec<Event>
 }
 
-#[inline]
-pub fn book_event(
-    (query_event, event_state, id):
-        (Json<QueryEvent>, Data<Mutex<EventState>>, Identity)
-) -> impl Future<Item=HttpResponse, Error=Error> {
-
-    let mut event_state = event_state.lock().unwrap();
-
-    result(Ok(HttpResponse::Ok().finish()))
-    /*
-    result(match event_state.event_list.get_mut(&query_event.event_name) {
-        Some(mut event) => {
-            if (event.left_tickets > 0) && (event.event_status == 1) {
-                event.left_tickets-=1;
-                if event.left_tickets == 0 {
-                    event.event_status = 2;
-                }
-                Ok(HttpResponse::Ok().finish()) // 200 Ok
-            } else {
-                Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
-            }
-        },
-        None => Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
-    })*/
-}
-
-#[inline]
-pub fn get_all_events(
-    (event_state, id):
-        (Data<Mutex<EventState>>, Identity)
-) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(id) => {
-            if id == *ADMIN_ID {
-                // TODO
-                Ok(HttpResponse::NotImplemented().finish())
-            } else {
-                Ok(HttpResponse::Unauthorized().finish())
-            }
-        },
-        None => Ok(HttpResponse::Unauthorized().finish())
-    })
-}
-
 #[derive(Serialize)]
 struct BroadCastEventInfo {
     event_id: String,
@@ -82,16 +38,18 @@ struct BroadCastRet {
     list: Vec<BroadCastEventInfo>
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn get_broadcast_events(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(id) => {
+    result(match identify_user(&id) {
+        Ok(_) => {
             let mut list: Vec<BroadCastEventInfo> = vec![];
             let mut count = 0;
-            for event in &(*EVENT_LIST.lock().unwrap()) {
-                if event.left_tickets > 0 {
+            for (_, event) in &(*EVENT_LIST.lock().unwrap()) {
+                if (event.left_tickets > 0)
+                    && (event.event_status == 1) {
                     list.push(BroadCastEventInfo {
                         event_id: event.event_id.clone(),
                         event_name: event.event_name.clone(),
@@ -108,10 +66,11 @@ pub fn get_broadcast_events(
                 list: list
             }))
         },
-        None => Ok(HttpResponse::Unauthorized().finish())
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })
 }
 
+#[allow(dead_code)]
 pub fn get_event_info(
     (id, query_event):
         (Identity, Json<QueryEventByID>)
@@ -121,19 +80,22 @@ pub fn get_event_info(
     }
 
     
+    /*
     for event in &(*EVENT_LIST.lock().unwrap()) {
         if event.event_id == query_event.event_id {
             return result(Ok(HttpResponse::Ok().json(event.clone())));
         }
-    }
+    }*/
 
     result(Ok(HttpResponse::BadRequest().finish()))
 }
 
+#[allow(dead_code)]
 pub fn alter_event_info(
     (id, event_info):
         (Identity, Json<Event>)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
+    /*
     result(match id.identity() {
         Some(name) => {
             let alter_event = event_info.into_inner();
@@ -151,5 +113,7 @@ pub fn alter_event_info(
             Ok(HttpResponse::BadRequest().finish())
         },
         None => Ok(HttpResponse::Unauthorized().finish())
-    })
+    })*/
+
+    result(Ok(HttpResponse::BadRequest().finish()))
 }
