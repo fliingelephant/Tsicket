@@ -6,6 +6,8 @@ use actix_web::{Error,
     web::Data,
     web::Json};
 use futures::{Future, future::result};
+use md5::compute;
+use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::db::events::{Event};
@@ -52,6 +54,7 @@ pub fn login(
         &login_sponsor.password) {
         Ok(name) => {
             id.remember("1".to_owned() + &name);
+            println!("sponsor {} log in", name);
             Ok(HttpResponse::Ok().json(name)) // 200 OK
         },
         Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)), // 422 Unprocessable Entity
@@ -92,22 +95,68 @@ pub fn register(
     })
 }
 
-#[allow(dead_code)]
+#[derive(Deserialize)]
+pub struct PublishEvent {
+    pub event_name: String,
+    pub start_time: String,
+    pub end_time: String,
+    pub event_type: i8,
+    pub event_introduction: String,
+    pub event_picture: String,
+    pub event_capacity: i32,
+    pub left_tickets: i32,
+    pub event_location: String,
+}
+
 #[inline]
+fn md5(x: &String) -> String {
+    format!("{:x}", compute(x.to_owned()))
+}
+
+#[derive(Serialize)]
+pub struct EventIDRet {
+    event_id: String
+}
+
+#[allow(dead_code)]
 pub fn publish_event(
-    event: Json<Event>,
+    new_event: Json<PublishEvent>,
     id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_sponsor(&id) {
-        Ok(_) => {
-            let new_event = event.into_inner();
-            EVENT_LIST.lock().unwrap()
-                .entry(new_event.event_id.clone())
-                .or_insert(new_event.clone());
-            //update_events(&events);
+        Ok(sponsor_name) => {
+            let mut event_id = md5(&thread_rng().gen::<u32>().to_string());
+            loop {
+                match (*EVENT_LIST).lock().unwrap().get(&event_id) {
+                    Some(_) => {
+                        event_id = md5(&thread_rng().gen::<u32>().to_string());
+                    },
+                    None => {
+                        (*EVENT_LIST).lock().unwrap().insert(event_id.clone(), Event{
+                            event_id: event_id.clone(),
+                            sponsor_name: sponsor_name,
+                            event_name: new_event.event_name.clone(),
+                            start_time: new_event.start_time.clone(),
+                            end_time: new_event.end_time.clone(),
+                            event_type: new_event.event_type,
+                            event_introduction: new_event.event_introduction.clone(),
+                            event_picture: new_event.event_picture.clone(),
+                            event_capacity: new_event.event_capacity,
+                            current_participants: 0,
+                            left_tickets: new_event.left_tickets,
+                            event_status: 0,
+                            event_location: new_event.event_location.clone(),
+                            update_type: 1,
+                        });
+                        break;
+                    }
+                }
+            }
 
-            Ok(HttpResponse::Ok().finish()) // 200 OK
-        }
+            Ok(HttpResponse::Ok().json(EventIDRet {
+                event_id: event_id
+            }))
+        },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }

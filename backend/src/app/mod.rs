@@ -102,7 +102,7 @@ fn routes(app: &mut web::ServiceConfig) {
                     )
                     .service(web::resource("users/like")
                         .route(web::get().to_async(users::get_like_list))
-                        //.route(web::post().to_async(users::like_or_dislike))
+                        .route(web::post().to_async(users::like_or_dislike))
                         .route(web::put().to_async(users::check_like))
                     )
                     .service(web::resource("users/login")

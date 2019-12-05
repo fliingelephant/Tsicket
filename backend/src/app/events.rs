@@ -39,7 +39,6 @@ struct BroadCastRet {
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn get_broadcast_events(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
@@ -57,7 +56,7 @@ pub fn get_broadcast_events(
                         intro: event.event_introduction.clone()
                     });
                     count += 1;
-                    if count >= 5 {
+                    if count >= 6 {
                         break;
                     }
                 }
@@ -79,13 +78,15 @@ pub fn get_event_info(
         return result(Ok(HttpResponse::Unauthorized().finish())); // 401 Unauthorized
     }
 
-    
+    //if *EVENT_LIST.lock().unwrap().entry(query_event.event_id)
     /*
     for event in &(*EVENT_LIST.lock().unwrap()) {
         if event.event_id == query_event.event_id {
             return result(Ok(HttpResponse::Ok().json(event.clone())));
         }
     }*/
+
+    
 
     result(Ok(HttpResponse::BadRequest().finish()))
 }

@@ -110,6 +110,28 @@ pub fn check_tsinghua_id(id: &String)->Result<bool, String>{
     return Err("No such user".to_string());
 }
 
+pub fn get_tsinghua_id(id: &String) -> Result<String, String> {
+    let command = format!("SELECT tsinghua_id FROM user_account WHERE account_id='{id}';", id=id);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    for row in res.unwrap(){
+        let result = row.unwrap().unwrap();
+        let tsinghua_id = format_string(&result[0].as_sql(true));
+        if tsinghua_id.is_empty(){
+            return Err("Tsinghua ID is not set yet.".to_string());
+        }
+        else {
+            return Ok(tsinghua_id.clone());
+        }
+    }
+    return Err("No such user".to_string());
+}
+
 pub fn get_user_records(id: &String)
                           -> Result<Vec<Record>, String> {
     let command = format!("SELECT * FROM ticket_record WHERE user_id='{id}';", id = id);

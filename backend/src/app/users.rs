@@ -30,12 +30,6 @@ pub struct MPLoginInfo {
     session_key: String,
 }
 
-#[derive(Deserialize)]
-pub struct WechatTHUInfo {
-    openid: String,
-    token: String,
-}
-
 #[derive(Serialize)]
 pub struct MPTHUInfo {
     token: String,
@@ -95,10 +89,12 @@ pub fn login(
         Ok(text)=> {
             id.remember("2".to_owned() + &text.openid);
             match users::add_user(&text.openid) {
-                Ok(()) => Ok(HttpResponse::Ok().json(WechatLoginReturn {
+                Ok(_) => Ok(HttpResponse::Ok().json(WechatLoginReturn {
                                 openid: text.openid.clone(),
                             })),
-                Err(_) => Ok(HttpResponse::InternalServerError().finish())
+                Err(_) => Ok(HttpResponse::Ok().json(WechatLoginReturn {
+                    openid: text.openid.clone(),
+                }))
             }
         },
         Err(e) => {
@@ -106,6 +102,11 @@ pub fn login(
             Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
         }
     })
+}
+
+#[derive(Deserialize)]
+pub struct WechatTHUInfo {
+    token: String
 }
 
 #[allow(dead_code)]
@@ -147,8 +148,12 @@ pub fn get_tsinghua_id(
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(openid) => {
-            // TODO
-            Ok(HttpResponse::NotImplemented().finish())
+            match users::get_tsinghua_id(&openid) {
+                Ok(tsinghua_id) => Ok(HttpResponse::Ok().json(WechatTHUReturn {
+                    tsinghuaid: tsinghua_id
+                })),
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
         }
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })
@@ -162,19 +167,35 @@ struct UserInfo {
     tsinghua_id: String,
 }
 
+#[derive(Serialize)]
+struct UserInfoWithoutTHUID {
+    follow: usize,
+    history: usize,
+    like: usize,
+}
+
 pub fn get_personal_info(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(openid) => {
-            Ok(HttpResponse::NotImplemented().json(UserInfo{
-                follow: 0,
-                history: 0,
-                like: 0,
-                tsinghua_id: "testtsinghuaid".to_string().clone()
-            }))
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            // TODO: 获得关注数目、历史数目和喜爱的数目
+            match users::get_tsinghua_id(&openid) {
+                Ok(tsinghua_id) => Ok(HttpResponse::NotImplemented().json(UserInfo{
+                    follow: 0,
+                    history: 0,
+                    like: 0,
+                    tsinghua_id: tsinghua_id
+                })),
+                Err(_) => Ok(HttpResponse::NotImplemented().json(UserInfoWithoutTHUID{
+                    follow: 0,
+                    history: 0,
+                    like: 0,
+                }))
+            }
+            
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
@@ -212,12 +233,16 @@ pub fn follow_or_unfo(
                 Ok(flag) => {
                     if flag == false {
                         match users::set_user_follow(&openid, &query_sponsor.sponsor_name) {
-                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Ok(_) => Ok(HttpResponse::Ok().json(FollowRet { // 200 OK
+                                follow: true
+                            })),
                             Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
                         }
                     } else {
                         match users::cancel_user_follow(&openid, &query_sponsor.sponsor_name) {
-                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Ok(_) => Ok(HttpResponse::Ok().json(FollowRet { // 200 OK
+                                follow: false
+                            })),
                             Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
                         }
                     }
@@ -388,12 +413,16 @@ pub fn like_or_dislike(
                 Ok(flag) => {
                     if flag == false {
                         match users::set_user_like(&openid, &query_event.event_id) {
-                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Ok(_) => Ok(HttpResponse::Ok().json(LikeRet {
+                                like: true
+                            })), // 200 OK
                             Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
                         }
                     } else {
                         match users::cancel_user_like(&openid, &query_event.event_id) {
-                            Ok(_) => Ok(HttpResponse::Ok().finish()), // 200 OK
+                            Ok(_) => Ok(HttpResponse::Ok().json(LikeRet {
+                                like: false
+                            })), // 200 OK
                             Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
                         }
                     }
