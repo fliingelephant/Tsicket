@@ -120,21 +120,19 @@ pub struct EventIDRet {
 
 #[allow(dead_code)]
 pub fn publish_event(
-    new_event: Json<PublishEvent>,
     id: Identity,
+    new_event: Json<PublishEvent>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_sponsor(&id) {
         Ok(sponsor_name) => {
             let mut event_id = md5(&thread_rng().gen::<u32>().to_string());
             loop {
-                match (*EVENT_LIST).lock().unwrap().get(&event_id) {
-                    Some(_) => {
+                if (*EVENT_LIST).lock().unwrap().contains_key(&event_id) {
                         event_id = md5(&thread_rng().gen::<u32>().to_string());
-                    },
-                    None => {
+                } else  {
                         (*EVENT_LIST).lock().unwrap().insert(event_id.clone(), Event{
                             event_id: event_id.clone(),
-                            sponsor_name: sponsor_name,
+                            sponsor_name: sponsor_name.clone(),
                             event_name: new_event.event_name.clone(),
                             start_time: new_event.start_time.clone(),
                             end_time: new_event.end_time.clone(),
@@ -146,16 +144,17 @@ pub fn publish_event(
                             left_tickets: new_event.left_tickets,
                             event_status: 0,
                             event_location: new_event.event_location.clone(),
-                            update_type: 1,
+                            update_type: 2,
                         });
-                        break;
-                    }
+                    break;
                 }
             }
-
-            Ok(HttpResponse::Ok().json(EventIDRet {
-                event_id: event_id
-            }))
+            match update_events() {
+                Ok(_) => Ok(HttpResponse::Ok().json(EventIDRet { // 200 OK
+                    event_id: event_id
+                })),
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })

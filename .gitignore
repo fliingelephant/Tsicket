@@ -5,3 +5,4 @@ backend/target
 
 
 Cargo.lock
+backend/nohup.out

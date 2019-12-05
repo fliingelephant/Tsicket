@@ -16,7 +16,10 @@ pub fn initiate(
     let command_event = "SELECT * FROM event;".to_string();
     let res = POOL.prep_exec(command_event, ());
     match res {
-        Err(e) => return Err(e.to_string()),
+        Err(e) => {
+            println!("{}", e.to_string());
+            return Err(e.to_string());
+        }
         _ => {},
     }
 

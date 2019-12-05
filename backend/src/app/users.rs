@@ -318,15 +318,15 @@ pub fn get_follow_list(
                             more = false;
                         }
                         for i in index..(index + 14) {
-                            match sponsors::get_info_by_name(&name_list[index]) {
+                            match sponsors::get_info_by_name(&name_list[i]) {
                                 Ok(sponsor) => {
                                     list.push(SponsorInfo {
                                         id: sponsor.id.clone(),
-                                        name: name_list[index].clone(),
+                                        name: name_list[i].clone(),
                                         avatar_url: "https://image.baidu.com/search/detail?ct=503316480&z=0&ipn=d&word=影流之主&step_word=&hs=0&pn=48&spn=0&di=2670&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=0&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=undefined&cs=562893584%2C1346842489&os=32714240%2C1997607233&simid=3364286120%2C229005232&adpicid=0&lpn=0&ln=777&fr=&fmq=1575227579031_R&fm=&ic=undefined&s=undefined&hd=undefined&latest=undefined&copyright=undefined&se=&sme=&tab=0&width=undefined&height=undefined&face=undefined&ist=&jit=&cg=&bdtype=11&oriquery=&objurl=http%3A%2F%2Fpic.fxsw.net%2Fup%2F2019-11%2F2019112310749555.jpg&fromurl=ippr_z2C%24qAzdH3FAzdH3Fooo_z%26e3Buxfo_z%26e3BgjpAzdH3Fip4sAzdH3Fd8la_z%26e3Bip4s&gsm=&rpstart=0&rpnum=0&islist=&querylist=&force=undefined".to_string().clone(),
                                     })
                                 },
-                                Err(e) => {
+                                Err(_) => {
                                     break;
                                 }
                             }

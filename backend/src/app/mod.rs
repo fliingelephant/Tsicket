@@ -41,6 +41,7 @@ lazy_static! {
 
 /* Static Data */
 lazy_static! {
+    pub static ref BROADCAST_LIST: Mutex<Vec<String>> = Mutex::new(Vec::new());
     pub static ref EVENT_LIST: Mutex<HashMap<String, Event>> = Mutex::new(HashMap::new());
     pub static ref POOL: Pool = Pool::new(&*DATABASE_URL).unwrap();
 }
@@ -60,7 +61,7 @@ pub fn start() -> () {
     let mut cookie_private_key = [0u8; 32];
     thread_rng().fill(&mut cookie_private_key[..]);
 
-    //initiate(& mut *EVENT_LIST.lock().unwrap()).unwrap();
+    initiate(& mut *EVENT_LIST.lock().unwrap()).unwrap();
 
     HttpServer::new(move || {
         App::new()

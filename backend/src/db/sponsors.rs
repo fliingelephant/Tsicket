@@ -35,7 +35,6 @@ pub fn sponsor_register(
      email, phone_number) VALUES ('{id}', '{name}', '{password}', '{email}', '{phone_number}');",
                           id = id, name = name, password = md5_with_salt(id, raw_password),
                           email=email, phone_number=phone_number);
-    println!("{}", command);
 
     match POOL.prep_exec(command, ()) {
         Ok(_) => Ok(()),
@@ -47,7 +46,6 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
                             -> Result<String, String> {
     let password = md5_with_salt(&id, &raw_password);
     let command = format!("SELECT password, sponsor_name FROM sponsor_account WHERE account_id='{id}';", id = id);
-    //println!("{}", command);
 
     let res = POOL.prep_exec(command, ());
     match res {
@@ -58,7 +56,6 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
     for row in res.unwrap(){
         let result = row.unwrap().unwrap();
         let pwd = format_string(&result[0].as_sql(true));
-        println!("{}, {}", password,pwd);
         if password == pwd{
             let name = format_string(&result[1].as_sql(true));
             return Ok(name);
@@ -72,7 +69,6 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
 
 pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
     let command = format!("SELECT * FROM event WHERE sponsor_name='{name}'", name = name);
-    //println!("{}", command);
 
     let res = POOL.prep_exec(command, ());
     match res {
@@ -166,7 +162,6 @@ pub fn alter_sponsor_info(
     let command = format!("UPDATE sponsor_account SET head_portrait='{head}', email='{email}', phone_number='{phone_number}' \
     WHERE sponsor_name='{sponsor_name}';", email=sponsor.email, phone_number=sponsor.phone_number,
                           head=sponsor.head_portrait, sponsor_name=sponsor.sponsor_name);
-    println!("{}", command);
     let res = POOL.prep_exec(command, ());
     match res {
         Err(e) => return Err(e.to_string()),
@@ -188,7 +183,6 @@ pub fn publish_moment(sponsor_name: &String, event_id: &String, text: &String, p
     let command = format!("INSERT INTO moment (sponsor_name, event_id, text, pictures) VALUES \
      ('{sponsor_name}', '{event_id}', '{text}', '{pictures}');", sponsor_name=sponsor_name,
                           event_id=event_id, text=text, pictures=picture_str);
-    println!("{}", command);
     let res = POOL.prep_exec(command, ());
     match res {
         Err(e) => return Err(e.to_string()),
@@ -208,7 +202,6 @@ pub fn release_push(sponsor_name: &String, event_id: &String, text: &String)
         let command = format!("INSERT INTO push (sponsor_name, event_id, user_id, text) VALUES \
      ('{sponsor_name}', '{event_id}', '{user_id}', '{text}');", sponsor_name=sponsor_name,
                               event_id=event_id, user_id=user, text=text);
-        println!("{}", command);
         let res = POOL.prep_exec(command, ());
         match res {
             Err(e) => return Err(e.to_string()),
