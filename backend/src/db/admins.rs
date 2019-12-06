@@ -25,7 +25,6 @@ fn admin_sign_up(id: String, name: String, raw_password: String)->String{
     let password = format!("{:x}", md5::compute(raw_password + &id));
     let command = format!("INSERT INTO admin_account (account_id, admin_name, password) VALUES\
      ('{id}', '{name}', '{password}');", id=id, name=name, password=password);
-    //println!("{}", command);
     let req = POOL.prep_exec(command, ());
     match req {
         Result::Ok(_val) => return "success".to_string(),

@@ -1,11 +1,19 @@
+use std::fs;
+use std::io::{Write};
+use std::path::{PathBuf};
 use std::sync::{Mutex};
 
 use actix_identity::{Identity};
-use actix_web::{Error,
+use actix_multipart::{Field, Multipart, MultipartError};
+use actix_web::{
+    error,
+    Error,
+    HttpRequest,
     HttpResponse,
-    web::Data,
+    web,
     web::Json};
-use futures::{Future, future::result};
+use futures::{Stream, Future, future::result};
+use futures::future::{err, Either};
 use md5::compute;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
@@ -225,7 +233,7 @@ pub fn alter_sponsor_info(
 }
 
 #[allow(dead_code)]
-pub fn get_sponsor_info (
+pub fn get_sponsor_info(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_sponsor(&id) {
@@ -237,4 +245,98 @@ pub fn get_sponsor_info (
         },
         Err(()) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
+}
+
+pub fn save_file(
+    field: Field,
+    file_name: &String
+) -> impl Future<Item=String, Error=Error> {
+    println!("{:?}", field.content_type());
+    let mut suffix = field.content_type().subtype().to_string();
+    if suffix == "jpeg" {
+        suffix = "jpg".to_string();
+    }
+    let name_assigned_by_server = file_name.to_owned() + "." + &suffix;
+    let path = "../../../static/".to_string() + &file_name + "." + &suffix;
+
+    let file = match fs::File::create(path) {
+        Ok(file) => file,
+        Err(e) => return Either::A(err(error::ErrorInternalServerError(e))),
+    };
+    Either::B(
+        field
+            .fold((file, 0i64), move |(mut file, mut acc), bytes| {
+                // fs operations are blocking, we have to execute writes
+                // on threadpool
+                web::block(move || {
+                    file.write_all(bytes.as_ref()).map_err(|e| {
+                        println!("file.write_all failed: {:?}", e);
+                        MultipartError::Payload(error::PayloadError::Io(e))
+                    })?;
+                    acc += bytes.len() as i64;
+                    Ok((file, acc))
+                })
+                .map_err(|e: error::BlockingError<MultipartError>| {
+                    match e {
+                        error::BlockingError::Error(e) => e,
+                        error::BlockingError::Canceled => MultipartError::Incomplete,
+                    }
+                })
+            })
+            .map(move |(_, _)| name_assigned_by_server)
+            .map_err(|e| {
+                println!("save_file failed, {:?}", e);
+                error::ErrorInternalServerError(e)
+            }),
+    )
+}
+
+#[inline]
+pub fn two_terms_md5(term_a: String, term_b: &str) -> String {
+    format!("{:x}_{:x}", compute(term_a.to_owned() + term_b), compute(term_b))
+}
+
+#[derive(Serialize)]
+pub struct FileURLRet {
+    file_url: String
+}
+
+#[allow(dead_code)]
+pub fn update_pic(
+    id: Identity,
+    multipart: Multipart,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    let file_name: String;
+    let name_assigned_by_sponsor = req.match_info().query("filename");
+    if let Ok(sponsor_name) = identify_sponsor(&id) {
+        file_name = two_terms_md5(sponsor_name, name_assigned_by_sponsor);
+    } else {
+        file_name = "default".to_string();
+    }
+
+        multipart
+            .map_err(error::ErrorInternalServerError)
+            .map(move |field| save_file(field, &file_name).into_stream())
+            .flatten()
+            .collect()
+            .map(|name_assigned_by_server| {
+                HttpResponse::Ok().json(FileURLRet {
+                    file_url: "http://2019-a18.iterator-traits.com/apis/sponsors/pic/".to_string() + &name_assigned_by_server[0]
+                })
+            })
+            .map_err(|e| {
+                    println!("failed: {}", e);
+                    e
+            })
+}
+
+#[allow(dead_code)]
+pub fn get_pic(
+    req: HttpRequest
+) -> actix_web::Result<actix_files::NamedFile> {
+    let path: PathBuf = ("../../../static/".to_string() + &req.match_info().query("filename")).parse().unwrap();
+    println!("serving file: {:?}", path);
+
+    Ok(actix_files::NamedFile::open(path)?)
 }

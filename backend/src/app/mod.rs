@@ -2,10 +2,11 @@ use std::collections::{HashMap};
 use std::env;
 use std::sync::{Mutex};
 
+use actix_files;
 use actix_identity::{Identity, CookieIdentityPolicy, IdentityService};
 use actix_web::{
     App,
-    HttpRequest,
+    HttpResponse,
     HttpServer,
     middleware,
     web,
@@ -44,15 +45,21 @@ lazy_static! {
     pub static ref BROADCAST_LIST: Mutex<Vec<String>> = Mutex::new(Vec::new());
     pub static ref EVENT_LIST: Mutex<HashMap<String, Event>> = Mutex::new(HashMap::new());
     pub static ref POOL: Pool = Pool::new(&*DATABASE_URL).unwrap();
+    //pub static ref RECORD: Mutex<Vec<Record>> = Mutex::bew(Ha)
 }
 
-fn index(id: Identity) -> String {
-    println!("{:?}", id.identity());
-    if let Some(id) = id.identity() {
-        format!("Hello {}!", id)
-    } else {
-        "Hello World!".to_string()
-    }
+fn index() -> HttpResponse {
+    let html = r#"<html>
+        <head><title>Upload Test</title></head>
+        <body>
+            <form target="/apis/sponsors/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file"/>
+                <input type="submit" value="Submit"></button>
+            </form>
+        </body>
+    </html>"#;
+
+    HttpResponse::Ok().body(html)
 }
 
 pub fn start() -> () {
@@ -127,6 +134,10 @@ fn routes(app: &mut web::ServiceConfig) {
                      )
                      .service(web::resource("sponsors/logout")
                          .route(web::post().to_async(sponsors::logout))
+                     )
+                     .service(web::resource("sponsors/pic/{filename}")
+                         .route(web::get().to_async(sponsors::get_pic))
+                         .route(web::post().to_async(sponsors::update_pic))
                      )
                      .service(web::resource("sponsors/view")
                          .route(web::get().to_async(sponsors::get_sponsor_info))

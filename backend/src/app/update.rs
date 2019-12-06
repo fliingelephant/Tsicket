@@ -63,8 +63,9 @@ pub fn update_events()
     return Ok(());
 }
 
-fn update_records(records: &Vec<records::Record>){
-    for record in records{
+/*
+fn update_records() {
+    for record in (*RECORD).lock().unwrap().values_mut() {
         /*if record.update_type == 1 { //修改
             let command = format!("UPDATE ticket_record SET event_id='{event_id}', \
                                     sponsor_name='{sponsor_name}', user_id='{user_id}',\
@@ -91,20 +92,26 @@ fn update_records(records: &Vec<records::Record>){
                                   end_time=record.end_time);
             let req = POOL.prep_exec(command, ());
             match req {
-                Result::Err(_err) => println!("{}", _err.to_string()),
+                Result::Err(e) => {
+                    println!("{}", e.to_string());
+                    return result(Err(e.to_string()));
+                }
                 _ => {}
             }
-            //record.update_type = 0;
+            record.update_type = 0;
         }
         else if record.update_type == 2 { //删除
             let command = format!("DELETE FROM ticket_record WHERE record_id='{record_id}';", record_id=record.record_id);
             let req = POOL.prep_exec(command, ());
             match req {
-                Result::Err(_err) => println!("{}", _err.to_string()),
+                Result::Err(e) => {
+                    println!("{}", e.to_string());
+                    return result(Err(e.to_string()));
+                }
                 _ => {}
             }
-            //record.update_type = 0;
+            record.update_type = 0;
             //如何删除vec中的指定项？
         }
     }
-}
+}*/

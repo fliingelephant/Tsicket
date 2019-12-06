@@ -116,7 +116,6 @@ pub struct AlterEvent {
     pub event_introduction: String,
     pub event_picture: String,
     pub event_capacity: i32,
-    pub left_tickets: i32,
     pub event_location: String,
 }
 
@@ -138,15 +137,18 @@ pub fn alter_event_info(
                     event.event_type = alter_event.event_type;
                     event.event_introduction = alter_event.event_introduction.clone();
                     event.event_picture = alter_event.event_picture.clone();
+                    event.left_tickets += alter_event.event_capacity - event.event_capacity;
+                    if event.left_tickets < 0 {
+                        event.left_tickets = 0;
+                    }
                     event.event_capacity = alter_event.event_capacity;
-                    event.left_tickets = alter_event.left_tickets;
                     event.event_location = alter_event.event_location.clone();
                     event.update_type = 1;
                 },
                 None => return result(Ok(HttpResponse::UnprocessableEntity().json("No such event.")))
             }
-            update_events(); // TODO: async
-            Ok(HttpResponse::BadRequest().finish())
+            update_events().unwrap(); // TODO: async
+            Ok(HttpResponse::Ok().finish())
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })

@@ -2,7 +2,7 @@ backend/target
 .idea
 **/*.rs.bk
 .DS_Store
-
+static
 
 Cargo.lock
 backend/nohup.out
