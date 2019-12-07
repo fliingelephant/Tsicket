@@ -12,7 +12,7 @@ mod utils;
 fn main() {
     dotenv::dotenv().ok();
 
-    let sys = actix::System::new("conduit");
+    /*let sys = actix::System::new("conduit");
 
     app::start();
 
@@ -96,9 +96,23 @@ fn main() {
         Err(e) => println!("{}", e),
         Ok(o) => println!("{}", o),
     }*/
-    let s = db::users::cancel_user_follow(&"123".to_string(), &"7".to_string());
+    /*let s = db::users::cancel_user_follow(&"123".to_string(), &"7".to_string());
     match s{
         Err(e) => println!("{}", e),
         Ok(_) => {},
+    }*/
+    let s = db::moment::get_event_moments(&"0".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {
+            println!("{}", o.len());
+            for i in 0..o.len(){
+                println!("{}", o[i].text);
+                for j in 0..o[i].pictures.len(){
+                    println!("{}", o[i].pictures[j]);
+                }
+                println!("{}", o[i].time);
+            }
+        },
     }
 }
