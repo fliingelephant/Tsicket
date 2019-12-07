@@ -8,7 +8,7 @@ pub fn identify_admin(
 ) -> Result<(), ()>{
     match id.identity() {
         Some(id) => 
-            if (&id[0..0] != "0")
+            if (&id[0..1] != "0")
                 || (&id[1..] != *ADMIN_ID) { // not an administrator
                 Err(())
             }
@@ -25,7 +25,7 @@ pub fn identify_sponsor(
 ) -> Result<String, ()>{
     match id.identity() {
         Some(id) => 
-            if &id[0..0] != "1" {
+            if &id[0..1] != "1" {
                 Err(())
             }
             else {
@@ -41,7 +41,7 @@ pub fn identify_user(
 ) -> Result<String, ()>{
     match id.identity() {
         Some(id) => 
-            if &id[0..0] != "2" {
+            if &id[0..1] != "2" {
                 Err(())
             }
             else {

@@ -1,14 +1,17 @@
 use crate::db::events;
 use crate::db::records;
 pub use crate::app::POOL;
+use super::{EVENT_LIST};
 
-pub fn update(events: Vec<events::Event>, records: Vec<records::Record>){
-    update_events(&events);
-    update_records(&records);
+pub fn update(){
+    update_events();
+    //update_records();
 }
 
-pub fn update_events(events: &Vec<events::Event>){
-    for event in events {
+pub fn update_events()
+    -> Result<(), String> {
+
+    for mut event in (*EVENT_LIST).lock().unwrap().values_mut() {
         if event.update_type == 1 { // 修改
             let command = format!("UPDATE event SET sponsor_name='{sponsor_name}', event_name='{event_name}', \
                                     start_time='{start_time}', end_time='{end_time}', event_type={event_type}, \
@@ -25,9 +28,13 @@ pub fn update_events(events: &Vec<events::Event>){
 
             let req=POOL.prep_exec(command, ());
             match req {
-                Result::Err(_err) => println!("{}", _err.to_string()),
+                Result::Err(e) => {
+                    println!("{}", e.to_string());
+                    return Err(e.to_string());
+                }
                 _ => {}
             }
+            event.update_type = 0;
         } else if event.update_type == 2 { // 添加
             let command = format!("INSERT INTO event (event_id, sponsor_name, event_name, start_time, end_time, \
                                     event_type, event_introduction, event_capacity, current_participants, \
@@ -44,15 +51,21 @@ pub fn update_events(events: &Vec<events::Event>){
             
             let req = POOL.prep_exec(command, ());
             match req {
-                Result::Err(_err) => println!("{}", _err.to_string()),
+                Result::Err(e) => {
+                    println!("{}", e.to_string());
+                    return Err(e.to_string());
+                }
                 _ => {}
             }
+            event.update_type = 0;
         }
     }
+    return Ok(());
 }
 
-fn update_records(records: &Vec<records::Record>){
-    for record in records{
+/*
+fn update_records() {
+    for record in (*RECORD).lock().unwrap().values_mut() {
         /*if record.update_type == 1 { //修改
             let command = format!("UPDATE ticket_record SET event_id='{event_id}', \
                                     sponsor_name='{sponsor_name}', user_id='{user_id}',\
@@ -79,20 +92,26 @@ fn update_records(records: &Vec<records::Record>){
                                   end_time=record.end_time);
             let req = POOL.prep_exec(command, ());
             match req {
-                Result::Err(_err) => println!("{}", _err.to_string()),
+                Result::Err(e) => {
+                    println!("{}", e.to_string());
+                    return result(Err(e.to_string()));
+                }
                 _ => {}
             }
-            //record.update_type = 0;
+            record.update_type = 0;
         }
         else if record.update_type == 2 { //删除
             let command = format!("DELETE FROM ticket_record WHERE record_id='{record_id}';", record_id=record.record_id);
             let req = POOL.prep_exec(command, ());
             match req {
-                Result::Err(_err) => println!("{}", _err.to_string()),
+                Result::Err(e) => {
+                    println!("{}", e.to_string());
+                    return result(Err(e.to_string()));
+                }
                 _ => {}
             }
-            //record.update_type = 0;
+            record.update_type = 0;
             //如何删除vec中的指定项？
         }
     }
-}
+}*/

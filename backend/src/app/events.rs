@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use super::{ADMIN_ID, EVENT_LIST};
 use super::update::{update_events};
 use crate::db::events::Event;
-use crate::utils::auth::{identify_user};
+use crate::utils::auth::{identify_sponsor, identify_user};
 
 #[derive(Deserialize)]
 pub struct QueryEvent {
@@ -39,7 +39,6 @@ struct BroadCastRet {
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn get_broadcast_events(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
@@ -57,7 +56,7 @@ pub fn get_broadcast_events(
                         intro: event.event_introduction.clone()
                     });
                     count += 1;
-                    if count >= 5 {
+                    if count >= 6 {
                         break;
                     }
                 }
@@ -70,50 +69,87 @@ pub fn get_broadcast_events(
     })
 }
 
+#[derive(Clone, Deserialize, Serialize)]
+pub struct EventInfo {
+    pub event_id: String,
+    pub sponsor_name: String,
+    pub event_name: String,
+    pub start_time: String,
+    pub end_time: String,
+    pub event_type: i8,
+    pub event_introduction: String,
+    pub event_picture: String,
+    pub event_capacity: i32,
+    pub current_participants: i32,
+    pub left_tickets: i32,
+    pub event_status: i8,
+    pub event_location: String,
+    pub update_type: i8,
+}
+
 #[allow(dead_code)]
 pub fn get_event_info(
-    (id, query_event):
-        (Identity, Json<QueryEventByID>)
+    id: Identity,
+    query_event: Json<QueryEventByID>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     if id.identity() == None {
         return result(Ok(HttpResponse::Unauthorized().finish())); // 401 Unauthorized
     }
 
-    
-    /*
-    for event in &(*EVENT_LIST.lock().unwrap()) {
-        if event.event_id == query_event.event_id {
-            return result(Ok(HttpResponse::Ok().json(event.clone())));
+    result(
+        if (*EVENT_LIST).lock().unwrap().contains_key(&query_event.event_id) {
+            Ok(HttpResponse::Ok().json(
+                (*EVENT_LIST).lock().unwrap().get(&query_event.event_id)))
+        } else {
+            Ok(HttpResponse::UnprocessableEntity().json("Event does not exist."))
         }
-    }*/
+    )
+}
 
-    result(Ok(HttpResponse::BadRequest().finish()))
+#[derive(Deserialize)]
+pub struct AlterEvent {
+    pub event_id: String,
+    pub event_name: String,
+    pub start_time: String,
+    pub end_time: String,
+    pub event_type: i8,
+    pub event_introduction: String,
+    pub event_picture: String,
+    pub event_capacity: i32,
+    pub event_location: String,
 }
 
 #[allow(dead_code)]
 pub fn alter_event_info(
-    (id, event_info):
-        (Identity, Json<Event>)
+    alter_event: Json<AlterEvent>,
+    id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    /*
-    result(match id.identity() {
-        Some(name) => {
-            let alter_event = event_info.into_inner();
-            if alter_event.sponsor_name != name {
-                return result(Ok(HttpResponse::Unauthorized().finish()));
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            match (*EVENT_LIST).lock().unwrap().get_mut(&alter_event.event_id) {
+                Some(mut event) => {
+                    if sponsor_name != event.sponsor_name {
+                        return result(Ok(HttpResponse::Unauthorized().finish()));
+                    }
+                    event.event_name = alter_event.event_name.clone();
+                    event.start_time = alter_event.start_time.clone();
+                    event.end_time = alter_event.end_time.clone();
+                    event.event_type = alter_event.event_type;
+                    event.event_introduction = alter_event.event_introduction.clone();
+                    event.event_picture = alter_event.event_picture.clone();
+                    event.left_tickets += alter_event.event_capacity - event.event_capacity;
+                    if event.left_tickets < 0 {
+                        event.left_tickets = 0;
+                    }
+                    event.event_capacity = alter_event.event_capacity;
+                    event.event_location = alter_event.event_location.clone();
+                    event.update_type = 1;
+                },
+                None => return result(Ok(HttpResponse::UnprocessableEntity().json("No such event.")))
             }
-            for mut event in &(*EVENT_LIST.lock().unwrap()) {
-                if (event.event_id == alter_event.event_id)
-                    && (event.sponsor_name == name) {
-                    event = &alter_event;
-                }
-            }
-            let events = EVENT_LIST.lock().unwrap().clone();
-            update_events(&events);
-            Ok(HttpResponse::BadRequest().finish())
+            update_events().unwrap(); // TODO: async
+            Ok(HttpResponse::Ok().finish())
         },
-        None => Ok(HttpResponse::Unauthorized().finish())
-    })*/
-
-    result(Ok(HttpResponse::BadRequest().finish()))
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
 }

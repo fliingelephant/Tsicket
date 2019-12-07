@@ -25,7 +25,6 @@ pub struct LoginAdmin {
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn login(
     id: Identity,
     login_admin: Json<LoginAdmin>
@@ -41,7 +40,6 @@ pub fn login(
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn logout(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {

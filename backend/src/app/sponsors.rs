@@ -1,11 +1,21 @@
+use std::fs;
+use std::io::{Write};
+use std::path::{PathBuf};
 use std::sync::{Mutex};
 
 use actix_identity::{Identity};
-use actix_web::{Error,
+use actix_multipart::{Field, Multipart, MultipartError};
+use actix_web::{
+    error,
+    Error,
+    HttpRequest,
     HttpResponse,
-    web::Data,
+    web,
     web::Json};
-use futures::{Future, future::result};
+use futures::{Stream, Future, future::result};
+use futures::future::{err, Either};
+use md5::compute;
+use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::db::events::{Event};
@@ -52,6 +62,7 @@ pub fn login(
         &login_sponsor.password) {
         Ok(name) => {
             id.remember("1".to_owned() + &name);
+            println!("sponsor {} log in", name);
             Ok(HttpResponse::Ok().json(name)) // 200 OK
         },
         Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)), // 422 Unprocessable Entity
@@ -92,28 +103,72 @@ pub fn register(
     })
 }
 
-#[allow(dead_code)]
+#[derive(Deserialize)]
+pub struct PublishEvent {
+    pub event_name: String,
+    pub start_time: String,
+    pub end_time: String,
+    pub event_type: i8,
+    pub event_introduction: String,
+    pub event_picture: String,
+    pub event_capacity: i32,
+    pub left_tickets: i32,
+    pub event_location: String,
+}
+
 #[inline]
+fn md5(x: &String) -> String {
+    format!("{:x}", compute(x.to_owned()))
+}
+
+#[derive(Serialize)]
+pub struct EventIDRet {
+    event_id: String
+}
+
+#[allow(dead_code)]
 pub fn publish_event(
-    event: Json<Event>,
     id: Identity,
+    new_event: Json<PublishEvent>,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_sponsor(&id) {
-        Ok(_) => {
-            let new_event = event.into_inner();
-            EVENT_LIST.lock().unwrap()
-                .entry(new_event.event_id.clone())
-                .or_insert(new_event.clone());
-            //update_events(&events);
-
-            Ok(HttpResponse::Ok().finish()) // 200 OK
-        }
+        Ok(sponsor_name) => {
+            let mut event_id = md5(&thread_rng().gen::<u32>().to_string());
+            loop {
+                if (*EVENT_LIST).lock().unwrap().contains_key(&event_id) {
+                        event_id = md5(&thread_rng().gen::<u32>().to_string());
+                } else  {
+                        (*EVENT_LIST).lock().unwrap().insert(event_id.clone(), Event{
+                            event_id: event_id.clone(),
+                            sponsor_name: sponsor_name.clone(),
+                            event_name: new_event.event_name.clone(),
+                            start_time: new_event.start_time.clone(),
+                            end_time: new_event.end_time.clone(),
+                            event_type: new_event.event_type,
+                            event_introduction: new_event.event_introduction.clone(),
+                            event_picture: new_event.event_picture.clone(),
+                            event_capacity: new_event.event_capacity,
+                            current_participants: 0,
+                            left_tickets: new_event.left_tickets,
+                            event_status: 0,
+                            event_location: new_event.event_location.clone(),
+                            update_type: 2,
+                        });
+                    break;
+                }
+            }
+            match update_events() {
+                Ok(_) => Ok(HttpResponse::Ok().json(EventIDRet { // 200 OK
+                    event_id: event_id
+                })),
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn get_available_events(
     id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
@@ -136,7 +191,27 @@ pub fn get_available_events(
 }
 
 #[allow(dead_code)]
-#[inline]
+pub fn get_all_events(
+    id: Identity,
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            match sponsors::get_sponsor_events(&sponsor_name) {
+                Ok(sponsor_event_list) => Ok(HttpResponse::Ok().json(EventsRet {
+                    events: sponsor_event_list
+                })),
+                Err(e) => {
+                    println!("{}", e);
+                    Ok(HttpResponse::InternalServerError().finish())
+                }
+            }
+            
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
 pub fn alter_sponsor_info(
     alter_sponsor: Json<sponsors::Sponsor>,
     id: Identity
@@ -158,8 +233,7 @@ pub fn alter_sponsor_info(
 }
 
 #[allow(dead_code)]
-#[inline]
-pub fn get_sponsor_info (
+pub fn get_sponsor_info(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_sponsor(&id) {
@@ -171,4 +245,98 @@ pub fn get_sponsor_info (
         },
         Err(()) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
+}
+
+pub fn save_file(
+    field: Field,
+    file_name: &String
+) -> impl Future<Item=String, Error=Error> {
+    println!("{:?}", field.content_type());
+    let mut suffix = field.content_type().subtype().to_string();
+    if suffix == "jpeg" {
+        suffix = "jpg".to_string();
+    }
+    let name_assigned_by_server = file_name.to_owned() + "." + &suffix;
+    let path = "../../../static/".to_string() + &file_name + "." + &suffix;
+
+    let file = match fs::File::create(path) {
+        Ok(file) => file,
+        Err(e) => return Either::A(err(error::ErrorInternalServerError(e))),
+    };
+    Either::B(
+        field
+            .fold((file, 0i64), move |(mut file, mut acc), bytes| {
+                // fs operations are blocking, we have to execute writes
+                // on threadpool
+                web::block(move || {
+                    file.write_all(bytes.as_ref()).map_err(|e| {
+                        println!("file.write_all failed: {:?}", e);
+                        MultipartError::Payload(error::PayloadError::Io(e))
+                    })?;
+                    acc += bytes.len() as i64;
+                    Ok((file, acc))
+                })
+                .map_err(|e: error::BlockingError<MultipartError>| {
+                    match e {
+                        error::BlockingError::Error(e) => e,
+                        error::BlockingError::Canceled => MultipartError::Incomplete,
+                    }
+                })
+            })
+            .map(move |(_, _)| name_assigned_by_server)
+            .map_err(|e| {
+                println!("save_file failed, {:?}", e);
+                error::ErrorInternalServerError(e)
+            }),
+    )
+}
+
+#[inline]
+pub fn two_terms_md5(term_a: String, term_b: &str) -> String {
+    format!("{:x}_{:x}", compute(term_a.to_owned() + term_b), compute(term_b))
+}
+
+#[derive(Serialize)]
+pub struct FileURLRet {
+    file_url: String
+}
+
+#[allow(dead_code)]
+pub fn update_pic(
+    id: Identity,
+    multipart: Multipart,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    let file_name: String;
+    let name_assigned_by_sponsor = req.match_info().query("filename");
+    if let Ok(sponsor_name) = identify_sponsor(&id) {
+        file_name = two_terms_md5(sponsor_name, name_assigned_by_sponsor);
+    } else {
+        file_name = "default".to_string();
+    }
+
+        multipart
+            .map_err(error::ErrorInternalServerError)
+            .map(move |field| save_file(field, &file_name).into_stream())
+            .flatten()
+            .collect()
+            .map(|name_assigned_by_server| {
+                HttpResponse::Ok().json(FileURLRet {
+                    file_url: "http://2019-a18.iterator-traits.com/apis/sponsors/pic/".to_string() + &name_assigned_by_server[0]
+                })
+            })
+            .map_err(|e| {
+                    println!("failed: {}", e);
+                    e
+            })
+}
+
+#[allow(dead_code)]
+pub fn get_pic(
+    req: HttpRequest
+) -> actix_web::Result<actix_files::NamedFile> {
+    let path: PathBuf = ("../../../static/".to_string() + &req.match_info().query("filename")).parse().unwrap();
+    println!("serving file: {:?}", path);
+
+    Ok(actix_files::NamedFile::open(path)?)
 }

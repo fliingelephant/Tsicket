@@ -16,7 +16,7 @@ fn main() {
 
     app::start();
 
-    let _ = sys.run();*/
+    let _ = sys.run();
 
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 
