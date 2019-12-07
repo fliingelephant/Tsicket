@@ -88,6 +88,5 @@ pub fn get_all_events(
         };
         event_list.push(event);
     }
-
     Ok(())
 }
