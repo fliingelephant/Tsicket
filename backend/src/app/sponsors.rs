@@ -20,6 +20,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::db::events::{Event};
 use crate::db::sponsors;
+use crate::db::moment;
 use super::events::EventsRet;
 use super::EVENT_LIST;
 use super::update::update_events;
@@ -363,7 +364,7 @@ pub fn publish_moment(
         Ok(sponsor_name) => {
             let event_id = req.match_info().query("event_id").to_string();
             // TODO: 检查是否符合活动和发布者对应
-            match sponsors::publish_moment(&sponsor_name, &event_id, &moment.text, &moment.pictures) {
+            match moment::publish_moment(&sponsor_name, &event_id, &"1".to_string(), &moment.text, &moment.pictures) {
                 Ok(_) => Ok(HttpResponse::Ok().finish()),
                 Err(e) => Ok(HttpResponse::InternalServerError().json(e))
             }

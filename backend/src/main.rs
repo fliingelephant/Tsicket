@@ -100,8 +100,8 @@ fn main() {
     match s{
         Err(e) => println!("{}", e),
         Ok(_) => {},
-    }*/
-    let s = db::moment::get_event_moments(&"0".to_string());
+    }*/*/
+    /*let s = db::moment::get_event_moments(&"0".to_string());
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {
@@ -114,5 +114,17 @@ fn main() {
                 println!("{}", o[i].time);
             }
         },
-    }
+    }*/
+
+    /*let s = db::notification::get_user_notifications(&"123".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {
+            println!("{}", o.len());
+            for i in 0..o.len(){
+                println!("{}", o[i].text);
+                println!("{}", o[i].time);
+            }
+        },
+    }*/
 }

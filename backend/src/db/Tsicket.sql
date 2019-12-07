@@ -168,6 +168,7 @@ CREATE TABLE `moment`
 (
     `sponsor_name` VARCHAR(255) NOT NULL,
     `event_id`     VARCHAR(32)  NOT NULL,
+    `moment_id`    VARCHAR(255) NOT NULL,
     `text`         TEXT,
     `pictures`     TEXT,
     `time`         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -179,20 +180,22 @@ CREATE TABLE `moment`
 -- Records of follow list
 -- ----------------------------
 
-INSERT INTO moment (`sponsor_name`, `event_id`) VALUES ('2', '0');
+INSERT INTO moment (`sponsor_name`, `event_id`, `moment_id`) VALUES ('2', '0', '999');
 
 -- ----------------------------
 -- Table structure for push list
 -- ----------------------------
 
-DROP TABLE IF EXISTS `push`;
-CREATE TABLE `push`
+DROP TABLE IF EXISTS `notification`;
+CREATE TABLE `notification`
 (
     `sponsor_name` VARCHAR(255) NOT NULL,
     `event_id`     VARCHAR(32)  NOT NULL,
     `user_id`      VARCHAR(32)  NOT NULL,
+    `notice_id`    VARCHAR(255) NOT NULL,
     `text`         TEXT,
     `time`         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `read`         TINYINT               DEFAULT 0,
     CONSTRAINT fk_push_sponsor FOREIGN KEY (`sponsor_name`) REFERENCES `sponsor_account` (`sponsor_name`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_push_event FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_push_user FOREIGN KEY (`user_id`) REFERENCES `user_account` (`account_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -203,7 +206,7 @@ CREATE TABLE `push`
 -- ----------------------------
 
 
-INSERT INTO push (`sponsor_name`, `event_id`, `user_id`, `text`) VALUES ('2', '0', '123', '活动取消');
+INSERT INTO notification (`sponsor_name`, `event_id`, `user_id`, `notice_id`, `text`) VALUES ('2', '0', '123', '090', '活动取消');
 
 
 SET FOREIGN_KEY_CHECKS = 1;
