@@ -365,7 +365,10 @@ pub fn publish_moment(
             // TODO: 检查是否符合活动和发布者对应
             match sponsors::publish_moment(&sponsor_name, &event_id, &moment.text, &moment.pictures) {
                 Ok(_) => Ok(HttpResponse::Ok().finish()),
-                Err(e) => Ok(HttpResponse::InternalServerError().json(e))
+                Err(e) => {
+                    println!("{}", e);
+                    Ok(HttpResponse::UnprocessableEntity().json(e))
+                }
             }
         }
         Err(_) => Ok(HttpResponse::Unauthorized().finish())

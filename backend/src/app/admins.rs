@@ -1,6 +1,7 @@
 use actix_identity::{Identity};
 use actix_web::{
     Error, 
+    HttpRequest,
     HttpResponse,
     web::Json
 };
@@ -8,7 +9,7 @@ use futures::{Future, future::result};
 use md5::compute;
 use serde::{Deserialize, Serialize};
 
-use super::{ADMIN_ID, ADMIN_PASSWORD_WITH_SALT};
+use super::{ADMIN_ID, ADMIN_PASSWORD_WITH_SALT, EVENT_LIST};
 use crate::db::admins;
 
 use crate::utils::auth::{identify_admin};
@@ -76,7 +77,6 @@ struct AllEventsRet {
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn get_all_events(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
@@ -87,6 +87,56 @@ pub fn get_all_events(
             Ok(HttpResponse::Ok().json(AllEventsRet { // 200 OK
                 events: all_event_list
             }))
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
+pub fn review_event(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            match (*EVENT_LIST).lock().unwrap().get_mut(&event_id) {
+                Some(mut event) => {
+                    if event.event_status == 0 {
+                        // TODO: 判断时间
+                        event.event_status = 1;
+                        event.update_type = 1;
+                        Ok(HttpResponse::Ok().finish())
+                    } else {
+                        Ok(HttpResponse::UnprocessableEntity().json("Event status error!"))
+                    }
+                }
+                None => Ok(HttpResponse::UnprocessableEntity().json("Event status error!"))
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
+pub fn cancel_event(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            match (*EVENT_LIST).lock().unwrap().get_mut(&event_id) {
+                Some(mut event) => {
+                    if event.event_status == 4 {
+                        // TODO: 判断时间
+                        event.event_status = 4;
+                        event.update_type = 1;
+                    }
+                    Ok(HttpResponse::Ok().finish())
+                }
+                None => Ok(HttpResponse::UnprocessableEntity().json("Event status error!"))
+            }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })

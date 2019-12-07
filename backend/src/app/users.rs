@@ -12,13 +12,15 @@ use md5::compute;
 use reqwest::{get, Client};
 use serde::{Deserialize, Serialize};
 
-use super::{APP_ID, EVENT_LIST, SECRET};
+use super::{APP_ID, EVENT_LIST, RECORD, SECRET};
 use super::sponsors::{QuerySponsor, QuerySponsorByID};
 use super::events::{QueryEvent, QueryEventByID, EventsRet};
 use crate::db::events;
+use crate::db::records::{Record};
 use crate::db::sponsors;
 use crate::db::users;
 use crate::utils::auth::{identify_user};
+use super::update::{update_records, update_events};
 
 #[derive(Deserialize)]
 pub struct WechatLoginInfo {
@@ -186,20 +188,22 @@ pub fn get_personal_info(
     result(match identify_user(&id) {
         Ok(openid) => {
             // TODO: 获得关注数目、历史数目和喜爱的数目
+            let follow = users::get_user_follows(&openid).unwrap().len();
+            let like = users::get_user_likes(&openid).unwrap().len();
+            let history = users::get_user_records(&openid).unwrap().len();
             match users::get_tsinghua_id(&openid) {
                 Ok(tsinghua_id) => Ok(HttpResponse::NotImplemented().json(UserInfo{
-                    follow: 0,
-                    history: 0,
-                    like: 0,
+                    follow: follow,
+                    history: history,
+                    like: like,
                     tsinghuaid: tsinghua_id
                 })),
                 Err(_) => Ok(HttpResponse::NotImplemented().json(UserInfoWithoutTHUID{
-                    follow: 0,
-                    history: 0,
-                    like: 0,
+                    follow: follow,
+                    history: history,
+                    like: like,
                 }))
             }
-            
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
@@ -530,9 +534,28 @@ pub fn book_event(
                     if (event.event_status == 2) && (event.left_tickets > 0) {
                         event.left_tickets -= 1;
                         event.update_type = 1;
-                        // TODO:record
+                        let index_str = event_id + "_" + &openid;
+                        let success: bool;
+                        success = match (*RECORD).lock().unwrap().get(&index_str) {
+                            Some(_) => false,
+                            None => true,
+                        };
+                        if success == true {
+                            (*RECORD).lock().unwrap().insert(index_str.clone(), Record {
+                                // TODO: 改变record_id
+                                record_id: index_str,
+                                event_id: event.event_id.clone(),
+                                sponsor_name: event.sponsor_name.clone(),
+                                user_id: openid,
+                                start_time: event.start_time.clone(),
+                                end_time: event.end_time.clone(),
+                                update_type: 1
+                            });
+                            update_events();
+                            update_records();
+                        }
                         Ok(HttpResponse::Ok().json(SuccessRet {
-                            success: true
+                            success: success
                         }))
                     } else {
                         Ok(HttpResponse::Ok().json(SuccessRet {
@@ -549,14 +572,18 @@ pub fn book_event(
 
 #[allow(dead_code)]
 pub fn get_sponsor_info(
-    query_sponsor: QuerySponsor,
-    id: Identity
+    id: Identity,
+    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(_) => {
-            let sponsor: SponsorInfo;
-            match sponsors::get_info_by_name(&query_sponsor.sponsor_name) {
-                Ok(sponsor) => Ok(HttpResponse::Ok().json(sponsor)),
+            let sponsor_name = req.match_info().query("sponsor_name").to_string();
+            match sponsors::get_info_by_name(&sponsor_name) {
+                Ok(sponsor) => Ok(HttpResponse::Ok().json(SponsorInfo {
+                    id: sponsor.id,
+                    name: sponsor.sponsor_name,
+                    avatar_url: sponsor.head_portrait,
+                })),
                 Err(e) => {
                     println!("{}", e);
                     Ok(HttpResponse::InternalServerError().finish()) // 500 Internal Server Error
@@ -586,14 +613,42 @@ pub fn get_available_enrolled_events(
     })
 }
 
+#[derive(Serialize)]
+pub struct EventBriefInfo {
+    pub event_id: String,
+    pub sponsor_name: String,
+    pub start_time: String,
+    pub end_time: String,
+}
+
+#[derive(Serialize)]
+pub struct EnrolledEventsRet {
+    pub events: Vec<EventBriefInfo>
+}
+
 #[allow(dead_code)]
 pub fn get_all_enrolled_events(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(openid) => {
-            // TODO
-            Ok(HttpResponse::NotImplemented().finish())
+            match users::get_user_records(&openid) {
+                Ok(records) => {
+                    let mut events: Vec<EventBriefInfo> = vec![];
+                    for record in records {
+                        events.push(EventBriefInfo {
+                            event_id: record.event_id,
+                            sponsor_name: record.sponsor_name,
+                            start_time: record.start_time,
+                            end_time: record.end_time
+                        })
+                    }
+                    Ok(HttpResponse::Ok().json(EnrolledEventsRet {
+                        events: events
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
+            }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })
@@ -691,4 +746,73 @@ pub fn get_pic(
     println!("serving file: {:?}", path);
 
     Ok(actix_files::NamedFile::open(path)?)
+}
+
+#[derive(Serialize)]
+pub struct IfEnrolledRet {
+    pub enrolled: bool
+}
+
+#[allow(dead_code)]
+pub fn check_if_enrolled(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            let records = users::get_user_records(&openid).unwrap();
+            let mut enrolled = false;
+            for record in records {
+                if (record.event_id == event_id) && (record.user_id == openid) {
+                    enrolled = true;
+                }
+            }
+
+            Ok(HttpResponse::Ok().json(IfEnrolledRet {
+                enrolled: enrolled
+            }))
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn cancel_book_event(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            match (*EVENT_LIST).lock().unwrap().get_mut(&event_id) {
+                Some(mut event) => {
+                    if event.event_status >=2 {
+                        event.left_tickets += 1;
+                        event.update_type = 1;
+                        let index_str = event_id + "_" + &openid;
+                        let success: bool;
+                        success = match (*RECORD).lock().unwrap().get_mut(&index_str) {
+                            Some(mut record) => {
+                                record.update_type = 2;
+                                true
+                            }
+                            None => false,
+                        };
+                        update_events();
+                        update_records();
+                        Ok(HttpResponse::Ok().json(SuccessRet {
+                            success: success
+                        }))
+                    } else {
+                        Ok(HttpResponse::Ok().json(SuccessRet {
+                            success: false
+                        }))
+                    }
+                }
+                None => Ok(HttpResponse::UnprocessableEntity().finish())
+            }
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
 }

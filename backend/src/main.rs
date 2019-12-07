@@ -12,7 +12,7 @@ mod utils;
 fn main() {
     dotenv::dotenv().ok();
 
-    /*let sys = actix::System::new("conduit");
+    let sys = actix::System::new("conduit");
 
     app::start();
 
@@ -101,6 +101,7 @@ fn main() {
         Err(e) => println!("{}", e),
         Ok(_) => {},
     }*/
+    /*
     let s = db::moment::get_event_moments(&"0".to_string());
     match s{
         Err(e) => println!("{}", e),
@@ -114,5 +115,5 @@ fn main() {
                 println!("{}", o[i].time);
             }
         },
-    }
+    }*/
 }

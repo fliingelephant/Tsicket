@@ -17,6 +17,7 @@ use rand::{thread_rng, Rng};
 
 use crate::db;
 use crate::db::events::Event;
+use crate::db::records::{Record};
 use init::initiate;
 
 pub mod admins;
@@ -44,6 +45,7 @@ lazy_static! {
 lazy_static! {
     pub static ref BROADCAST_LIST: Mutex<Vec<String>> = Mutex::new(Vec::new());
     pub static ref EVENT_LIST: Mutex<HashMap<String, Event>> = Mutex::new(HashMap::new());
+    pub static ref RECORD: Mutex<HashMap<String, Record>> = Mutex::new(HashMap::new());
     pub static ref POOL: Pool = Pool::new(&*DATABASE_URL).unwrap();
     //pub static ref RECORD: Mutex<Vec<Record>> = Mutex::bew(Ha)
 }
@@ -72,9 +74,6 @@ pub fn start() -> () {
 
     HttpServer::new(move || {
         App::new()
-            //.register_data(Data::new(EventState {
-            //    event_list: Vec::new(),
-            //}))
             .configure(routes)
             .wrap(IdentityService::new(
                 CookieIdentityPolicy::new(&cookie_private_key[..])
@@ -95,11 +94,14 @@ fn routes(app: &mut web::ServiceConfig) {
                     
                     .service(web::resource("users/view")
                         .route(web::get().to_async(users::get_personal_info))
-                        //.route(web::post().to_async(users::get_enrolled_events))
                     )
-                    //.service(web::)
+                    .service(web::resource("users/book")
+                        .route(web::get().to_async(users::get_all_enrolled_events))
+                    )
                     .service(web::resource("users/book/{event_id}")
+                        .route(web::get().to_async(users::check_if_enrolled))
                         .route(web::post().to_async(users::book_event))
+                        .route(web::delete().to_async(users::cancel_book_event))
                     )
                     .service(web::resource("users/broadcast")
                         .route(web::get().to_async(events::get_broadcast_events))
@@ -129,7 +131,8 @@ fn routes(app: &mut web::ServiceConfig) {
                         .route(web::get().to_async(users::get_tsinghua_id))
                         .route(web::post().to_async(users::bind_tsinghua_id))
                     )
-
+                    
+                    
                      /* Sponsor routes ↓ */
                      .service(web::resource("sponsors")
                          .route(web::get().to_async(sponsors::get_available_events))
@@ -152,6 +155,9 @@ fn routes(app: &mut web::ServiceConfig) {
                          .route(web::get().to_async(sponsors::get_sponsor_info))
                          .route(web::put().to_async(sponsors::alter_sponsor_info))
                      )
+                     .service(web::resource("sponsors/view/{sponsor_name}")
+                        .route(web::get().to_async(users::get_sponsor_info))
+                     )
 
                      /* Administrator routes ↓ */
                      .service(web::resource("admins")
@@ -163,7 +169,10 @@ fn routes(app: &mut web::ServiceConfig) {
                      .service(web::resource("admins/logout")
                          .route(web::post().to_async(admins::logout))
                      )
-
+                     .service(web::resource("admins/review/{event_id}")
+                         .route(web::post().to_async(admins::review_event))
+                     )
+                     
                      
                      .service(web::resource("events/view")
                          .route(web::post().to_async(events::get_event_info))

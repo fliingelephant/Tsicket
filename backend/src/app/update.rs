@@ -1,7 +1,7 @@
 use crate::db::events;
 use crate::db::records;
 pub use crate::app::POOL;
-use super::{EVENT_LIST};
+use super::{EVENT_LIST, RECORD};
 
 pub fn update(){
     update_events();
@@ -62,13 +62,14 @@ pub fn update_events()
             event.update_type = 0;
         }
     }
-    return Ok(());
+    Ok(())
 }
 
-/*
-fn update_records() {
-    for record in (*RECORD).lock().unwrap().values_mut() {
-        /*if record.update_type == 1 { //修改
+pub fn update_records()
+    -> Result<(), String> {
+    for (index_str, record) in (*RECORD).lock().unwrap().iter_mut() {
+        /*
+        if record.update_type == 1 { //修改
             let command = format!("UPDATE ticket_record SET event_id='{event_id}', \
                                     sponsor_name='{sponsor_name}', user_id='{user_id}',\
                                      start_time='{start_time}', end_time='{end_time}'\
@@ -94,9 +95,9 @@ fn update_records() {
                                   end_time=record.end_time);
             let req = POOL.prep_exec(command, ());
             match req {
-                Result::Err(e) => {
+                Err(e) => {
                     println!("{}", e.to_string());
-                    return result(Err(e.to_string()));
+                    return Err(e.to_string());
                 }
                 _ => {}
             }
@@ -108,12 +109,12 @@ fn update_records() {
             match req {
                 Result::Err(e) => {
                     println!("{}", e.to_string());
-                    return result(Err(e.to_string()));
+                    return Err(e.to_string());
                 }
                 _ => {}
             }
-            record.update_type = 0;
-            //如何删除vec中的指定项？
+            (*RECORD).lock().unwrap().remove(index_str);
         }
     }
-}*/
+    Ok(())
+}
