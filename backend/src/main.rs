@@ -127,4 +127,20 @@ fn main() {
             }
         },
     }*/
+
+    /*let s = db::notification::check_notice_read(&"090".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {println!("{}", o)},
+    }*/
+    /*let s = db::moment::delete_moment(&"999".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {},
+    }*/
+    let s = db::users::get_user_follow_number(&"23".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {println!("{}", o)},
+    }
 }

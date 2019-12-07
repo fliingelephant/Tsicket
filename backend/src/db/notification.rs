@@ -85,3 +85,46 @@ pub fn get_user_notifications(user_id: &String)->Result<Vec<Notification>, Strin
     }
     return Ok(notices);
 }
+
+pub fn check_notice_read(notice_id: &String) -> Result<bool, String>{
+    let command = format!("SELECT `read` FROM notification WHERE notice_id='{id}';", id = notice_id);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    for row in res.unwrap() {
+        let info = row.unwrap().unwrap();
+        let read: i8 = info[0].as_sql(true).parse().unwrap();
+        if read == 0{
+            return Ok(false);
+        }
+        else if read == 1{
+            return Ok(true);
+        }
+    }
+    return Err("No such notice".to_string());
+}
+
+pub fn set_notice_read(notice_id: &String) -> Result<(), String>{
+    let command = format!("UPDATE notification SET `read`=1 WHERE notice_id='{notice_id}';",
+                          notice_id=notice_id);
+    println!("{}", command);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) =>Ok(()),
+    }
+}
+
+pub fn cancel_notice_read(notice_id: &String) -> Result<(), String>{
+    let command = format!("UPDATE notification SET `read`=0 WHERE notice_id='{notice_id}';",
+                          notice_id=notice_id);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) =>Ok(()),
+    }
+}

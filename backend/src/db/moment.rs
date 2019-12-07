@@ -107,3 +107,36 @@ pub fn get_sponsor_moments(sponsor_name: &String)->Result<Vec<Moment>, String>{
     }
     return Ok(moments);
 }
+
+pub fn alter_moment(
+    moment_id: &String,
+    text: &String,
+    pictures: &Vec<String>,
+    time: &String
+) -> Result<(), String> {
+    let mut picture_str = "".to_string();
+    for pic in pictures {
+        if picture_str == "" {
+            picture_str = picture_str + &pic;
+        } else {
+            picture_str = picture_str + "&" + &pic;
+        }
+    }
+    let command = format!("UPDATE moment SET text='{text}', pictures='{pictures}'\
+    , time='{time}' WHERE moment_id='{moment_id}';", moment_id = moment_id,
+                          text = text, pictures = picture_str, time = time);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) => Ok(()),
+    }
+}
+
+pub fn delete_moment(moment_id: &String)->Result<(), String>{
+    let command = format!("DELETE FROM moment WHERE moment_id='{moment_id}';", moment_id=moment_id);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) => Ok(()),
+    }
+}
