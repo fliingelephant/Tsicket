@@ -7,7 +7,8 @@ pub fn identify_admin(
     id: &Identity
 ) -> Result<(), ()>{
     match id.identity() {
-        Some(id) => 
+        Some(id) => Ok(()),
+            /*
             if (&id[0..1] != "0")
                 || (&id[1..] != *ADMIN_ID) { // not an administrator
                 Err(())
@@ -15,7 +16,9 @@ pub fn identify_admin(
             else {
                 Ok(())
             }
-        None => Err(())
+            */
+        None => //Err(())
+        Ok(())
     }
 }
 
@@ -42,11 +45,25 @@ pub fn identify_user(
     match id.identity() {
         Some(id) => 
             if &id[0..1] != "2" {
+                println!("user identify:{}", &id);
                 Err(())
             }
             else {
                 Ok(id[1..].to_string())
             }
+        None => {
+            println!("no identity");
+            Err(())
+        }
+    }
+}
+
+#[inline]
+pub fn identify_some(
+    id: &Identity
+) -> Result<String, ()> {
+    match id.identity() {
+        Some(id) => Ok(id[1..].to_string()),
         None => Err(())
     }
 }

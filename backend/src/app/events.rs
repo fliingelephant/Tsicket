@@ -1,14 +1,17 @@
 use std::sync::{Mutex};
 
 use actix_identity::{Identity};
-use actix_web::{Error, HttpRequest, HttpResponse, web::Data, web::Json};
+use actix_web::{Error, HttpRequest, HttpResponse,  web::Json, web::Query};
 use futures::{Future, future::result};
 use serde::{Deserialize, Serialize};
 
 use super::{ADMIN_ID, EVENT_LIST};
+use super::sponsors::QuerySponsor;
 use super::update::{update_events};
 use crate::db::events::Event;
-use crate::utils::auth::{identify_sponsor, identify_user};
+use crate::db::records::{MomentRecord, PostRecord};
+use crate::db::moment;
+use crate::utils::auth::{identify_some, identify_sponsor, identify_user};
 
 #[derive(Deserialize)]
 pub struct QueryEvent {
@@ -40,15 +43,19 @@ struct BroadCastRet {
 
 #[allow(dead_code)]
 pub fn get_broadcast_events(
+    req: HttpRequest,
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
+    println!("{:?}", req.head());
+    println!("{:?}", req.headers());
+
     result(match identify_user(&id) {
         Ok(_) => {
             let mut list: Vec<BroadCastEventInfo> = vec![];
             let mut count = 0;
             for (_, event) in &(*EVENT_LIST.lock().unwrap()) {
                 if (event.left_tickets > 0)
-                    && (event.event_status == 1) {
+                    && (event.event_status == 2) {
                     list.push(BroadCastEventInfo {
                         event_id: event.event_id.clone(),
                         event_name: event.event_name.clone(),
@@ -117,6 +124,7 @@ pub struct AlterEvent {
     pub event_picture: String,
     pub event_capacity: i32,
     pub event_location: String,
+    pub event_time: String,
 }
 
 #[allow(dead_code)]
@@ -143,6 +151,7 @@ pub fn alter_event_info(
                     }
                     event.event_capacity = alter_event.event_capacity;
                     event.event_location = alter_event.event_location.clone();
+                    event.event_time = alter_event.event_time.clone();
                     event.update_type = 1;
                 },
                 None => return result(Ok(HttpResponse::UnprocessableEntity().json("No such event.")))
@@ -151,5 +160,86 @@ pub fn alter_event_info(
             Ok(HttpResponse::Ok().finish())
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[derive(Deserialize)]
+pub struct QueryList {
+    pub index: usize,
+}
+
+#[derive(Serialize)]
+pub struct MomentRet {
+    // TODO: 确定数据格式
+    pub content: String,
+}
+
+#[derive(Serialize)]
+pub struct MomentsRet {
+    pub moments: Vec<moment::Moment>
+}
+
+#[allow(dead_code)]
+pub fn get_event_moments(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_some(&id) {
+        Ok(_) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            match moment::get_event_moments(&event_id) {
+                Ok(moments) => Ok(HttpResponse::Ok().json(MomentsRet {
+                    moments: moments
+                })),
+                Err(_) => Ok(HttpResponse::InternalServerError().finish())
+            }
+        }
+        Err(_) => Ok(HttpResponse::Ok().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn get_sponsor_moments(
+    id: Identity,
+    Query(query_sponsor): Query<QuerySponsor> 
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_some(&id) {
+        Ok(_) => {
+            match moment::get_sponsor_moments(&query_sponsor.sponsor_name) {
+                Ok(moments) => Ok(HttpResponse::Ok().json(MomentsRet {
+                    moments: moments
+                })),
+                Err(_) => Ok(HttpResponse::InternalServerError().finish())
+            }
+        }
+        Err(_) => Ok(HttpResponse::Ok().finish())
+    })
+}
+
+#[derive(Serialize)]
+pub struct PostRet {
+    // TODO: 确定数据格式
+    pub content: String,
+}
+
+#[derive(Serialize)]
+pub struct PostsRet {
+    // TODO: 要不要 more
+    pub sponsor_name: String,
+    pub posts: Vec<PostRet>
+}
+
+#[allow(dead_code)]
+pub fn get_event_posts(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_some(&id) {
+        Ok(_) => {
+            let event_id = req.match_info().query("event_id");
+            // TODO
+            Ok(HttpResponse::NotImplemented().finish())
+        }
+        Err(_) => Ok(HttpResponse::Ok().finish())
     })
 }

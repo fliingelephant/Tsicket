@@ -46,6 +46,7 @@ pub fn initiate(
                 left_tickets: ev[10].as_sql(true).parse().unwrap(),
                 event_status: ev[11].as_sql(true).parse().unwrap(),
                 event_location: format_string(&ev[12].as_sql(true)),
+                event_time: format_string(&ev[13].as_sql(true)),
                 update_type: 0
             };
             event_list.insert(event.event_id.clone(), event.clone());

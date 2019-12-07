@@ -78,6 +78,7 @@ pub fn get_all_events(
             left_tickets: ev[10].as_sql(true).parse().unwrap(),
             event_status: ev[11].as_sql(true).parse().unwrap(),
             event_location: format_string(&ev[12].as_sql(true)),
+            event_time: format_string(&ev[13].as_sql(true))
         };
         event_list.push(event);
     }

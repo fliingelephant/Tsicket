@@ -28,12 +28,12 @@ fn md5_with_salt(id: &String, raw_password: &String) -> String {
 }
 
 pub fn sponsor_register(
-    id: &String, name: &String, raw_password: &String,
+    id: &String, name: &String, avatar_url: &String, raw_password: &String,
     email: &String, phone_number: &String
 )-> Result<(), String> {
-    let command = format!("INSERT INTO sponsor_account (account_id, sponsor_name, password,\
-     email, phone_number) VALUES ('{id}', '{name}', '{password}', '{email}', '{phone_number}');",
-                          id = id, name = name, password = md5_with_salt(id, raw_password),
+    let command = format!("INSERT INTO sponsor_account (account_id, sponsor_name, head_portrait, password,\
+     email, phone_number) VALUES ('{id}', '{name}', '{head_portrait}', '{password}', '{email}', '{phone_number}');",
+                          id = id, name = name, head_portrait = avatar_url, password = md5_with_salt(id, raw_password),
                           email=email, phone_number=phone_number);
 
     match POOL.prep_exec(command, ()) {
@@ -67,6 +67,25 @@ pub fn sponsor_log_in(id: &String, raw_password: &String)
     return Err(String::from("Account does not exist."));
 }
 
+pub fn get_sponsor_events_id(name: &String)
+    -> Result<Vec<String>, String> {
+    let command = format!("SELECT event_id FROM event WHERE sponsor_name='{name}';", name = name);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {}
+    }
+
+    let mut event_id_list: Vec<String> = Vec::new();
+    for row in res.unwrap(){
+        let result = row.unwrap().unwrap();
+        event_id_list.push(format_string(&result[0].as_sql(true)));
+    }
+
+    return Ok(event_id_list);
+}
+
 pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
     let command = format!("SELECT * FROM event WHERE sponsor_name='{name}'", name = name);
 
@@ -93,6 +112,7 @@ pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
             left_tickets: ev[10].as_sql(true).parse().unwrap(),
             event_status: ev[11].as_sql(true).parse().unwrap(),
             event_location: format_string(&ev[12].as_sql(true)),
+            event_time: format_string(&ev[13].as_sql(true)),
             update_type: 0
         };
         event_list.push(event);
@@ -100,7 +120,7 @@ pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
     return Ok(event_list);
 }
 
-pub fn check_sponsor_by_id(id: &String)->Result<bool, String>{
+pub fn check_sponsor_by_id(id: &String)->Result<bool, String> {
     let command = format!("SELECT count(*) FROM sponsor_account WHERE account_id='{id}'", id=id);
 
     let res = POOL.prep_exec(command, ());
@@ -169,11 +189,15 @@ pub fn alter_sponsor_info(
     }
 }
 
-pub fn publish_moment(sponsor_name: &String, event_id: &String, text: &String, pictures: &Vec<String>)
-                       -> Result<(), String>{
+pub fn publish_moment(
+    sponsor_name: &String,
+    event_id: &String,
+    text: &String,
+    pictures: &Vec<String>
+) -> Result<(), String> {
     let mut picture_str = "".to_string();
-    for pic in pictures{
-        if picture_str == ""{
+    for pic in pictures {
+        if picture_str == "" {
             picture_str = picture_str + &pic;
         }
         else{

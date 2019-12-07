@@ -13,6 +13,7 @@ pub struct Event {
     pub sponsor_name: String,
     pub event_name: String,
     pub start_time: String,
+    pub event_time: String,
     pub end_time: String,
     pub event_type: i8,
     pub event_introduction: String,
@@ -24,6 +25,8 @@ pub struct Event {
     pub event_location: String,
     pub update_type: i8,
 }
+
+
 
 pub fn get_info_by_id(id: &String)-> Result<Event, String> {
     let command = format!("SELECT * FROM event WHERE event_id='{id}'", id = id);
@@ -50,6 +53,7 @@ pub fn get_info_by_id(id: &String)-> Result<Event, String> {
             left_tickets: ev[10].as_sql(true).parse().unwrap(),
             event_status: ev[11].as_sql(true).parse().unwrap(),
             event_location: format_string(&ev[12].as_sql(true)),
+            event_time: format_string(&ev[13].as_sql(true)),
             update_type: 0
         };
         return Ok(event);
@@ -84,6 +88,7 @@ pub fn get_all_events(
             left_tickets: ev[10].as_sql(true).parse().unwrap(),
             event_status: ev[11].as_sql(true).parse().unwrap(),
             event_location: format_string(&ev[12].as_sql(true)),
+            event_time: format_string(&ev[13].as_sql(true)),
             update_type: 0
         };
         event_list.push(event);

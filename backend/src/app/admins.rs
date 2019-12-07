@@ -67,6 +67,7 @@ pub struct EventInfoRetToAdmin {
     pub left_tickets: i32,
     pub event_status: i8,
     pub event_location: String,
+    pub event_time: String,
 }
 
 #[derive(Serialize)]

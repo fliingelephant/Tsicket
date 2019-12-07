@@ -72,8 +72,12 @@ pub fn login(
 #[allow(dead_code)]
 #[inline]
 pub fn logout(
+    req: HttpRequest,
     id: Identity,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
+    println!("{:?}", req.head());
+    println!("{:?}", req.headers());
+
     result(match identify_sponsor(&id) {
         Ok(_) => {
             id.forget();
@@ -84,7 +88,6 @@ pub fn logout(
 }
 
 #[allow(dead_code)]
-#[inline]
 pub fn register(
     id: Identity,
     register_sponsor: Json<RegisterSponsor>,
@@ -92,6 +95,7 @@ pub fn register(
     result(match sponsors::sponsor_register(
         &register_sponsor.id,
         &register_sponsor.sponsorname,
+        &"http://2019-a18.iterator-traits.com/apis/sponsors/pic/default_avatar.jpg".to_string(),
         &register_sponsor.password,
         &register_sponsor.email,
         &register_sponsor.phone_number) {
@@ -108,6 +112,7 @@ pub struct PublishEvent {
     pub event_name: String,
     pub start_time: String,
     pub end_time: String,
+    pub event_time: String,
     pub event_type: i8,
     pub event_introduction: String,
     pub event_picture: String,
@@ -150,8 +155,9 @@ pub fn publish_event(
                             event_capacity: new_event.event_capacity,
                             current_participants: 0,
                             left_tickets: new_event.left_tickets,
-                            event_status: 0,
+                            event_status: 2,
                             event_location: new_event.event_location.clone(),
+                            event_time: new_event.event_time.clone(),
                             update_type: 2,
                         });
                     break;
@@ -339,4 +345,50 @@ pub fn get_pic(
     println!("serving file: {:?}", path);
 
     Ok(actix_files::NamedFile::open(path)?)
+}
+
+#[derive(Deserialize)]
+pub struct Moment {
+    pub text: String,
+    pub pictures: Vec<String>
+}
+
+#[allow(dead_code)]
+pub fn publish_moment(
+    id: Identity,
+    moment: Json<Moment>,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            // TODO: 检查是否符合活动和发布者对应
+            match sponsors::publish_moment(&sponsor_name, &event_id, &moment.text, &moment.pictures) {
+                Ok(_) => Ok(HttpResponse::Ok().finish()),
+                Err(e) => Ok(HttpResponse::InternalServerError().json(e))
+            }
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[derive(Deserialize)]
+pub struct EventPost {
+    pub text: String
+}
+
+#[allow(dead_code)]
+pub fn publish_post(
+    id: Identity,
+    post: Json<EventPost>,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            let event_id = req.match_info().query("event_id").to_string();
+
+            Ok(HttpResponse::NotImplemented().finish())
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
 }

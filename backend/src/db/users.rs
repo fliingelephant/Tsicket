@@ -132,6 +132,7 @@ pub fn get_tsinghua_id(id: &String) -> Result<String, String> {
     return Err("No such user".to_string());
 }
 
+#[allow(dead_code)]
 pub fn get_user_records(id: &String)
                           -> Result<Vec<Record>, String> {
     let command = format!("SELECT * FROM ticket_record WHERE user_id='{id}';", id = id);

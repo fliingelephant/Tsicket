@@ -24,6 +24,7 @@ pub fn new_pool<S: Into<String>>(database_url: S) -> Result<PgPool> {
 
 pub mod admins;
 pub mod events;
+pub mod moment;
 pub mod sponsors;
 pub mod users;
 pub mod records;

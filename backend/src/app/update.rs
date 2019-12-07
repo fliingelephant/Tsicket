@@ -15,15 +15,15 @@ pub fn update_events()
         if event.update_type == 1 { // 修改
             let command = format!("UPDATE event SET sponsor_name='{sponsor_name}', event_name='{event_name}', \
                                     start_time='{start_time}', end_time='{end_time}', event_type={event_type}, \
-                                    event_introduction='{event_introduction}', event_capacity={event_capacity}, \
+                                    event_introduction='{event_introduction}', event_picture='{event_picture}', event_capacity={event_capacity}, \
                                     current_participants={current_participants}, left_tickets={left_tickets}, \
-                                    event_status={event_status}, event_location='{event_location}' \
+                                    event_status={event_status}, event_location='{event_location}', event_time='{event_time}' \
                                     WHERE event_id='{event_id}';", sponsor_name=event.sponsor_name,
                                   event_name=event.event_name, start_time=event.start_time,
                                   end_time=event.end_time, event_type=event.event_type,
-                                  event_introduction=event.event_introduction, event_capacity=event.event_capacity,
+                                  event_introduction=event.event_introduction, event_picture=event.event_picture, event_capacity=event.event_capacity,
                                   current_participants=event.current_participants, left_tickets=event.left_tickets,
-                                  event_status=event.event_status, event_location=event.event_location,
+                                  event_status=event.event_status, event_location=event.event_location, event_time=event.event_time,
                                   event_id=event.event_id);
 
             let req=POOL.prep_exec(command, ());
@@ -37,17 +37,19 @@ pub fn update_events()
             event.update_type = 0;
         } else if event.update_type == 2 { // 添加
             let command = format!("INSERT INTO event (event_id, sponsor_name, event_name, start_time, end_time, \
-                                    event_type, event_introduction, event_capacity, current_participants, \
-                                    left_tickets, event_status, event_location) VAlUES ('{event_id}', \
+                                    event_type, event_introduction, event_picture, event_capacity, current_participants, \
+                                    left_tickets, event_status, event_location, event_time) VAlUES ('{event_id}', \
                                     '{sponsor_name}', '{event_name}', '{start_time}', '{end_time}', {event_type}, \
-                                    '{event_introduction}', {event_capacity}, {current_participants}, \
-                                    {left_tickets}, {event_status}, '{event_location}');", event_id=event.event_id,
+                                    '{event_introduction}', '{event_picture}', {event_capacity}, {current_participants}, \
+                                    {left_tickets}, {event_status}, '{event_location}', '{event_time}');", event_id=event.event_id,
                                   sponsor_name=event.sponsor_name, event_name=event.event_name,
                                   start_time=event.start_time,
                                   end_time=event.end_time, event_type=event.event_type,
-                                  event_introduction=event.event_introduction, event_capacity=event.event_capacity,
+                                  event_introduction=event.event_introduction,
+                                  event_picture=event.event_picture, event_capacity=event.event_capacity,
                                   current_participants=event.current_participants, left_tickets=event.left_tickets,
-                                  event_status=event.event_status, event_location=event.event_location);
+                                  event_status=event.event_status, event_location=event.event_location,
+                                  event_time=event.event_time);
             
             let req = POOL.prep_exec(command, ());
             match req {
