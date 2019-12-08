@@ -38,6 +38,7 @@
         </el-table-column>
 
         <el-table-column
+                prop="event_status"
                 label="活动状态">
         </el-table-column>
 
@@ -48,9 +49,9 @@
           <template slot-scope="scope">
             <el-button @click="eventInfo(scope.row)" type="text" size="small">查看</el-button>
             <el-button @click="changeEvent(scope.row)" type="text" size="small">编辑</el-button>
-            <el-button type="text" size="small">结束抢票</el-button>
-            <el-button type="text" size="small">取消活动</el-button>
-            <el-button type="text" size="small">申请推广</el-button>
+            <el-button disabled type="text" size="small">结束抢票</el-button>
+            <el-button disabled type="text" size="small">取消活动</el-button>
+            <el-button disabled type="text" size="small">申请推广</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -80,6 +81,7 @@
         data() {
             return({
                 events: [],
+                states: ['未审核','抢票未开始','抢票中','抢票结束','活动结束','未通过审核','活动取消'],
                 currentPage:1,
                 pageSize:10
             })

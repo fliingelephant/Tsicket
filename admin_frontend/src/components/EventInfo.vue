@@ -164,17 +164,6 @@
                 info:'',
                 notice_data:[],
                 moment_data:[],
-                active_name: 'first',
-                event_name: '测试——活动名称',
-                event_place: '测试——活动地点',
-                event_start: '2019.6.18 12:00:00',
-                distribute:'测试——抢票',
-                event_type:'讲座',
-                event_intro:'测试——本活动是一场讲座，会邀请xxxyyy来到zzzzzzzzz，为大家带来xxxxx。',
-                start_time:"2019.6.10 12:00:00",
-                end_time:"2019.6.10 12:00:00",
-                event_capacity:20,
-                left_ticket:10,
             };
         },
         mounted(){

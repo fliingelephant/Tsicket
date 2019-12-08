@@ -111,8 +111,6 @@
                       accept="image/png,image/jpeg"
                       list-type="picture-card"
                       :before-upload="beforeUploadPicture"
-                      :on-preview="handlePictureCardPreview"
-                      :on-progress="uploadProgress"
                       :on-remove="handleRemove"
                       :on-success="uploadSuccess"
                       :on-error="uploadError"
@@ -195,24 +193,20 @@
                     return false;
                 }
             },
-            // 上传图片时调用
-            uploadProgress(event,file, fileList){
-            },
-            // 上传图片成功
+
             uploadSuccess(res, file, fileList) {
                 file.url=file.response.file_url
                 this.event_picture=file.url
             },
-            // 上传图片出错
+
             uploadError(err, file, fileList) {
                 this.$message.error("上传出错");
             },
-            // 移除图片
+
             handleRemove(file, fileList) {
                 this.event_picture=''
             },
-            handlePictureCardPreview(file) {
-            },
+
         }
     }
 </script>

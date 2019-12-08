@@ -75,8 +75,6 @@
                       accept="image/png,image/jpeg"
                       list-type="picture-card"
                       :before-upload="beforeUploadPicture"
-                      :on-preview="handlePictureCardPreview"
-                      :on-progress="uploadProgress"
                       :on-remove="handleRemove"
                       :on-success="uploadSuccess"
                       :on-error="uploadError"
@@ -191,9 +189,7 @@
                     return false;
                 }
             },
-            // 上传图片时调用
-            uploadProgress(event,file, fileList){
-            },
+
             // 上传图片成功
             uploadSuccess(res, file, fileList) {
                 file.url=file.response.file_url
@@ -207,8 +203,7 @@
             handleRemove(file, fileList) {
                 this.head_portrait=''
             },
-            handlePictureCardPreview(file) {
-            },
+
         }
     }
 </script>

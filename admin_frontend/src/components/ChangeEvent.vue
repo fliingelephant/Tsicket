@@ -115,7 +115,7 @@
 
         <el-form-item v-if="change">
           <el-row :gutter="20">
-            <el-col :span="4"><div class="info-text">修改图片</div></el-col>
+            <el-col :span="4"><div class="event-text">修改图片</div></el-col>
             <el-col :span="20">
               <!--上传图片-->
               <el-upload
@@ -124,8 +124,6 @@
                       accept="image/png,image/jpeg"
                       list-type="picture-card"
                       :before-upload="beforeUploadPicture"
-                      :on-preview="handlePictureCardPreview"
-                      :on-progress="uploadProgress"
                       :on-remove="handleRemove"
                       :on-success="uploadSuccess"
                       :on-error="uploadError"
@@ -157,29 +155,10 @@
         name: "Register",
         data() {
             return {
-                info:'',
-                name: '',
-                place: '',
-                date: '',
-                time: '',
-                method: '',
-                type:'',
+                info:{},
                 change:false,
                 upload_url:'apis/sponsors/pic/',
-                description:'',
-                distributestart:'',
-                distributeend:'',
                 capacity:0,
-                types:[{
-                    value:'0',
-                    label:'讲座'
-                },{
-                    value:'1',
-                    label:'文艺活动'
-                },{
-                    value:'2',
-                    label:'其他'
-                }]
             }
         },
         mounted(){
@@ -194,7 +173,6 @@
                     if(response.status===200) {
                         this.info=response.data
                         this.info.event_type=this.info.event_type.toString()
-                        this.info.event_capacity=this.info.event_capacity.toString()
                     }
                     else{
                         this.$message({
@@ -240,7 +218,6 @@
                         type: 'error'
                     })
                 })
-                //this.$router.push('/EventList')
             },
             pageReturn(){
                 this.$router.push('/EventList')
@@ -251,24 +228,20 @@
                     return false;
                 }
             },
-            // 上传图片时调用
-            uploadProgress(event,file, fileList){
-            },
-            // 上传图片成功
+
             uploadSuccess(res, file, fileList) {
                 file.url=file.response.file_url
                 this.info.event_picture=file.url
             },
-            // 上传图片出错
+
             uploadError(err, file, fileList) {
                 this.$message.error("上传出错");
             },
-            // 移除图片
+
             handleRemove(file, fileList) {
                 this.info.event_picture=''
             },
-            handlePictureCardPreview(file) {
-            },
+
         }
     }
 </script>

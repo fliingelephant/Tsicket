@@ -38,9 +38,9 @@
           >
             <template slot-scope="scope">
               <el-button @click="eventInfo(scope.row)" type="text" size="small">查看</el-button>
-              <el-button type="text" size="small">通过审核</el-button>
-              <el-button type="text" size="small">取消活动</el-button>
-              <el-button type="text" size="small">通过推广申请</el-button>
+              <el-button disabled type="text" size="small">通过审核</el-button>
+              <el-button disabled type="text" size="small">取消活动</el-button>
+              <el-button disabled type="text" size="small">通过推广申请</el-button>
             </template>
           </el-table-column>
 

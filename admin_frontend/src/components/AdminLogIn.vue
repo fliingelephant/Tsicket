@@ -70,7 +70,7 @@
                 },err=>{
                     if(err.response.status===422)
                         this.$message({
-                            message: '登录失败：用户不存在',
+                            message: '登录失败：用户名或密码错误',
                             type: 'error'
                         })
                 })
