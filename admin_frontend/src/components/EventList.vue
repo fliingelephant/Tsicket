@@ -1,11 +1,13 @@
 <template>
   <el-container class="container">
+
     <el-header class="header">
       <el-row>
         <el-col :span="20"><div>活动列表</div></el-col>
         <el-col :span="4"><div class="add-event"><el-button @click="addEvent">添加活动</el-button></div></el-col>
       </el-row>
     </el-header>
+
     <el-main>
       <el-table
               stripe
@@ -14,32 +16,45 @@
           prop="event_name"
           label="活动名称">
         </el-table-column>
+
         <el-table-column
           prop="start_time"
-          label="发票开始">
+          label="抢票开始">
         </el-table-column>
+
         <el-table-column
           prop="end_time"
-          label="发票结束">
+          label="抢票结束">
         </el-table-column>
+
         <el-table-column
           prop="event_capacity"
           label="活动容量">
         </el-table-column>
+
         <el-table-column
           prop="left_tickets"
           label="剩余票数">
         </el-table-column>
 
         <el-table-column
-                label="操作">
+                label="活动状态">
+        </el-table-column>
+
+        <el-table-column
+                label="操作"
+                min-width="120%"
+        >
           <template slot-scope="scope">
             <el-button @click="eventInfo(scope.row)" type="text" size="small">查看</el-button>
             <el-button @click="changeEvent(scope.row)" type="text" size="small">编辑</el-button>
+            <el-button type="text" size="small">结束抢票</el-button>
+            <el-button type="text" size="small">取消活动</el-button>
+            <el-button type="text" size="small">申请推广</el-button>
           </template>
         </el-table-column>
-
       </el-table>
+
       <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -49,10 +64,13 @@
       :total="events.length"
       layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
+
     </el-main>
+
     <el-footer>
       <div class="list-footer" @click="help">查看帮助</div>
     </el-footer>
+
   </el-container>
 </template>
 
@@ -118,10 +136,8 @@
                             })
                     })
                 }
-
-            }
+            },
         },
-
     }
 </script>
 
@@ -133,13 +149,11 @@
     font-size: 25px;
     text-align: left;
   }
-
   .header {
     text-align: left;
     border-top: none;
     border-left: none;
     border-right: none;
-
   }
   .list-footer{
     text-align: center;
@@ -150,5 +164,4 @@
   .add-event{
     text-align: right;
   }
-
 </style>

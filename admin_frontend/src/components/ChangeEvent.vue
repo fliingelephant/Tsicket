@@ -1,8 +1,10 @@
 <template>
   <el-container class="container">
+
     <el-header class="header">
       <div>活动信息修改</div>
     </el-header>
+
     <el-main>
       <el-form>
         <el-form-item>
@@ -10,43 +12,46 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动名称</div></el-col>
             <el-col :span="12"><el-input
                     type="text"
-                    v-model="name"
+                    v-model="info.event_name"
                     auto-complete="off"
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动地点</div></el-col>
             <el-col :span="12"><el-input
                     type="text"
-                    v-model="place"
+                    v-model="info.event_location"
                     auto-complete="off"
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票开始时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      v-model="distributestart"
+                      value-format="yyyy-MM-dd HH:mm:ss"
+                      v-model="info.start_time"
                       type="datetime"
               ></el-date-picker>
             </el-col>
-
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票停止时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      v-model="distributeend"
+                      value-format="yyyy-MM-dd HH:mm:ss"
+                      v-model="info.end_time"
                       type="datetime"
               ></el-date-picker>
             </el-col>
-
           </el-row>
         </el-form-item>
 
@@ -54,7 +59,7 @@
           <el-row :gutter="20">
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动容量</div></el-col>
             <el-col :span="12"><el-input-number
-                    v-model="capacity"
+                    v-model="info.event_capacity"
             ></el-input-number></el-col>
           </el-row>
         </el-form-item>
@@ -64,54 +69,83 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动开始时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      v-model="date"
+                      value-format="yyyy-MM-dd HH:mm:ss"
+                      v-model="info.event_time"
                       type="datetime"
               ></el-date-picker>
             </el-col>
-
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动发票方式</div></el-col>
             <el-col :span="12">
-              <el-radio v-model="method" label="0">抢票</el-radio>
-              <el-radio v-model="method" label="1">扫码领票</el-radio>
-              <el-radio v-model="method" label="2">申请审核</el-radio>
+              <el-radio v-model="info.event_type" label="0">抢票</el-radio>
+              <el-radio v-model="info.event_type" label="1">扫码领票</el-radio>
+              <el-radio v-model="info.event_type" label="2">申请审核</el-radio>
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item>
-          <el-row :gutter="20">
-            <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动类别</div></el-col>
-            <el-col :span="12">
-              <el-select v-model="type" placeholder="选择类别">
-                <el-option
-                        v-for="type in types"
-                        :key="type.value"
-                        :label="type.label"
-                        :value="type.value"
-                ></el-option>
-              </el-select>
-            </el-col>
-          </el-row>
-        </el-form-item>
+
 
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动简介</div></el-col>
             <el-col :span="12"><el-input
                     type="textarea"
-                    v-model="description"
+                    v-model="info.event_introduction"
                     :autosize="{minRows:5,maxRows:20}"
                     auto-complete="off"
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
+        <el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="4"><div class="event-text">活动图片</div></el-col>
+            <el-col :span="16">
+              <img :src="info.event_picture" height="300">
+            </el-col>
+            <el-col :span="4">
+              <el-button v-if="!change" @click="change=true">修改</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+
+        <el-form-item v-if="change">
+          <el-row :gutter="20">
+            <el-col :span="4"><div class="info-text">修改图片</div></el-col>
+            <el-col :span="20">
+              <!--上传图片-->
+              <el-upload
+                      :action="upload_url+new Date().toISOString()"
+                      :limit="1"
+                      accept="image/png,image/jpeg"
+                      list-type="picture-card"
+                      :before-upload="beforeUploadPicture"
+                      :on-preview="handlePictureCardPreview"
+                      :on-progress="uploadProgress"
+                      :on-remove="handleRemove"
+                      :on-success="uploadSuccess"
+                      :on-error="uploadError"
+                      :show-file-list="true">
+                <i class="el-icon-plus"></i>
+              </el-upload>
+            </el-col>
+          </el-row>
+        </el-form-item>
+
+
+
       </el-form>
+
       <el-row>
-        <el-col>
-          <el-button @click="post" type="primary" style="width: 10%">修改</el-button>
+        <el-col :span="3">
+          <el-button @click="post" type="primary">修改</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>
     </el-main>
@@ -123,17 +157,19 @@
         name: "Register",
         data() {
             return {
+                info:'',
                 name: '',
                 place: '',
                 date: '',
                 time: '',
                 method: '',
                 type:'',
+                change:false,
+                upload_url:'apis/sponsors/pic/',
                 description:'',
                 distributestart:'',
                 distributeend:'',
-                capacity:'',
-
+                capacity:0,
                 types:[{
                     value:'0',
                     label:'讲座'
@@ -143,35 +179,114 @@
                 },{
                     value:'2',
                     label:'其他'
-                }
-                ]
+                }]
             }
         },
+        mounted(){
+            this.getInfo()
+        },
         methods:{
+            getInfo(){
+                let data={
+                    "event_id":this.$route.params.id
+                }
+                this.$axios.post("/events/view",data).then(response => {
+                    if(response.status===200) {
+                        this.info=response.data
+                        this.info.event_type=this.info.event_type.toString()
+                        this.info.event_capacity=this.info.event_capacity.toString()
+                    }
+                    else{
+                        this.$message({
+                            message: '查询失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+                    this.$message({
+                        message: '查询失败',
+                        type: 'error'
+                    })
+                })
+            },
             post(){
+                let data={
+                    "event_id":this.info.event_id,
+                    "event_name":this.info.event_name,
+                    "start_time":this.info.start_time,
+                    "end_time":this.info.end_time,
+                    "event_time":this.info.event_time,
+                    "event_type":parseInt(this.info.event_type),
+                    "event_introduction":this.info.event_introduction,
+                    "event_picture":this.info.event_picture,
+                    "event_capacity":parseInt(this.info.event_capacity),
+                    "left_tickets": parseInt(this.info.event_capacity),
+                    "event_location":this.info.event_location,
+                }
+                this.$axios.put("/events/view",data).then(response => {
+                    if(response.status===200) {
+                        this.$router.push('/EventList')
+                    }
+                    else{
+                        this.$message({
+                            message: '提交失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+
+                    this.$message({
+                        message: '提交失败',
+                        type: 'error'
+                    })
+                })
+                //this.$router.push('/EventList')
+            },
+            pageReturn(){
                 this.$router.push('/EventList')
-            }
+            },
+            beforeUploadPicture(file) {
+                if(file.size > 10*1024*1024){
+                    this.$message.error("上传图片不能大于10M");
+                    return false;
+                }
+            },
+            // 上传图片时调用
+            uploadProgress(event,file, fileList){
+            },
+            // 上传图片成功
+            uploadSuccess(res, file, fileList) {
+                file.url=file.response.file_url
+                this.info.event_picture=file.url
+            },
+            // 上传图片出错
+            uploadError(err, file, fileList) {
+                this.$message.error("上传出错");
+            },
+            // 移除图片
+            handleRemove(file, fileList) {
+                this.info.event_picture=''
+            },
+            handlePictureCardPreview(file) {
+            },
         }
     }
 </script>
 
 <style scoped>
   .container{
-
     margin: 10px;
     padding: 5px;
     font-weight: 600;
     font-size: 25px;
     text-align: left;
   }
-
   .header {
     display: flex;
     text-align: center;
     border-top: none;
     border-left: none;
     border-right: none;
-
   }
   .event-text {
     font-weight: 400;
@@ -180,5 +295,4 @@
   .compulsory{
     color:#ff0000
   }
-
 </style>

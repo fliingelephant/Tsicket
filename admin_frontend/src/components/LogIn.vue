@@ -1,8 +1,10 @@
 <template>
   <el-container class="container">
+
     <el-header class="header">
       <div>登录</div>
     </el-header>
+
     <el-main>
       <el-form>
         <el-form-item>
@@ -12,6 +14,7 @@
                   type="text"
           ></el-input>
         </el-form-item>
+
         <el-form-item prop="password">
           <div align="left" class="login-text">密码：</div>
           <el-input
@@ -20,18 +23,23 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <el-row class="retrieve-text">
-        <div align="right"> 找回密码 </div>
-      </el-row>
+<!--找回密码连接-->
+<!--      <el-row class="retrieve-text">-->
+<!--        <div align="right"> 找回密码 </div>-->
+<!--      </el-row>-->
+
       <el-row>
         <el-col :span="12">
           <el-button @click="login" type="primary" style="width: 60%">登录</el-button>
         </el-col>
+
         <el-col :span="12">
           <el-button @click="toRegister" style="width: 60%">注册</el-button>
         </el-col>
       </el-row>
+
     </el-main>
+
   </el-container>
 </template>
 
@@ -73,8 +81,8 @@
                         this.$message({
                             message: '登录失败：用户不存在',
                             type: 'error'
-                        })})
-
+                        })
+                })
             },
             toRegister(){
                 this.$router.push('/Register')
@@ -95,7 +103,6 @@
     font-size: 25px;
     text-align: center;
   }
-
   .header {
     text-align: center;
     border-bottom: 1px solid silver;
@@ -104,7 +111,6 @@
     font-size: 12px;
     margin:5px
   }
-
   .login-text {
     font-weight: 400;
     font-size: 16px;
