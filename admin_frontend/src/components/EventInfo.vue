@@ -164,6 +164,7 @@
                 info:'',
                 notice_data:[],
                 moment_data:[],
+                active_name:'first'
             };
         },
         mounted(){
