@@ -180,6 +180,23 @@ pub fn get_user_likes(id: &String) -> Result<Vec<String>, String>{
     return Ok(event_list);
 }
 
+pub fn get_user_like_number(id: &String) -> Result<i32, String>{
+    let command = format!("SELECT COUNT(*) FROM `like` WHERE user_id='{id}';", id = id);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    for row in res.unwrap() {
+        let info = row.unwrap().unwrap();
+        let number: i32 = info[0].as_sql(true).parse().unwrap();
+        return Ok(number);
+    }
+    return Ok(0);
+}
+
 pub fn check_user_like(user_id: &String, event_id: &String) -> Result<bool, String> {
     let res = get_user_likes(user_id);
     match res{
@@ -229,6 +246,23 @@ pub fn get_user_follows(id: &String) -> Result<Vec<String>, String>{
         sponsor_list.push(sponsor);
     }
     return Ok(sponsor_list);
+}
+
+pub fn get_user_follow_number(id: &String) -> Result<i32, String>{
+    let command = format!("SELECT COUNT(*) FROM follow WHERE user_id='{id}';", id = id);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    for row in res.unwrap() {
+        let info = row.unwrap().unwrap();
+        let number: i32 = info[0].as_sql(true).parse().unwrap();
+        return Ok(number);
+    }
+    return Ok(0);
 }
 
 pub fn check_user_follow(user_id: &String, sponsor_name: &String) -> Result<bool, String> {

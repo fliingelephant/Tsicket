@@ -115,5 +115,11 @@ fn main() {
                 println!("{}", o[i].time);
             }
         },
-    }*/
+    }
+    let s = db::users::get_user_follow_number(&"23".to_string());
+    match s{
+        Err(e) => println!("{}", e),
+        Ok(o) => {println!("{}", o)},
+    }
+    */
 }

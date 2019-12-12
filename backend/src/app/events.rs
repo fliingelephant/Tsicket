@@ -103,10 +103,20 @@ pub fn get_event_info(
         return result(Ok(HttpResponse::Unauthorized().finish())); // 401 Unauthorized
     }
 
+    match (*EVENT_LIST).try_lock() {
+        Ok(a) => {
+            drop(a);
+        }
+        Err(e) => {
+            println!("FAIL HERE get_event_info:{}",e);
+        }
+    }
+    let events = (*EVENT_LIST).lock().unwrap();
     result(
-        if (*EVENT_LIST).lock().unwrap().contains_key(&query_event.event_id) {
-            Ok(HttpResponse::Ok().json(
-                (*EVENT_LIST).lock().unwrap().get(&query_event.event_id)))
+        if events.contains_key(&query_event.event_id) {
+            let event = events.get(&query_event.event_id).unwrap().clone();
+            drop(events);
+            Ok(HttpResponse::Ok().json(event.clone()))
         } else {
             Ok(HttpResponse::UnprocessableEntity().json("Event does not exist."))
         }

@@ -28,3 +28,4 @@ pub mod moment;
 pub mod sponsors;
 pub mod users;
 pub mod records;
+pub mod notification;

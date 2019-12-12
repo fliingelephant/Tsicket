@@ -70,7 +70,7 @@ pub fn start() -> () {
     let mut cookie_private_key = [0u8; 32];
     thread_rng().fill(&mut cookie_private_key[..]);
 
-    initiate(& mut *EVENT_LIST.lock().unwrap()).unwrap();
+    initiate(& mut *EVENT_LIST.lock().unwrap(), & mut * RECORD.lock().unwrap()).unwrap();
 
     HttpServer::new(move || {
         App::new()

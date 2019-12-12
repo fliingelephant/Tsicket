@@ -3,7 +3,7 @@ use std::collections::{HashMap};
 use super::POOL;
 
 use crate::db::events::{Event};
-//use crate::db::records::{Record};
+use crate::db::records::{Record};
 
 #[inline]
 fn format_string(src: &String) -> String {
@@ -11,7 +11,8 @@ fn format_string(src: &String) -> String {
 }
 
 pub fn initiate(
-    event_list: &mut HashMap<String, Event>
+    event_list: &mut HashMap<String, Event>,
+    record_list: &mut HashMap<String, Record>
 ) -> Result<(), String> {
     let command_event = "SELECT * FROM event;".to_string();
     let res = POOL.prep_exec(command_event, ());
@@ -53,7 +54,7 @@ pub fn initiate(
         }
     }
 
-    /*let command_record = "SELECT * FROM ticket_record;".to_string();
+    let command_record = "SELECT * FROM ticket_record;".to_string();
     let res = POOL.prep_exec(command_record, ());
     match res {
         Err(e) => return Err(e.to_string()),
@@ -70,8 +71,8 @@ pub fn initiate(
             end_time: format_string(&ev[5].as_sql(true)),
             update_type: 0
         };
-        record_list.push(record);
-    }*/
+        record_list.insert(record.record_id.clone(), record);
+    }
 
     return Ok(());
 }

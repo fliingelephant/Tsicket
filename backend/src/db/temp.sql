@@ -1,5 +1,5 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-INSERT INTO `sponsor_account` VALUES ('123', 'zjr', '123');
+UPDATE notification SET read=1 WHERE notice_id='090';
 
 SET FOREIGN_KEY_CHECKS = 1;
