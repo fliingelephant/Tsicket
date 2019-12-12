@@ -1,8 +1,10 @@
 <template>
   <el-container class="container">
+
     <el-header class="header">
       <div>修改个人信息</div>
     </el-header>
+
     <el-main>
       <el-form ref="register">
         <el-form-item prop="username">
@@ -16,6 +18,7 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item prop="name">
           <el-row :gutter="20">
             <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>机构/个人名称</div></el-col>
@@ -27,6 +30,7 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item prop="email">
           <el-row :gutter="20">
             <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>电子邮箱</div></el-col>
@@ -37,6 +41,7 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item prop="phone">
           <el-row :gutter="20">
             <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>联系电话</div></el-col>
@@ -47,13 +52,51 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+        <el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="4"><div class="info-text">头像</div></el-col>
+            <el-col :span="16">
+              <img :src="head_portrait" height="200">
+            </el-col>
+            <el-col :span="4">
+              <el-button v-if="!change" @click="change=true">修改</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+
+        <el-form-item v-if="change">
+          <el-row :gutter="20">
+            <el-col :span="4"><div class="info-text">修改头像</div></el-col>
+            <el-col :span="20">
+              <!--上传图片-->
+              <el-upload
+                      :action="upload_url"
+                      :limit="1"
+                      accept="image/png,image/jpeg"
+                      list-type="picture-card"
+                      :before-upload="beforeUploadPicture"
+                      :on-remove="handleRemove"
+                      :on-success="uploadSuccess"
+                      :on-error="uploadError"
+                      :show-file-list="true">
+                <i class="el-icon-plus"></i>
+              </el-upload>
+            </el-col>
+          </el-row>
+        </el-form-item>
       </el-form>
+
       <el-row>
-        <el-col>
-          <el-button @click="changeInfo" type="primary" style="width: 10%">修改</el-button>
+        <el-col :span="3">
+          <el-button @click="changeInfo" type="primary">修改</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>
+
     </el-main>
+
   </el-container>
 </template>
 
@@ -66,6 +109,9 @@
                 email: '',
                 phone: '',
                 name: '',
+                head_portrait:'',
+                change:false,
+                upload_url:'apis/sponsors/pic/head_portrait',
                 email_regular:/^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/,
                 phone_regular:/^\d{11}$|^\d{7,8}$|^(\d{4}|\d{3})-(\d{7,8})$|^(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})$|^(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})$/
             }
@@ -78,11 +124,11 @@
             getInfo() {
                 this.$axios.get("/sponsors/view").then(response => {
                     let userInfo=response.data
+                    this.head_portrait=userInfo.head_portrait
                     this.username=userInfo.id
                     this.email=userInfo.email
                     this.phone=userInfo.phone_number
                     this.name=userInfo.sponsor_name
-
                 })
             },
             changeInfo(){
@@ -92,6 +138,7 @@
                     let data={
                         "id":this.username,
                         "sponsor_name":this.name,
+                        "head_portrait":this.head_portrait,
                         "email":this.email,
                         "phone_number":this.phone
                     }
@@ -109,7 +156,6 @@
                                 type: 'error'
                             })
                         }
-
                     })
                 }
                 else if(!email_available){
@@ -133,7 +179,31 @@
                     })
                     this.$router.push('/')
                 }
-            }
+            },
+            pageReturn(){
+                this.$router.push('/EventList')
+            },
+            beforeUploadPicture(file) {
+                if(file.size > 10*1024*1024){
+                    this.$message.error("上传图片不能大于10M");
+                    return false;
+                }
+            },
+
+            // 上传图片成功
+            uploadSuccess(res, file, fileList) {
+                file.url=file.response.file_url
+                this.head_portrait=file.url
+            },
+            // 上传图片出错
+            uploadError(err, file, fileList) {
+                this.$message.error("上传出错");
+            },
+            // 移除图片
+            handleRemove(file, fileList) {
+                this.head_portrait=''
+            },
+
         }
     }
 </script>
@@ -146,7 +216,6 @@
     font-size: 25px;
     text-align: left;
   }
-
   .header {
     display: flex;
     text-align: center;
@@ -158,5 +227,4 @@
   .compulsory{
     color:#ff0000
   }
-
 </style>

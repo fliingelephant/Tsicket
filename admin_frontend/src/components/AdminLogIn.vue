@@ -1,8 +1,10 @@
 <template>
   <el-container class="container">
+
     <el-header class="header">
-      <div>登录</div>
+      <div>管理员登录</div>
     </el-header>
+
     <el-main>
       <el-form>
         <el-form-item>
@@ -12,6 +14,7 @@
                   type="text"
           ></el-input>
         </el-form-item>
+
         <el-form-item>
           <div align="left" class="login-text">密码：</div>
           <el-input
@@ -20,11 +23,13 @@
           ></el-input>
         </el-form-item>
       </el-form>
+
       <el-row>
         <el-col>
           <el-button @click="login" type="primary" style="width: 30%">登录</el-button>
         </el-col>
       </el-row>
+
     </el-main>
   </el-container>
 </template>
@@ -46,7 +51,6 @@
                 }
                 this.$axios.post("/admins/login", data).then(response => {
                     if (response.status === 200) {
-
                         let resdata = {
                             username: this.username,
                             admin: true
@@ -66,9 +70,10 @@
                 },err=>{
                     if(err.response.status===422)
                         this.$message({
-                            message: '登录失败：用户不存在',
+                            message: '登录失败：用户名或密码错误',
                             type: 'error'
-                        })})
+                        })
+                })
             },
         }
     }
@@ -86,12 +91,10 @@
     font-size: 25px;
     text-align: center;
   }
-
   .header {
     text-align: center;
     border-bottom: 1px solid silver;
   }
-
   .login-text {
     font-weight: 400;
     font-size: 16px;

@@ -1,8 +1,10 @@
 <template>
   <el-container class="container">
+
     <el-header class="header">
       <div>活动发布者注册</div>
     </el-header>
+
     <el-main>
       <el-form>
         <el-form-item>
@@ -16,6 +18,7 @@
             <el-col :span="8"><div class="hint-text">字母开头，6至32字符(字母、数字、下划线)</div></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>密码</div></el-col>
@@ -27,6 +30,7 @@
             <el-col :span="8"><div class="hint-text">6至32字符(字母、数字、特殊符号)</div></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item >
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>确认密码</div></el-col>
@@ -38,6 +42,7 @@
             <el-col :span="8"><div class="hint-text">6至32字符(字母、数字、特殊符号)</div></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>机构/个人名称</div></el-col>
@@ -49,6 +54,7 @@
             <el-col :span="8"><div class="hint-text">后期不可修改</div></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>电子邮箱</div></el-col>
@@ -59,6 +65,7 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>联系电话</div></el-col>
@@ -69,13 +76,20 @@
             ></el-input></el-col>
           </el-row>
         </el-form-item>
+
       </el-form>
-      <el-row>
-        <el-col>
-          <el-button type="primary" @click="reg" style="width: 10%">注册</el-button>
+
+      <el-row :gutter="20">
+        <el-col :span="3">
+          <el-button type="primary" @click="reg">注册</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>
+
     </el-main>
+
   </el-container>
 </template>
 
@@ -169,7 +183,10 @@
                         type:'warning'
                     });
                 }
-            }
+            },
+            pageReturn(){
+                this.$router.push('/')
+            },
         }
     }
 </script>
@@ -182,7 +199,6 @@
     font-size: 25px;
     text-align: left;
   }
-
   .header {
     display: flex;
   }
@@ -197,5 +213,4 @@
   .compulsory{
     color:#ff0000
   }
-
 </style>

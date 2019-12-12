@@ -10,6 +10,9 @@ import AdminLogIn from "@/components/AdminLogIn";
 import AdminMenu from "@/components/AdminMenu";
 import ChangeInfo from "@/components/ChangeInfo";
 import EventInfo from "@/components/EventInfo";
+import AddMoment from "@/components/AddMoment";
+import AddNotice from "@/components/AddNotice";
+import AdminEvent from "@/components/AdminEvent";
 
 Vue.use(Router)
 
@@ -93,12 +96,40 @@ export default new Router({
         },
         {
             path:'/ChangeInfo',
-            name: '/ChangeInfo',
+            name: 'ChangeInfo',
             component: ChangeInfo,
             meta: {
                 hasInfo:true,
                 title: '更改信息'
             }
         },
+        {
+            path:'/AddMoment/:id',
+            name: 'AddMoment',
+            component: AddMoment,
+            meta: {
+                hasInfo:true,
+                title: '添加动态'
+            }
+        },
+        {
+            path:'/AddNotice/:id',
+            name: 'AddNotice',
+            component: AddNotice,
+            meta: {
+                hasInfo:true,
+                title: '添加通知'
+            }
+        },
+        {
+            path:'/AdminEvent/:id',
+            name: 'AdminEvent',
+            component: AdminEvent,
+            meta: {
+                hasInfo:true,
+                title: '管理员查看'
+            }
+        },
     ]
 })
+

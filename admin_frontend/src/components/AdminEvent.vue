@@ -4,8 +4,6 @@
     <el-header class="header">
       <el-row>
         <el-col :span="16"><div>活动详情</div></el-col>
-        <el-col :span="4"><div class="add-event"><el-button @click="addNotice" disabled>发布通知</el-button></div></el-col>
-        <el-col :span="4"><div class="add-event"><el-button @click="addMoment">添加动态</el-button></div></el-col>
       </el-row>
     </el-header>
 
@@ -87,62 +85,7 @@
               </el-row>
             </el-form-item>
 
-
-
           </el-form>
-        </el-tab-pane>
-
-        <el-tab-pane label="动态列表" name="second">
-
-          <el-table
-                  stripe
-                  :data="moment_data">
-
-            <el-table-column
-                    prop="text"
-                    label="动态内容"
-                    min-width="40%">
-            </el-table-column>
-
-            <el-table-column
-                    prop="pictures"
-                    label="图片"
-                    min-width="40%">
-              <template   slot-scope="scope">
-                <img v-for="picture in scope.row.pictures" :src="picture" class="image" min-width="70" height="70" />
-              </template>
-            </el-table-column>
-
-            <el-table-column
-                    prop="time"
-                    label="发布时间"
-                    min-width="20%">
-            </el-table-column>
-
-          </el-table>
-
-
-        </el-tab-pane>
-
-        <el-tab-pane label="通知列表" name="third">
-
-          <el-table
-                  stripe
-                  :data="notice_data">
-
-            <el-table-column
-                    prop="moment_content"
-                    label="通知内容">
-            </el-table-column>
-
-            <el-table-column
-                    prop="moment_time"
-                    label="发布时间">
-            </el-table-column>
-
-          </el-table>
-
-
         </el-tab-pane>
 
       </el-tabs>
@@ -158,19 +101,18 @@
 
 <script>
     export default {
-        name: "EventInfo",
+        name: "AdminEvent",
         data() {
             return {
                 info:'',
                 notice_data:[],
                 moment_data:[],
-                active_name:'first'
+                active_name: 'first',
+
             };
         },
         mounted(){
             this.getInfo()
-            //this.getNotice()
-            this.getMoment()
         },
         methods: {
             getInfo(){
@@ -194,53 +136,8 @@
                     })
                 })
             },
-            getNotice(){
-                this.$axios.get("/events/posts/"+this.$route.params.id).then(response => {
-                    if(response.status===200) {
-                        this.notice_data=response.data
-                        console.log(this.notice_data)
-                    }
-                    else{
-                        this.$message({
-                            message: '查询通知失败',
-                            type: 'error'
-                        })
-                    }
-                },err=>{
-                    this.$message({
-                        message: '查询通知失败',
-                        type: 'error'
-                    })
-                })
-
-            },
-            getMoment(){
-                this.$axios.get("/events/moments/"+this.$route.params.id).then(response => {
-                    if(response.status===200) {
-                        this.moment_data=response.data.moments
-                    }
-                    else{
-                        this.$message({
-                            message: '查询动态失败',
-                            type: 'error'
-                        })
-                    }
-                },err=>{
-                    this.$message({
-                        message: '查询动态失败',
-                        type: 'error'
-                    })
-                })
-
-            },
-            addNotice(){
-                this.$router.push('/AddNotice/'+this.$route.params.id)
-            },
-            addMoment(){
-                this.$router.push('/AddMoment/'+this.$route.params.id)
-            },
             pageReturn(){
-                this.$router.push('/EventList')
+                this.$router.push('/AdminMenu')
             }
         },
     }
