@@ -108,7 +108,14 @@
 			};
 		},
 		onLoad() {
-
+			uni.showShareMenu({})
+		},
+		onShareAppMessage(res) {
+			return {
+			    title: app.globalData.sharetitle,
+			    path: '/pages/index/index',
+				imageUrl: app.globalData.shareimg
+			}
 		},
 		methods: {
 			cardSwiper(e) {
@@ -132,7 +139,7 @@
 			},
 			like(id) {
 				uni.request({
-					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like', //仅为示例，并非真实接口地址。
+					url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
 					method: 'POST',
 					data: {
 						openid: app.globalData.openid,

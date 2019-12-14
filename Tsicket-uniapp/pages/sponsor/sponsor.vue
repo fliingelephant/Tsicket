@@ -26,8 +26,12 @@
 				<view class="cu-avatar xxl round" :style="{backgroundImage: 'url(' + sponsor.avatarUrl + ')'}"></view>
 			</view>
 			<view class="toolbar flex align-stretch text-center">
-				<view class="flex-sub flex align-center justify-center" @click="share">
-					<text class="cuIcon-share" @click.stop=""></text>
+				<view class="flex-sub flex align-center justify-center">
+					<button open-type="share" @click="share">
+						<view class= "flex align-center justify-center sharbutton">
+							<text class="cuIcon-share"></text>
+						</view>
+					</button>
 				</view>
 				<view class="flex-sub flex align-center justify-center" @click="follow">
 					<text :class="sponsor.follow ? 'cuIcon-check' : 'cuIcon-friendadd'"></text>
@@ -186,69 +190,129 @@
 		},
 		onLoad(option) {
 			console.log(option)
-			// uni.request({
-			// 	url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-			// 	data: {
-			// 		id: option.id
-			// 	},
-			// 	header: {
-			// 		'content-type': 'application/json' //自定义请求头信息
-			// 	},
-			// 	success: (res) => {
-			// 		console.log(res.data);
-			// 	}
-			// });
-			return 0
+			this.sponsor.name = option.id
+			if (app.globalData.cookie != '') {
+				console.log('onload')
+				this.loadpage()
+			} else {
+				console.log('nocookie')
+				app.globalData.cookieReadyCallback = this.loadpage
+			}
+			uni.showShareMenu({})
+		},
+		onShareAppMessage(res) {
+			return {
+			    title: '清易票-' + this.sponsor.name,
+				//imageUrl: app.globalData.shareimg
+			}
 		},
 		methods: {
+			loadpage() {
+				uni.request({
+					url: app.globalData.apiurl + 'sponsors/view/' + this.sponsor.name,
+					//method: 'POST',
+					data: {
+						sponsor_name: this.sponsor.name,
+					},
+					header: {
+						'content-type': 'application/json', //自定义请求头信息
+						'cookie': app.globalData.cookie
+					},
+					success: (res) => {
+						console.log(res)
+						this.sponsor.tostart = res.data.tostart
+						this.sponsor.history = res.data.history
+						this.sponsor.message = res.data.message
+					}
+				})
+				uni.request({
+					url: app.globalData.apiurl + 'users/follow/' + this.sponsor.name,
+					header: {
+						'content-type': 'application/json' ,//自定义请求头信息
+						'cookie': app.globalData.cookie
+					},
+					success: (res) => {
+						console.log(res)
+						this.sponsor.follow = res.data.follow
+					}
+				})
+				uni.request({
+					url: app.globalData.apiurl + 'events/moments', //仅为示例，并非真实接口地址。
+					data: {
+						'sponsor_name': this.sponsor.name
+					},
+					header: {
+						'content-type': 'application/json', //自定义请求头信息
+						'cookie': app.globalData.cookie
+					},
+					success: (res) => {
+						console.log(res.data);
+						//this.activitylist = res.data
+					}
+				});
+			},
 			tabSelect(e) {
 				this.current = e.currentTarget.dataset.id;
+				console.log(this.current)
+				if ((this.current == 1) && (!this.messagelist[0])) {
+					uni.request({
+						url: app.globalData.apiurl + 'events/moments', //仅为示例，并非真实接口地址。
+						data: {
+							'sponsor_name': sponsor.name
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res.data);
+							this.messagelist = res.data.moments
+						}
+					});
+				}
 			},
 			navChange(index) {
 				this.current = index;
 			},
 			swiperChange(e) {
 				this.current = e.detail.current;
-			},
-			reserve() {
-				uni.request({
-					url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-					data: {
-						activityid: this.id,
-						userid: app.globalData.userInfo
-					},
-					header: {
-						'content-type': 'application/json' //自定义请求头信息
-					},
-					success: (res) => {
-						console.log(res.data);
-					}
-				});
+				if ((this.current == 1) && (!this.messagelist[0])) {
+					uni.request({
+						url: app.globalData.apiurl + 'events/moments', //仅为示例，并非真实接口地址。
+						data: {
+							'sponsor_name': sponsor.name
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res.data);
+							this.messagelist = res.data.moments
+						}
+					});
+				}
 			},
 			share() {
 
 			},
 			follow() {
 				uni.request({
-					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/follow',
+					url: app.globalData.apiurl + 'users/follow/' + this.sponsor.name,
 					method: 'POST',
-					data: {
-						openid: app.globalData.openid,
-						sponsorid: this.sponsor.id,
-						session: '',
-					},
 					header: {
-						'content-type': 'application/json' //自定义请求头信息
+						'content-type': 'application/json' ,//自定义请求头信息
+						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
 						console.log(res.data);
+						this.sponsor.follow = res.data.follow
 					}
 				});
-				this.sponsor.follow = !this.sponsor.follow
 			},
 			appreciate(id){
 				uni.request({
-					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/appreciate',
+					url: app.globalData.apiurl + 'users/appreciate',
 					method: 'POST',
 					data: {
 						openid: app.globalData.openid,
@@ -279,7 +343,7 @@
 			},
 			like(id) {
 				uni.request({
-					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like',
+					url: app.globalData.apiurl + 'users/like',
 					method: 'POST',
 					data: {
 						openid: app.globalData.openid,
@@ -350,6 +414,24 @@
 		height: 100rpx;
 		width: 100%;
 		font-size: 48rpx;
+	}
+	
+	button {
+		font-size: 48rpx;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: none;
+		background: none;
+	}
+	
+	button:after {
+		border: none;
+	}
+	
+	button>view {
+		width: 100%;
+		height: 100%;
 	}
 
 	.tab-swiper-view {

@@ -9,7 +9,7 @@
 "use strict";
 /* WEBPACK VAR INJECTION */(function(createApp) {__webpack_require__(/*! uni-pages */ 4);__webpack_require__(/*! @dcloudio/uni-stat */ 5);
 var _vue = _interopRequireDefault(__webpack_require__(/*! vue */ 2));
-var _App = _interopRequireDefault(__webpack_require__(/*! ./App */ 9));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};var ownKeys = Object.keys(source);if (typeof Object.getOwnPropertySymbols === 'function') {ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {return Object.getOwnPropertyDescriptor(source, sym).enumerable;}));}ownKeys.forEach(function (key) {_defineProperty(target, key, source[key]);});}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var message = function message() {return __webpack_require__.e(/*! import() | components/message */ "components/message").then(__webpack_require__.bind(null, /*! ./components/message.vue */ 63));};var activityMiniCard = function activityMiniCard() {return __webpack_require__.e(/*! import() | components/activity-mini-card */ "components/activity-mini-card").then(__webpack_require__.bind(null, /*! ./components/activity-mini-card.vue */ 70));};var activityPrepare = function activityPrepare() {return __webpack_require__.e(/*! import() | components/activity-prepare */ "components/activity-prepare").then(__webpack_require__.bind(null, /*! @/components/activity-prepare.vue */ 77));};var activityCheck = function activityCheck() {return __webpack_require__.e(/*! import() | components/activity-check */ "components/activity-check").then(__webpack_require__.bind(null, /*! @/components/activity-check.vue */ 84));};var followList = function followList() {return __webpack_require__.e(/*! import() | components/follow-list */ "components/follow-list").then(__webpack_require__.bind(null, /*! @/components/follow-list.vue */ 91));};
+var _App = _interopRequireDefault(__webpack_require__(/*! ./App */ 9));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};var ownKeys = Object.keys(source);if (typeof Object.getOwnPropertySymbols === 'function') {ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {return Object.getOwnPropertyDescriptor(source, sym).enumerable;}));}ownKeys.forEach(function (key) {_defineProperty(target, key, source[key]);});}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var message = function message() {return __webpack_require__.e(/*! import() | components/message */ "components/message").then(__webpack_require__.bind(null, /*! ./components/message.vue */ 79));};var activityMiniCard = function activityMiniCard() {return __webpack_require__.e(/*! import() | components/activity-mini-card */ "components/activity-mini-card").then(__webpack_require__.bind(null, /*! ./components/activity-mini-card.vue */ 86));};var activityPrepare = function activityPrepare() {return __webpack_require__.e(/*! import() | components/activity-prepare */ "components/activity-prepare").then(__webpack_require__.bind(null, /*! @/components/activity-prepare.vue */ 93));};var activityCheck = function activityCheck() {return __webpack_require__.e(/*! import() | components/activity-check */ "components/activity-check").then(__webpack_require__.bind(null, /*! @/components/activity-check.vue */ 100));};var followList = function followList() {return __webpack_require__.e(/*! import() | components/follow-list */ "components/follow-list").then(__webpack_require__.bind(null, /*! @/components/follow-list.vue */ 107));};
 
 
 
@@ -105,7 +105,11 @@ __webpack_require__.r(__webpack_exports__);
 {
   globalData: {
     hasuserInfo: false,
-    openid: 0 },
+    openid: 0,
+    cookie: '',
+    apiurl: 'http://2019-a18.iterator-traits.com:8080/apis/',
+    sharetitle: '清易票tsicket-校园活动抢票平台',
+    shareimg: '/static/tsicket.png' },
 
   onLaunch: function onLaunch() {var _this = this;
     console.log('App Launch');
@@ -115,19 +119,44 @@ __webpack_require__.r(__webpack_exports__);
       success: function success(res) {
         console.log(res);
         uni.request({
-          url: 'http://2019-a18.iterator-traits.com:8080/apis/users/login', //仅为示例，并非真实接口地址。
+          url: _this.globalData.apiurl + 'users/login', //仅为示例，并非真实接口地址。
+          method: "POST",
           data: {
             code: res.code },
-
 
           header: {
             'content-type': 'application/json' //自定义请求头信息
           },
           success: function success(res) {
-            //onsole.log(res.data);
-            _this.globalData.openid = res.data.openid;
-            console.log(res.data.openid);
             console.log(res);
+            _this.globalData.openid = res.data.openid;
+            if (res.header["set-cookie"]) {
+              _this.globalData.cookie = res.header["set-cookie"].slice(0, res.header["set-cookie"].indexOf(';'));
+            } else {
+              _this.globalData.cookie = res.header["Set-Cookie"].slice(0, res.header["Set-Cookie"].indexOf(';'));
+            }
+            console.log(_this.globalData.cookie);
+            if (_this.globalData.cookieReadyCallback) {
+              console.log('callback');
+              _this.globalData.cookieReadyCallback(_this.globalData.cookie);
+            } else
+            {
+              console.log('nocallback');
+            }
+            uni.request({
+              url: _this.globalData.apiurl + 'users/tsinghuaid', //仅为示例，并非真实接口地址。
+              header: {
+                'content-type': 'application/json', //自定义请求头信息
+                'cookie': _this.globalData.cookie },
+
+              success: function success(res) {
+                console.log(res.data);
+                _this.globalData.tsinghuaid = res.data.tsinghuaid;
+              } });
+
+          },
+          fail: function fail() {
+            console.log('loginfail');
           } });
 
       } });

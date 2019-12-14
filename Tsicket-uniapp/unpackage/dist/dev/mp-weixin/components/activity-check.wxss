@@ -19,7 +19,6 @@
 	width: 100%;
 	height: 300rpx;
 	-webkit-transition: all 0.5s ease 0s;
-	-o-transition: all 0.5s ease 0s;
 	transition: all 0.5s ease 0s;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
 	background-color: #F2F2F2;
@@ -28,7 +27,6 @@
 .card-back.unfold {
 	height: 400rpx;
 	-webkit-transition: all 0.5s ease 0s;
-	-o-transition: all 0.5s ease 0s;
 	transition: all 0.5s ease 0s;
 }
 .line-round {
@@ -48,22 +46,18 @@
 .flex-column {
 	display: -webkit-box;
 	display: -webkit-flex;
-	display: -ms-flexbox;
 	display: flex;
 	-webkit-box-orient: vertical;
 	-webkit-box-direction: normal;
 	-webkit-flex-direction: column;
-	    -ms-flex-direction: column;
 	        flex-direction: column;
 	-webkit-box-pack: justify;
 	-webkit-justify-content: space-between;
-	    -ms-flex-pack: justify;
 	        justify-content: space-between;
 }
 .toolbar-enter-active,
 .toolbar-leave-active {
 	-webkit-transition: all 0.5s ease-in 0s;
-	-o-transition: all 0.5s ease-in 0s;
 	transition: all 0.5s ease-in 0s;
 }
 .toolbar-enter,
@@ -76,7 +70,6 @@
 	width: 100%;
 	height: 0;
 	-webkit-transition: all 0.5s ease 0s;
-	-o-transition: all 0.5s ease 0s;
 	transition: all 0.5s ease 0s;
 	font-size: 48rpx;
 }
@@ -84,7 +77,6 @@
 	opacity: 1;
 	height: 100rpx;
 	-webkit-transition: all 0.5s ease 0s;
-	-o-transition: all 0.5s ease 0s;
 	transition: all 0.5s ease 0s;
 }
 .tab-swiper-view {
@@ -92,7 +84,6 @@
 }
 .cuIcon-likefill {
 	-webkit-transition: opacity 1s ease-in 0s;
-	-o-transition: opacity 1s ease-in 0s;
 	transition: opacity 1s ease-in 0s;
 }
 

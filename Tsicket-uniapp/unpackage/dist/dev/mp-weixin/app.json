@@ -47,5 +47,6 @@
     "activity-prepare": "/components/activity-prepare",
     "activity-check": "/components/activity-check",
     "follow-list": "/components/follow-list"
-  }
+  },
+  "sitemapLocation": "sitemap73.json"
 }

@@ -2,14 +2,14 @@
 	<view class="bg-message">
 		<view class="padding-top padding-lr">
 		<view class="flex justify-between">
-			<view class="flex text-left" @click="$emit('sponsorPage', sponsor.id)">
+			<view class="flex text-left" @click="$emit('sponsorPage', sponsor.name)">
 				<view class="cu-avatar round" :style="{backgroundImage: 'url(' + sponsor.avatarUrl + ')'}"></view>
 				<view class="flex-column padding-left-sm">
 					<view class="text-sm text-bold">{{sponsor.name}}</view>
-					<view class="text-xs">{{activity.start}}</view>
+					<view class="text-xs">{{message.time}}</view>
 				</view>
 			</view>
-			<view class="text-right" @click="$emit('activityPage', activity.id)">{{activity.name}}</view>
+			<view class="text-right" @click="$emit('activityPage', activity.event_id)">{{activity.event_name}}</view>
 		</view>
 		<view class="message-content padding-tb-sm solid-bottom">{{message.text}}</view>
 		</view>

@@ -78,18 +78,18 @@ component.options.__file = "C:/Users/12811/Documents/HBuilderProjects/Tsicket/pa
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_hbuilderx_packages_webpack_uni_nvue_loader_lib_templateLoader_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_17_0_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_template_js_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_vue_vue_type_template_id_bed27b2c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/templateLoader.js??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--17-0!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/template.js!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-custom-block-loader??ref--0-1!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/style.js!./index.vue?vue&type=template&id=bed27b2c& */ 18);
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_hbuilderx_packages_webpack_uni_nvue_loader_lib_templateLoader_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_17_0_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_template_js_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_vue_vue_type_template_id_bed27b2c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_16_0_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_template_js_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_vue_vue_type_template_id_bed27b2c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--16-0!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/template.js!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-custom-block-loader??ref--0-1!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/style.js!./index.vue?vue&type=template&id=bed27b2c& */ 18);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_16_0_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_template_js_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_vue_vue_type_template_id_bed27b2c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_hbuilderx_packages_webpack_uni_nvue_loader_lib_templateLoader_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_17_0_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_template_js_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_vue_vue_type_template_id_bed27b2c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_preprocess_loader_index_js_ref_16_0_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_template_js_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_vue_loader_lib_index_js_vue_loader_options_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_vue_cli_plugin_uni_packages_webpack_custom_block_loader_index_js_ref_0_1_D_Software_HBuilderX_HBuilderX_plugins_uniapp_cli_node_modules_dcloudio_webpack_uni_mp_loader_lib_style_js_index_vue_vue_type_template_id_bed27b2c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
 /***/ }),
 /* 18 */
-/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/templateLoader.js??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--17-0!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/template.js!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-custom-block-loader??ref--0-1!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/style.js!C:/Users/12811/Documents/HBuilderProjects/Tsicket/pages/index/index.vue?vue&type=template&id=bed27b2c& ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader??ref--16-0!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/template.js!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/@dcloudio/vue-cli-plugin-uni/packages/webpack-custom-block-loader??ref--0-1!./node_modules/@dcloudio/webpack-uni-mp-loader/lib/style.js!C:/Users/12811/Documents/HBuilderProjects/Tsicket/pages/index/index.vue?vue&type=template&id=bed27b2c& ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -175,174 +175,182 @@ var app = getApp();var _default =
   data: function data() {
     return {
       cardCur: 0,
-      swiperList: [{
-        id: 0,
-        type: 'image',
-        url: ''
-        // url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big37006.jpg',
-      }, {
-        id: 1,
-        type: 'image',
-        url: ''
-        // url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big39000.jpg'
-      }, {
-        id: 2,
-        type: 'image',
-        url: ''
-        // url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg'
-      }],
+      swiperList: [],
       dotStyle: false,
       towerStart: 0,
       direction: '',
       url: "/static/cardback0.jpg",
-      activitylist: [{
-        id: 0,
-        name: '活动名',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 1,
-        name: '活动名1',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 2,
-        name: '活动名2',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 3,
-        name: '活动名3',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 4,
-        name: '活动名4',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 5,
-        name: '活动名5',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 6,
-        name: '活动名6',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true }],
-
-
+      activitylist: [
+        //	{
+        // 	event_id: 0,
+        // 	event_name: '活动名',
+        // 	event_introdution: '活动介绍语',
+        // 	event_picture: '',
+        // 	left_tickets: 80,
+        // 	event_location: '活动地点',
+        // 	start_time: '2019年xx月xx日',
+        // 	end_time: '',
+        // 	sponsor_name: 'xx学生会',
+        // 	event_type: 1,
+        // 	event_status: 200,
+        // 	reserved: false,
+        // 	like: false
+        // }
+      ],
       current: 0,
       tabs: [
-      "介绍", "动态"],
-
-      sponsor: {
-        avatarUrl: '',
-        name: 'xx学生会' },
-
-      message: {} };
-
+      "介绍", "动态"] };
 
 
   },
   onLoad: function onLoad() {
+    console.log(app.globalData.cookie);
+    if (app.globalData.cookie != '') {
+      console.log('indexonload');
+      this.loadpage();
+    } else {
+      console.log('nocookie');
+      app.globalData.cookieReadyCallback = this.loadpage;
+    }
+
+    uni.showShareMenu({});
+    // app.globalData.cookieReadyCallback = function(res) {
+    // 	uni.request({
+    // 		url: 'http://2019-a18.iterator-traits.com/apis/users/broadcast',
+    // 		//method: 'POST',
+    // 		/* data: {
+    // 			index: 0
+    // 		}, */
+    // 		header: {
+    // 			'content-type': 'application/json', //自定义请求头信息
+    // 			'cookie': app.globalData.cookie
+    // 		},
+    // 		success: (res) => {
+    // 			console.log(res.data);
+    // 		}
+    // 	})
+    // }
+    //console.log(app.cookieReadyCallback)
+  },
+  onShareAppMessage: function onShareAppMessage(res) {
+    return {
+      title: app.globalData.sharetitle,
+      path: '/pages/index/index',
+      imageUrl: app.globalData.shareimg };
 
   },
   methods: {
+    loadpage: function loadpage(cookie) {var _this = this;
+      console.log('cookieReadyCallback');
+      console.log(cookie);
+      /* uni.request({
+                           	url: 'http://2019-a18.iterator-traits.com/apis/users/newactivities',
+                           	method: 'POST',
+                           	data: {
+                           		index: 0
+                           	},
+                           	header: {
+                           		'content-type': 'application/json', //自定义请求头信息
+                           		'cookie': cookie
+                           	},
+                           	success: (res) => {
+                           		
+                           		console.log(res);
+                           	}
+                           }) */
+      uni.showLoading({
+        title: '加载中' });
+
+      uni.request({
+        url: app.globalData.apiurl + 'users/broadcast',
+        header: {
+          'content-type': 'application/json', //自定义请求头信息
+          'cookie': app.globalData.cookie },
+
+        success: function success(res) {
+          console.log(res);
+          console.log(res.data);
+          _this.swiperList = res.data.list;
+          if (_this.activitylist != []) {
+            uni.showToast({
+              title: '加载成功',
+              icon: 'none' });
+
+          }
+        } });
+
+      uni.request({
+        url: app.globalData.apiurl + 'admins',
+        //method: 'POST',
+        /* data: {
+        	index: 0
+        }, */
+        header: {
+          'content-type': 'application/json', //自定义请求头信息
+          'cookie': cookie },
+
+        success: function success(res) {
+          console.log(res);
+          console.log(res.data);
+          var temp = res.data.events;
+          temp.forEach(function (res) {
+            res.like = true;
+          });
+          _this.activitylist = temp;
+          console.log(_this.activitylist);
+          if (_this.swiperList != []) {
+            uni.showToast({
+              title: '加载成功',
+              icon: 'none' });
+
+          }
+        } });
+
+      /* uni.request({
+              	url: 'http://2019-a18.iterator-traits.com/apis/users',
+              	//method: 'POST',
+              	header: {
+              		'content-type': 'application/json', //自定义请求头信息
+              		'cookie': cookie
+              	},
+              	success: (res) => {
+              		console.log(res)
+              		console.log(res.data);
+              	}
+              }) */
+
+
+    },
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
     },
     swiperActivity: function swiperActivity(e) {
-      this.activityPage(this.swiperList[this.cardCur].id);
+      this.activityPage(this.swiperList[this.cardCur].event_id);
     },
     activityPage: function activityPage(id) {
       uni.navigateTo({
         url: "../activity/activity?id=" + id });
 
     },
-    like: function like(id) {
+    like: function like(id) {var _this2 = this;
       uni.request({
-        url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like',
+        url: app.globalData.apiurl + 'users/like/' + id,
         method: 'POST',
-        data: {
-          openid: app.globalData.openid,
-          eventid: id,
-          session: '' },
-
         header: {
-          'content-type': 'application/json' //自定义请求头信息
-        },
+          'content-type': 'application/json', //自定义请求头信息
+          'cookie': app.globalData.cookie },
+
         success: function success(res) {
           console.log(res.data);
+          console.log(id);
+          var index = _this2.activitylist.findIndex(function (item) {
+            return item.event_id == id;
+          });
+          console.log(index);
+          _this2.activitylist[index].like = res.data.like;
+          console.log(_this2.activitylist[index]);
         } });
 
-      var index = this.activitylist.findIndex(function (item) {
-        return item.id == id;
-      });
-      console.log(index);
-      this.activitylist[index].like = !this.activitylist[index].like;
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

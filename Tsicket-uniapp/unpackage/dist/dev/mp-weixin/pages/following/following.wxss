@@ -22,8 +22,7 @@
 }
 .text-ellipsis {
 	max-width: 400rpx;
-	-o-text-overflow: ellipsis;
-	   text-overflow: ellipsis;
+	text-overflow: ellipsis;
 	overflow: hidden;
 }
 .tab-swiper-view {
