@@ -963,7 +963,7 @@ pub fn get_sponsor_moments(
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(_) => {
-            match moment::get_sponsor_moments(&query_list.sponsor_name) {
+            match moment::get_sponsor_moments_sorted(&query_list.sponsor_name) {
                 Ok(moments) => {
                     let index = query_list.index;
 
@@ -1004,7 +1004,7 @@ pub fn get_event_moments(
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(_) => {
-            match moment::get_event_moments(&query_list.event_id) {
+            match moment::get_event_moments_sorted(&query_list.event_id) {
                 Ok(moments) => {
                     let index = query_list.index;
 

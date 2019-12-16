@@ -220,14 +220,15 @@ pub fn get_ad_applications(
 
 #[allow(dead_code)]
 pub fn allow_advertise(
-    query_event: Json<QueryEventByID>,
-    id: Identity
+    id: Identity,
+    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_admin(&id) {
         Ok(_) => {
+            let event_id = req.match_info().query("event_id").to_string();
             let mut events = (*EVENT_LIST).lock().unwrap();
             let ad_status: i8;
-            match events.get(&query_event.event_id) {
+            match events.get(&event_id) {
                 Some(event) => {
                     ad_status = event.event_status / 10;
                 }
@@ -239,7 +240,7 @@ pub fn allow_advertise(
                 -1 => Ok(HttpResponse::UnprocessableEntity().finish()),
                 0 => Ok(HttpResponse::UnprocessableEntity().json("Event not in application for advertisement.")),
                 1 => {
-                    let mut event = events.get_mut(&query_event.event_id).unwrap();
+                    let mut event = events.get_mut(&event_id).unwrap();
                     event.event_status += 10;
                     event.update_type = 1;
                     drop(events);
@@ -256,14 +257,15 @@ pub fn allow_advertise(
 
 #[allow(dead_code)]
 pub fn cancel_advertise(
-    query_event: Json<QueryEventByID>,
-    id: Identity
+    id: Identity,
+    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_admin(&id) {
         Ok(_) => {
+            let event_id = req.match_info().query("event_id").to_string();
             let mut events = (*EVENT_LIST).lock().unwrap();
             let ad_status: i8;
-            match events.get(&query_event.event_id) {
+            match events.get(&event_id) {
                 Some(event) => {
                     ad_status = event.event_status / 10;
                 }
@@ -276,7 +278,7 @@ pub fn cancel_advertise(
                 0 => Ok(HttpResponse::UnprocessableEntity().json("Event not in application for advertisement.")),
                 1 => Ok(HttpResponse::UnprocessableEntity().json("Event just in application for advertisement.")),
                 2 => {
-                    let mut event = events.get_mut(&query_event.event_id).unwrap();
+                    let mut event = events.get_mut(&event_id).unwrap();
                     event.event_status -= 10;
                     event.update_type = 1;
                     drop(events);

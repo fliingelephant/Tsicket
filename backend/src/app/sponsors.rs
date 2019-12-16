@@ -210,15 +210,16 @@ pub fn cancel_event(
 
 #[allow(dead_code)]
 pub fn advertise_event(
-    event: Json<QueryEventByID>,
-    id: Identity
+    id: Identity,
+    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_sponsor(&id) {
         Ok(sponsor_name) => {
+            let event_id = req.match_info().query("event_id").to_string();
             let mut events = (*EVENT_LIST).lock().unwrap();
             let status: i8;
             let ad_status: i8;
-            match events.get(&event.event_id) {
+            match events.get(&event_id) {
                 Some(event) => {
                     status = event.event_status % 10;
                     ad_status = event.event_status / 10;
@@ -234,7 +235,9 @@ pub fn advertise_event(
                 1 => {
                     match ad_status {
                         0 => {
-                            events.get_mut(&event.event_id).unwrap().event_status = 11;
+                            let mut event = events.get_mut(&event_id).unwrap();
+                            event.event_status = 11;
+                            event.update_type = 1;
                             drop(events);
                             update_events();
                             Ok(HttpResponse::Ok().finish())
@@ -247,7 +250,9 @@ pub fn advertise_event(
                 2 => {
                     match ad_status {
                         0 => {
-                            events.get_mut(&event.event_id).unwrap().event_status = 12;
+                            let mut event = events.get_mut(&event_id).unwrap();
+                            event.event_status = 12;
+                            event.update_type = 1;
                             drop(events);
                             update_events();
                             Ok(HttpResponse::Ok().finish())
@@ -266,15 +271,16 @@ pub fn advertise_event(
 
 #[allow(dead_code)]
 pub fn cancel_advertise_event(
-    event: Json<QueryEventByID>,
     id: Identity,
+    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_sponsor(&id) {
         Ok(sponsor_name) => {
+            let event_id = req.match_info().query("event_id").to_string();
             let mut events = (*EVENT_LIST).lock().unwrap();
             let status: i8;
             let ad_status: i8;
-            match events.get(&event.event_id) {
+            match events.get(&event_id) {
                 Some(event) => {
                     status = event.event_status % 10;
                     ad_status = event.event_status / 10;
@@ -291,7 +297,7 @@ pub fn cancel_advertise_event(
                     match ad_status {
                         0 => Ok(HttpResponse::UnprocessableEntity().json("Not in application for advertisement now.")),
                         1 => {
-                            events.get_mut(&event.event_id).unwrap().event_status = 1;
+                            events.get_mut(&event_id).unwrap().event_status = 1;
                             drop(events);
                             update_events();
 
@@ -305,7 +311,7 @@ pub fn cancel_advertise_event(
                     match ad_status {
                         0 => Ok(HttpResponse::UnprocessableEntity().json("Not in application for advertisement now.")),
                         1 => {
-                            events.get_mut(&event.event_id).unwrap().event_status = 2;
+                            events.get_mut(&event_id).unwrap().event_status = 2;
                             drop(events);
                             update_events();
 
