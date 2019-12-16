@@ -197,7 +197,7 @@ pub fn get_event_moments(
     result(match identify_some(&id) {
         Ok(_) => {
             let event_id = req.match_info().query("event_id").to_string();
-            match moment::get_event_moments(&event_id) {
+            match moment::get_event_moments_sorted(&event_id) {
                 Ok(moments) => Ok(HttpResponse::Ok().json(MomentsRet {
                     moments: moments
                 })),
@@ -215,7 +215,7 @@ pub fn get_sponsor_moments(
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_some(&id) {
         Ok(_) => {
-            match moment::get_sponsor_moments(&query_sponsor.sponsor_name) {
+            match moment::get_sponsor_moments_sorted(&query_sponsor.sponsor_name) {
                 Ok(moments) => Ok(HttpResponse::Ok().json(MomentsRet {
                     moments: moments
                 })),
