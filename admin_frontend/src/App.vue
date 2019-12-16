@@ -101,6 +101,7 @@
   }
   .topbar-info {
     margin-top: 10px;
-    text-align: center;
+    margin-right: 40px;
+    text-align: right;
   }
 </style>

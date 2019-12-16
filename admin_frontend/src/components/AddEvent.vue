@@ -35,7 +35,7 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票开始时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      value-format="yyyy-MM-dd HH:mm:ss"
+                      value-format="yyyy/MM/dd HH:mm:ss"
                       v-model="distributestart"
                       type="datetime"
               ></el-date-picker>
@@ -45,10 +45,10 @@
 
         <el-form-item>
           <el-row :gutter="20">
-            <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票停止时间</div></el-col>
+            <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票结束时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      value-format="yyyy-MM-dd HH:mm:ss"
+                      value-format="yyyy/MM/dd HH:mm:ss"
                       v-model="distributeend"
                       type="datetime"
               ></el-date-picker>
@@ -70,7 +70,7 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动开始时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      value-format="yyyy-MM-dd HH:mm:ss"
+                      value-format="yyyy/MM/dd HH:mm:ss"
                       v-model="date"
                       type="datetime"
               ></el-date-picker>
@@ -83,8 +83,8 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动发票方式</div></el-col>
             <el-col :span="12">
               <el-radio v-model="method" label='0'>抢票</el-radio>
-              <el-radio v-model="method" label='1'>扫码领票</el-radio>
-              <el-radio v-model="method" label='2'>申请审核</el-radio>
+<!--              <el-radio v-model="method" label='1'>扫码领票</el-radio>-->
+<!--              <el-radio v-model="method" label='2'>申请审核</el-radio>-->
             </el-col>
           </el-row>
         </el-form-item>
@@ -103,8 +103,8 @@
 
         <el-form-item>
           <el-row :gutter="20">
-            <el-col :span="4"><div class="event-text">活动图片</div></el-col>
-            <el-col :span="20">
+            <el-col :span="5"><div class="event-text">活动图片</div></el-col>
+            <el-col :span="12">
               <el-upload
                       :action="upload_url+new Date().toISOString()"
                       :limit="1"
@@ -123,10 +123,8 @@
       </el-form>
 
       <el-row :gutter="20">
-        <el-col :span="3">
+        <el-col :span="10">
           <el-button @click="post" type="primary">发布</el-button>
-        </el-col>
-        <el-col :span="3">
           <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>
@@ -155,34 +153,48 @@
         },
         methods:{
             post(){
-                let data={
-                    "event_name":this.name,
-                    "start_time":this.distributestart,
-                    "end_time":this.distributeend,
-                    "event_time":this.date,
-                    "event_type":parseInt(this.method),
-                    "event_introduction":this.description,
-                    "event_picture":this.event_picture,
-                    "event_capacity":this.capacity,
-                    "left_tickets": this.capacity,
-                    "event_location":this.place,
+
+                if(this.name === '' || this.place === ''|| this.date === ''||this.method === ''||this.description === ''||this.distributestart === ''||this.distributeend === ''||this.capacity === ''){
+                    this.$message.error('请输入必填项')
                 }
-                this.$axios.post("/sponsors",data).then(response => {
-                    if(response.status===200) {
-                        this.$router.push('/EventList')
-                    }
-                    else{
-                        this.$message({
-                            message: '提交失败',
-                            type: 'error'
+                else {
+                    let time_start=Date.parse(this.distributestart)
+                    let time_end=Date.parse(this.distributeend)
+                    let time_event=Date.parse(this.date)
+                    if(time_start<time_end&&time_end<time_event) {
+                        let data = {
+                            "event_name": this.name,
+                            "start_time": this.distributestart,
+                            "end_time": this.distributeend,
+                            "event_time": this.date,
+                            "event_type": parseInt(this.method),
+                            "event_introduction": this.description,
+                            "event_picture": this.event_picture,
+                            "event_capacity": this.capacity,
+                            "left_tickets": this.capacity,
+                            "event_location": this.place,
+                        }
+                        this.$axios.post("/sponsors", data).then(response => {
+                            if (response.status === 200) {
+                                this.$router.push('/EventList')
+                            } else {
+                                this.$message({
+                                    message: '提交失败',
+                                    type: 'error'
+                                })
+                            }
+                        }, err => {
+                            this.$message({
+                                message: '提交失败',
+                                type: 'error'
+                            })
                         })
                     }
-                },err=>{
-                    this.$message({
-                        message: '提交失败',
-                        type: 'error'
-                    })
-                })
+                    else
+                    {
+                        this.$message.error('开始时间应早于结束时间，结束时间应早于活动时间。')
+                    }
+                }
             },
             pageReturn(){
                 this.$router.push('/EventList')

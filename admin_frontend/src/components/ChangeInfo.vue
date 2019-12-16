@@ -9,7 +9,7 @@
       <el-form ref="register">
         <el-form-item prop="username">
           <el-row :gutter="20">
-            <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>用户名</div></el-col>
+            <el-col :span="5"><div class="info-text"><a class="compulsory">*</a>用户ID</div></el-col>
             <el-col :span="11"><el-input
                     :disabled="true"
                     type="text"
@@ -54,8 +54,8 @@
         </el-form-item>
         <el-form-item>
           <el-row :gutter="20">
-            <el-col :span="4"><div class="info-text">头像</div></el-col>
-            <el-col :span="16">
+            <el-col :span="5"><div class="info-text">头像</div></el-col>
+            <el-col :span="15">
               <img :src="head_portrait" height="200">
             </el-col>
             <el-col :span="4">
@@ -87,10 +87,8 @@
       </el-form>
 
       <el-row>
-        <el-col :span="3">
+        <el-col :span="10">
           <el-button @click="changeInfo" type="primary">修改</el-button>
-        </el-col>
-        <el-col :span="3">
           <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>

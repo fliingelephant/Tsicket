@@ -34,7 +34,7 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票开始时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      value-format="yyyy-MM-dd HH:mm:ss"
+                      value-format="yyyy/MM/dd HH:mm:ss"
                       v-model="info.start_time"
                       type="datetime"
               ></el-date-picker>
@@ -47,7 +47,7 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>发票停止时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      value-format="yyyy-MM-dd HH:mm:ss"
+                      value-format="yyyy/MM/dd HH:mm:ss"
                       v-model="info.end_time"
                       type="datetime"
               ></el-date-picker>
@@ -69,7 +69,7 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动开始时间</div></el-col>
             <el-col :span="12">
               <el-date-picker
-                      value-format="yyyy-MM-dd HH:mm:ss"
+                      value-format="yyyy/MM/dd HH:mm:ss"
                       v-model="info.event_time"
                       type="datetime"
               ></el-date-picker>
@@ -82,8 +82,8 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动发票方式</div></el-col>
             <el-col :span="12">
               <el-radio v-model="info.event_type" label="0">抢票</el-radio>
-              <el-radio v-model="info.event_type" label="1">扫码领票</el-radio>
-              <el-radio v-model="info.event_type" label="2">申请审核</el-radio>
+<!--              <el-radio v-model="info.event_type" label="1">扫码领票</el-radio>-->
+<!--              <el-radio v-model="info.event_type" label="2">申请审核</el-radio>-->
             </el-col>
           </el-row>
         </el-form-item>
@@ -103,9 +103,9 @@
 
         <el-form-item>
           <el-row :gutter="20">
-            <el-col :span="4"><div class="event-text">活动图片</div></el-col>
-            <el-col :span="16">
-              <img :src="info.event_picture" height="300">
+            <el-col :span="5"><div class="event-text">活动图片</div></el-col>
+            <el-col :span="15">
+              <img :src="info.event_picture" height="200">
             </el-col>
             <el-col :span="4">
               <el-button v-if="!change" @click="change=true">修改</el-button>
@@ -139,10 +139,8 @@
       </el-form>
 
       <el-row>
-        <el-col :span="3">
+        <el-col :span="10">
           <el-button @click="post" type="primary">修改</el-button>
-        </el-col>
-        <el-col :span="3">
           <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>
@@ -188,36 +186,49 @@
                 })
             },
             post(){
-                let data={
-                    "event_id":this.info.event_id,
-                    "event_name":this.info.event_name,
-                    "start_time":this.info.start_time,
-                    "end_time":this.info.end_time,
-                    "event_time":this.info.event_time,
-                    "event_type":parseInt(this.info.event_type),
-                    "event_introduction":this.info.event_introduction,
-                    "event_picture":this.info.event_picture,
-                    "event_capacity":parseInt(this.info.event_capacity),
-                    "left_tickets": parseInt(this.info.event_capacity),
-                    "event_location":this.info.event_location,
+                if(this.info.event_name===''||this.info.event_introduction===''||this.info.event_location==='')
+                {
+                    this.$message.error('必填项不能为空')
                 }
-                this.$axios.put("/events/view",data).then(response => {
-                    if(response.status===200) {
-                        this.$router.push('/EventList')
-                    }
-                    else{
-                        this.$message({
-                            message: '提交失败',
-                            type: 'error'
+                else {
+                    let time_start=Date.parse(this.info.start_time)
+                    let time_end=Date.parse(this.info.end_time)
+                    let time_event=Date.parse(this.info.event_time)
+                    if(time_start<time_end&&time_end<time_event) {
+                        let data = {
+                            "event_id": this.info.event_id,
+                            "event_name": this.info.event_name,
+                            "start_time": this.info.start_time,
+                            "end_time": this.info.end_time,
+                            "event_time": this.info.event_time,
+                            "event_type": parseInt(this.info.event_type),
+                            "event_introduction": this.info.event_introduction,
+                            "event_picture": this.info.event_picture,
+                            "event_capacity": parseInt(this.info.event_capacity),
+                            "left_tickets": parseInt(this.info.event_capacity),
+                            "event_location": this.info.event_location,
+                        }
+                        this.$axios.put("/events/view", data).then(response => {
+                            if (response.status === 200) {
+                                this.$router.push('/EventList')
+                            } else {
+                                this.$message({
+                                    message: '提交失败',
+                                    type: 'error'
+                                })
+                            }
+                        }, err => {
+
+                            this.$message({
+                                message: '提交失败',
+                                type: 'error'
+                            })
                         })
                     }
-                },err=>{
-
-                    this.$message({
-                        message: '提交失败',
-                        type: 'error'
-                    })
-                })
+                    else{
+                        this.$message.error('开始时间应早于结束时间，结束时间应早于活动时间。')
+                    }
+                }
             },
             pageReturn(){
                 this.$router.push('/EventList')

@@ -8,7 +8,7 @@
     <el-main>
       <el-form>
         <el-form-item>
-          <div align="left" class="login-text">用户名：</div>
+          <div align="left" class="login-text">用户ID：</div>
           <el-input
                   v-model="username"
                   type="text"

@@ -43,10 +43,8 @@
       </el-form>
 
       <el-row>
-        <el-col :span="3">
+        <el-col :span="10">
           <el-button type="primary" @click="post">发布</el-button>
-        </el-col>
-        <el-col :span="3">
           <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>

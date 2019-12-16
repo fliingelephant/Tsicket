@@ -79,15 +79,13 @@
 
             <el-form-item v-if="info.event_picture">
               <el-row :gutter="20">
-                <el-col :span="4"><div class="event-text">活动图片</div></el-col>
-                <el-col :span="16">
-                  <img :src="info.event_picture" height="400">
+                <el-col :span="5"><div class="event-text">活动图片</div></el-col>
+                <el-col :span="11">
+                  <img :src="info.event_picture" height="200">
                 </el-col>
 
               </el-row>
             </el-form-item>
-
-
 
           </el-form>
         </el-tab-pane>
