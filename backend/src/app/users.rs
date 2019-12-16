@@ -1,6 +1,7 @@
 use std::env;
 use std::fs;
 use std::io::{Write};
+use std::mem::drop;
 use std::path::{PathBuf};
 
 use actix_multipart::{Field, Multipart, MultipartError};
@@ -13,13 +14,15 @@ use reqwest::{get, Client};
 use serde::{Deserialize, Serialize};
 use actix_service::ServiceExt;
 
-use super::{APP_ID, EVENT_LIST, SECRET};
+use super::{APP_ID, EVENT_LIST, RECORD, SECRET};
 use super::sponsors::{QuerySponsor, QuerySponsorByID};
 use super::events::{QueryEvent, QueryEventByID, EventsRet};
 use crate::db::events;
+use crate::db::records::{Record};
 use crate::db::sponsors;
 use crate::db::users;
 use crate::utils::auth::{identify_user};
+use super::update::{update_records, update_events};
 
 #[derive(Deserialize)]
 pub struct WechatLoginInfo {
@@ -94,14 +97,21 @@ pub fn login(
     let content = resp.unwrap().json::<MPLoginInfo>();
     result(match content {
         Ok(text)=> {
+
             id.remember("2".to_owned() + &text.openid);
+            if let Some(id) = id.identity() {
+                println!("{}", id);
+            }
             match users::add_user(&text.openid) {
                 Ok(_) => Ok(HttpResponse::Ok().json(WechatLoginReturn {
                                 openid: text.openid.clone(),
                             })),
-                Err(_) => Ok(HttpResponse::Ok().json(WechatLoginReturn {
-                    openid: text.openid.clone(),
-                }))
+                Err(e) => {
+                    println!("{}", e);
+                    Ok(HttpResponse::Ok().json(WechatLoginReturn {
+                        openid: text.openid.clone(),
+                    }))
+                }
             }
         },
         Err(e) => {
@@ -134,7 +144,10 @@ pub fn bind_tsinghua_id(
             let content = resp.unwrap().json::<TsinghuaInfo>();
             match content {
                 Ok(text)=> {
-                    users::set_tsinghua_id(&openid, &text.user.card).unwrap();
+                    match users::set_tsinghua_id(&openid, &text.user.card) {
+                        Ok(_) => {}
+                        Err(e) => {println!("{}", e);}
+                    }
                     Ok(HttpResponse::Ok().json(WechatTHUReturn {
                             tsinghuaid: text.user.card.clone(),
                     }))
@@ -182,25 +195,29 @@ struct UserInfoWithoutTHUID {
 }
 
 pub fn get_personal_info(
-    id: Identity
+    id: Identity,
+    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
+    println!("{:?}", req.headers());
+
     result(match identify_user(&id) {
         Ok(openid) => {
-            // TODO: 获得关注数目、历史数目和喜爱的数目
+            let follow = users::get_user_follows(&openid).unwrap().len();
+            let like = users::get_user_likes(&openid).unwrap().len();
+            let history = users::get_user_records(&openid).unwrap().len();
             match users::get_tsinghua_id(&openid) {
-                Ok(tsinghua_id) => Ok(HttpResponse::NotImplemented().json(UserInfo{
-                    follow: 0,
-                    history: 0,
-                    like: 0,
+                Ok(tsinghua_id) => Ok(HttpResponse::Ok().json(UserInfo{
+                    follow: follow,
+                    history: history,
+                    like: like,
                     tsinghuaid: tsinghua_id
                 })),
-                Err(_) => Ok(HttpResponse::NotImplemented().json(UserInfoWithoutTHUID{
-                    follow: 0,
-                    history: 0,
-                    like: 0,
+                Err(_) => Ok(HttpResponse::Ok().json(UserInfoWithoutTHUID{
+                    follow: follow,
+                    history: history,
+                    like: like,
                 }))
             }
-            
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
@@ -216,17 +233,17 @@ pub fn check_follow(
     id: Identity,
     req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(id) => {
+    result(match identify_user(&id) {
+        Ok(openid) => {
             let sponsor_name = req.match_info().query("sponsor_name").to_string();
-            match users::check_user_follow(&id, &sponsor_name) {
+            match users::check_user_follow(&openid, &sponsor_name) {
                 Ok(flag) => Ok(HttpResponse::Ok().json(FollowRet { // 200 Ok
                     follow: flag,
                 })),
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
             }
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
@@ -313,48 +330,45 @@ pub fn get_follow_list(
     (id, Query(query_list)):
     (Identity, Query<QueryList>)
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(openid) => {
+    result(match identify_user(&id) {
+        Ok(openid) => {
             match users::get_user_follows(&openid) {
                 Ok(name_list) => {
                     let index = query_list.index;
-                    if name_list.len() <= index {
-                        Ok(HttpResponse::BadRequest().finish())
-                    } else {
-                        let mut more = true;
-                        let mut list: Vec<SponsorInfo> = vec![];
+                    let mut list: Vec<SponsorInfo> = vec![];
 
-                        if index + 15 >= name_list.len() {  // if no more sponsors followed
-                            more = false;
-                        }
-                        for i in index..(index + 14) {
-                            match sponsors::get_info_by_name(&name_list[i]) {
-                                Ok(sponsor) => {
-                                    list.push(SponsorInfo {
-                                        id: sponsor.id.clone(),
-                                        name: name_list[i].clone(),
-                                        avatar_url: "https://image.baidu.com/search/detail?ct=503316480&z=0&ipn=d&word=影流之主&step_word=&hs=0&pn=48&spn=0&di=2670&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=0&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=undefined&cs=562893584%2C1346842489&os=32714240%2C1997607233&simid=3364286120%2C229005232&adpicid=0&lpn=0&ln=777&fr=&fmq=1575227579031_R&fm=&ic=undefined&s=undefined&hd=undefined&latest=undefined&copyright=undefined&se=&sme=&tab=0&width=undefined&height=undefined&face=undefined&ist=&jit=&cg=&bdtype=11&oriquery=&objurl=http%3A%2F%2Fpic.fxsw.net%2Fup%2F2019-11%2F2019112310749555.jpg&fromurl=ippr_z2C%24qAzdH3FAzdH3Fooo_z%26e3Buxfo_z%26e3BgjpAzdH3Fip4sAzdH3Fd8la_z%26e3Bip4s&gsm=&rpstart=0&rpnum=0&islist=&querylist=&force=undefined".to_string().clone(),
-                                    })
-                                },
-                                Err(_) => {
-                                    break;
-                                }
+                    let more: bool;
+                    let end: usize;
+                    if index + 15 >= name_list.len() {  // if no more sponsors followed
+                        more = false;
+                        end = name_list.len();
+                    } else {
+                        more = true;
+                        end = index + 15;
+                    }
+                    for i in index..end {
+                        match sponsors::get_info_by_name(&name_list[i]) {
+                            Ok(sponsor) => {
+                                list.push(SponsorInfo {
+                                    id: sponsor.id.clone(),
+                                    name: name_list[i].clone(),
+                                    avatar_url: "https://image.baidu.com/search/detail?ct=503316480&z=0&ipn=d&word=影流之主&step_word=&hs=0&pn=48&spn=0&di=2670&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=0&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=undefined&cs=562893584%2C1346842489&os=32714240%2C1997607233&simid=3364286120%2C229005232&adpicid=0&lpn=0&ln=777&fr=&fmq=1575227579031_R&fm=&ic=undefined&s=undefined&hd=undefined&latest=undefined&copyright=undefined&se=&sme=&tab=0&width=undefined&height=undefined&face=undefined&ist=&jit=&cg=&bdtype=11&oriquery=&objurl=http%3A%2F%2Fpic.fxsw.net%2Fup%2F2019-11%2F2019112310749555.jpg&fromurl=ippr_z2C%24qAzdH3FAzdH3Fooo_z%26e3Buxfo_z%26e3BgjpAzdH3Fip4sAzdH3Fd8la_z%26e3Bip4s&gsm=&rpstart=0&rpnum=0&islist=&querylist=&force=undefined".to_string().clone(),
+                                })
+                            },
+                            Err(_) => {
+                                break;
                             }
                         }
-                        if list.len() == 15 {
-                            Ok(HttpResponse::Ok().json(FollowListRet { // 200 OK
-                                more: more,
-                                list: list,
-                            }))
-                        } else {
-                            Ok(HttpResponse::UnprocessableEntity().finish())
-                        }
                     }
+                    Ok(HttpResponse::Ok().json(FollowListRet { // 200 OK
+                        more: more,
+                        list: list,
+                    }))
                 },
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
             }
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
@@ -367,8 +381,8 @@ pub fn check_like(
     id: Identity,
     req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
-    result(match id.identity() {
-        Some(openid) => {
+    result(match identify_user(&id) {
+        Ok(openid) => {
             let event_id = req.match_info().query("event_id").to_string();
             match users::check_user_like(&openid, &event_id) {
                 Ok(flag) => Ok(HttpResponse::Ok().json(LikeRet { // 200 Ok
@@ -377,7 +391,7 @@ pub fn check_like(
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
             }
         },
-        None => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
 
@@ -526,14 +540,54 @@ pub fn book_event(
     result(match identify_user(&id) {
         Ok(openid) => {
             let event_id = req.match_info().query("event_id").to_string();
-            match (*EVENT_LIST).lock().unwrap().get_mut(&event_id) {
+            match (*EVENT_LIST).try_lock() {
+                Ok(a) => {println!("OKOKOK!");drop(a);}
+                Err(e) => {println!("{:?}", e);}
+            }
+            let mut events = (*EVENT_LIST).lock().unwrap();
+            match events.get_mut(&event_id) {
                 Some(mut event) => {
+                    println!("{} is booking {}", openid, event_id);
                     if (event.event_status == 2) && (event.left_tickets > 0) {
                         event.left_tickets -= 1;
                         event.update_type = 1;
-                        // TODO:record
+                        let index_str = event_id + "_" + &openid;
+                        let success: bool;
+                        match (*RECORD).try_lock() {
+                            Ok(a) => {println!("OKOKOK!");drop(a);}
+                            Err(e) => {println!("{:?}", e);}
+                        }
+                        let mut records = (*RECORD).lock().unwrap();
+                        success = match records.get(&index_str) {
+                            Some(_) => false,
+                            None => true,
+                        };
+                        println!("HERE!!{:?}",success);
+                        if success == true {
+                            records.insert(index_str.clone(), Record {
+                                // TODO: 改变record_id
+                                record_id: index_str,
+                                event_id: event.event_id.clone(),
+                                sponsor_name: event.sponsor_name.clone(),
+                                user_id: openid,
+                                start_time: event.start_time.clone(),
+                                end_time: event.end_time.clone(),
+                                update_type: 1
+                            });
+                        }
+                        drop(records);
+                        drop(events);
+                        match update_events() {
+                            Ok(_) => {}
+                            Err(e) => {println!("{}",e);}
+                        }
+                        println!("HERE!!updated events");
+                        match update_records() {
+                            Ok(_) => {}
+                            Err(e) => {println!("{}",e);}
+                        }
                         Ok(HttpResponse::Ok().json(SuccessRet {
-                            success: true
+                            success: success
                         }))
                     } else {
                         Ok(HttpResponse::Ok().json(SuccessRet {
@@ -541,7 +595,10 @@ pub fn book_event(
                         }))
                     }
                 }
-                None => Ok(HttpResponse::UnprocessableEntity().finish())
+                None => {
+                    drop(events);
+                    Ok(HttpResponse::UnprocessableEntity().finish())
+                }
             }
         }
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
@@ -550,14 +607,18 @@ pub fn book_event(
 
 #[allow(dead_code)]
 pub fn get_sponsor_info(
-    query_sponsor: QuerySponsor,
-    id: Identity
+    id: Identity,
+    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(_) => {
-            let sponsor: SponsorInfo;
-            match sponsors::get_info_by_name(&query_sponsor.sponsor_name) {
-                Ok(sponsor) => Ok(HttpResponse::Ok().json(sponsor)),
+            let sponsor_name = req.match_info().query("sponsor_name").to_string();
+            match sponsors::get_info_by_name(&sponsor_name) {
+                Ok(sponsor) => Ok(HttpResponse::Ok().json(SponsorInfo {
+                    id: sponsor.id,
+                    name: sponsor.sponsor_name,
+                    avatar_url: sponsor.head_portrait,
+                })),
                 Err(e) => {
                     println!("{}", e);
                     Ok(HttpResponse::InternalServerError().finish()) // 500 Internal Server Error
@@ -587,14 +648,42 @@ pub fn get_available_enrolled_events(
     })
 }
 
+#[derive(Serialize)]
+pub struct EventBriefInfo {
+    pub event_id: String,
+    pub sponsor_name: String,
+    pub start_time: String,
+    pub end_time: String,
+}
+
+#[derive(Serialize)]
+pub struct EnrolledEventsRet {
+    pub events: Vec<EventBriefInfo>
+}
+
 #[allow(dead_code)]
 pub fn get_all_enrolled_events(
     id: Identity
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(openid) => {
-            // TODO
-            Ok(HttpResponse::NotImplemented().finish())
+            match users::get_user_records(&openid) {
+                Ok(records) => {
+                    let mut events: Vec<EventBriefInfo> = vec![];
+                    for record in records {
+                        events.push(EventBriefInfo {
+                            event_id: record.event_id,
+                            sponsor_name: record.sponsor_name,
+                            start_time: record.start_time,
+                            end_time: record.end_time
+                        })
+                    }
+                    Ok(HttpResponse::Ok().json(EnrolledEventsRet {
+                        events: events
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
+            }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })
@@ -692,4 +781,86 @@ pub fn get_pic(
     println!("serving file: {:?}", path);
 
     Ok(actix_files::NamedFile::open(path)?)
+}
+
+#[derive(Serialize)]
+pub struct IfEnrolledRet {
+    pub enrolled: bool
+}
+
+#[allow(dead_code)]
+pub fn check_if_enrolled(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            let records = users::get_user_records(&openid).unwrap();
+            let mut enrolled = false;
+            for record in records {
+                if (record.event_id == event_id) && (record.user_id == openid) {
+                    enrolled = true;
+                }
+            }
+
+            Ok(HttpResponse::Ok().json(IfEnrolledRet {
+                enrolled: enrolled
+            }))
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn cancel_book_event(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            match (*EVENT_LIST).try_lock() {
+                Ok(a) => {println!("OKOKOK!");drop(a);}
+                Err(e) => {println!("{:?}", e);}
+            }
+            let mut events = (*EVENT_LIST).lock().unwrap();
+            match events.get_mut(&event_id) {
+                Some(mut event) => {
+                    if event.event_status >=2 {
+                        event.left_tickets += 1;
+                        event.update_type = 1;
+                        let index_str = event_id + "_" + &openid;
+                        let success: bool;
+                        let mut records = (*RECORD).lock().unwrap();
+                        success = match records.get_mut(&index_str) {
+                            Some(mut record) => {
+                                record.update_type = 2;
+                                true
+                            }
+                            None => false,
+                        };
+                        println!("HERE!!success:{}", success);
+                        drop(events);
+                        drop(records);
+                        update_events();
+                        update_records();
+                        Ok(HttpResponse::Ok().json(SuccessRet {
+                            success: success
+                        }))
+                    } else {
+                        drop(events);
+                        Ok(HttpResponse::Ok().json(SuccessRet {
+                            success: false
+                        }))
+                    }
+                }
+                None => {
+                    drop(events);
+                    Ok(HttpResponse::UnprocessableEntity().finish())
+                }
+            }
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
 }

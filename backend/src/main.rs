@@ -12,7 +12,7 @@ mod utils;
 fn main() {
     dotenv::dotenv().ok();
 
-    /*let sys = actix::System::new("conduit");
+    let sys = actix::System::new("conduit");
 
     app::start();
 
@@ -100,8 +100,9 @@ fn main() {
     match s{
         Err(e) => println!("{}", e),
         Ok(_) => {},
-    }*/*/
-    /*let s = db::moment::get_event_moments(&"0".to_string());
+    }*/
+    /*
+    let s = db::moment::get_event_moments(&"0".to_string());
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {
@@ -114,33 +115,11 @@ fn main() {
                 println!("{}", o[i].time);
             }
         },
-    }*/
-
-    /*let s = db::notification::get_user_notifications(&"123".to_string());
-    match s{
-        Err(e) => println!("{}", e),
-        Ok(o) => {
-            println!("{}", o.len());
-            for i in 0..o.len(){
-                println!("{}", o[i].text);
-                println!("{}", o[i].time);
-            }
-        },
-    }*/
-
-    /*let s = db::notification::check_notice_read(&"090".to_string());
-    match s{
-        Err(e) => println!("{}", e),
-        Ok(o) => {println!("{}", o)},
-    }*/
-    /*let s = db::moment::delete_moment(&"999".to_string());
-    match s{
-        Err(e) => println!("{}", e),
-        Ok(o) => {},
-    }*/
+    }
     let s = db::users::get_user_follow_number(&"23".to_string());
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {println!("{}", o)},
     }
+    */
 }

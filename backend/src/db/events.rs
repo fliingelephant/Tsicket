@@ -27,7 +27,6 @@ pub struct Event {
 }
 
 
-
 pub fn get_info_by_id(id: &String)-> Result<Event, String> {
     let command = format!("SELECT * FROM event WHERE event_id='{id}'", id = id);
 

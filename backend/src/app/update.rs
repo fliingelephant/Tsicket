@@ -1,7 +1,7 @@
 use crate::db::events;
 use crate::db::records;
 pub use crate::app::POOL;
-use super::{EVENT_LIST};
+use super::{EVENT_LIST, RECORD};
 
 pub fn update(){
     update_events();
@@ -10,8 +10,12 @@ pub fn update(){
 
 pub fn update_events()
     -> Result<(), String> {
-
-    for mut event in (*EVENT_LIST).lock().unwrap().values_mut() {
+    match (*EVENT_LIST).try_lock() {
+        Ok(a) => {println!("OKOKOK!");drop(a);}
+        Err(e) => {println!("{:?}", e);}
+    }
+    let mut events = (*EVENT_LIST).lock().unwrap();
+    for mut event in events.values_mut() {
         if event.update_type == 1 { // 修改
             let command = format!("UPDATE event SET sponsor_name='{sponsor_name}', event_name='{event_name}', \
                                     start_time='{start_time}', end_time='{end_time}', event_type={event_type}, \
@@ -25,7 +29,7 @@ pub fn update_events()
                                   current_participants=event.current_participants, left_tickets=event.left_tickets,
                                   event_status=event.event_status, event_location=event.event_location, event_time=event.event_time,
                                   event_id=event.event_id);
-
+            println!("{}", command);
             let req=POOL.prep_exec(command, ());
             match req {
                 Result::Err(e) => {
@@ -50,7 +54,6 @@ pub fn update_events()
                                   current_participants=event.current_participants, left_tickets=event.left_tickets,
                                   event_status=event.event_status, event_location=event.event_location,
                                   event_time=event.event_time);
-            
             let req = POOL.prep_exec(command, ());
             match req {
                 Result::Err(e) => {
@@ -62,13 +65,20 @@ pub fn update_events()
             event.update_type = 0;
         }
     }
-    return Ok(());
+    Ok(())
 }
 
-/*
-fn update_records() {
-    for record in (*RECORD).lock().unwrap().values_mut() {
-        /*if record.update_type == 1 { //修改
+pub fn update_records()
+    -> Result<(), String> {
+    match (*RECORD).try_lock() {
+        Ok(a) => {println!("OKOKOK!");drop(a);}
+        Err(e) => {println!("{:?}", e);}
+    }
+    let mut records = (*RECORD).lock().unwrap();
+    let mut to_remove: Vec<String> = vec![];
+    for (index_str, record) in records.iter_mut() {
+        /*
+        if record.update_type == 1 { //修改
             let command = format!("UPDATE ticket_record SET event_id='{event_id}', \
                                     sponsor_name='{sponsor_name}', user_id='{user_id}',\
                                      start_time='{start_time}', end_time='{end_time}'\
@@ -92,11 +102,12 @@ fn update_records() {
                                   sponsor_name=record.sponsor_name, user_id=record.user_id,
                                   start_time=record.start_time,
                                   end_time=record.end_time);
+            println!("{}", command);
             let req = POOL.prep_exec(command, ());
             match req {
-                Result::Err(e) => {
+                Err(e) => {
                     println!("{}", e.to_string());
-                    return result(Err(e.to_string()));
+                    return Err(e.to_string());
                 }
                 _ => {}
             }
@@ -104,16 +115,22 @@ fn update_records() {
         }
         else if record.update_type == 2 { //删除
             let command = format!("DELETE FROM ticket_record WHERE record_id='{record_id}';", record_id=record.record_id);
+            println!("{}", command);
             let req = POOL.prep_exec(command, ());
             match req {
                 Result::Err(e) => {
                     println!("{}", e.to_string());
-                    return result(Err(e.to_string()));
+                    return Err(e.to_string());
                 }
                 _ => {}
             }
-            record.update_type = 0;
-            //如何删除vec中的指定项？
+            to_remove.push(record.record_id.clone());
         }
     }
-}*/
+    {
+        for id in to_remove {
+            records.remove(&id.clone());
+        }
+    }
+    Ok(())
+}

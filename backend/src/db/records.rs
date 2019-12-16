@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug)]
 pub struct Record {
     pub record_id: String,
     pub event_id: String,
