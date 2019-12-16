@@ -12,11 +12,11 @@ mod utils;
 fn main() {
     dotenv::dotenv().ok();
 
-    let sys = actix::System::new("conduit");
+    //let sys = actix::System::new("conduit");
 
-    app::start();
+    //app::start();
 
-    let _ = sys.run();
+    //let _ = sys.run();
 
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 
@@ -81,7 +81,7 @@ fn main() {
     /*let pic1 = "123".to_string();
     let pic2 = "456".to_string();
     let pic = vec![pic1, pic2];
-    let s = db::sponsors::publish_moment(&"2".to_string(), &"0".to_string(), &"jjj".to_string(), &pic);
+    let s = db::moment::publish_moment(&"2".to_string(), &"0".to_string(), &"id1".to_string(), &"jjj".to_string(), &pic);
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {},
@@ -101,25 +101,45 @@ fn main() {
         Err(e) => println!("{}", e),
         Ok(_) => {},
     }*/
-    /*
-    let s = db::moment::get_event_moments(&"0".to_string());
+
+//    let s = db::moment::get_event_moments_sorted(&"0".to_string());
+//    match s{
+//        Err(e) => println!("{}", e),
+//        Ok(o) => {
+//            println!("{}", o.len());
+//            for i in 0..o.len(){
+//                println!("{}", o[i].text);
+//                for j in 0..o[i].pictures.len(){
+//                    println!("{}", o[i].pictures[j]);
+//                }
+//                println!("{}", o[i].time);
+//            }
+//        },
+//    }
+//    let s = db::users::get_user_follow_number(&"23".to_string());
+//    match s{
+//        Err(e) => println!("{}", e),
+//        Ok(o) => {println!("{}", o)},
+//    }
+
+    /*let s = db::moment::get_user_follow_sponsor_moments_sorted(&"123".to_string());
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {
-            println!("{}", o.len());
-            for i in 0..o.len(){
-                println!("{}", o[i].text);
-                for j in 0..o[i].pictures.len(){
-                    println!("{}", o[i].pictures[j]);
-                }
-                println!("{}", o[i].time);
+            for moment in o{
+                println!("sponsor_name:{}, event_id:{}, moment_id:{}, text:{}, time:{}",
+                         moment.sponsor_name, moment.event_id, moment.moment_id, moment.text, moment.time);
             }
         },
-    }
-    let s = db::users::get_user_follow_number(&"23".to_string());
-    match s{
-        Err(e) => println!("{}", e),
-        Ok(o) => {println!("{}", o)},
-    }
-    */
+    }*/
+//    let s = db::moment::get_user_like_event_moments_ordered(&"123".to_string());
+//    match s{
+//        Err(e) => println!("{}", e),
+//        Ok(o) => {
+//            for moment in o{
+//                println!("sponsor_name:{}, event_id:{}, moment_id:{}, text:{}, time:{}",
+//                         moment.sponsor_name, moment.event_id, moment.moment_id, moment.text, moment.time);
+//            }
+//        },
+//    }
 }

@@ -94,3 +94,44 @@ pub fn get_all_events(
     }
     Ok(())
 }
+
+pub fn check_event(event_id: &String)->Result<bool, String>{
+    let command = format!("SELECT count(*) FROM event WHERE event_id='{event_id}'", event_id=event_id);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    for row in res.unwrap() {
+        let info = row.unwrap().unwrap();
+        let count: i32 = info[0].as_sql(true).parse().unwrap();;
+        if count == 0 {
+            return Ok(false);
+        }
+        else{
+            return Ok(true);
+        }
+    }
+    return Err("Not impossible".to_string());
+}
+
+pub fn cancel_event(event_id: &String)->Result<(), String>{
+    let rs = check_event(event_id);
+    match rs {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) => {
+            if o{
+                return Ok(());
+            }
+            else{
+                return Err("No such event.".to_string());
+            }
+        }
+    }
+    let command = format!("UPDATE event SET event_status='4' WHERE event_id='{event_id}'", event_id=event_id);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        Ok(o) => return Ok(()),
+    }
+}

@@ -23,7 +23,7 @@ fn admin_log_in(id :String, raw_password: String)->Result<(), String>{
     //println!("{}", command);
     let req = POOL.prep_exec(command, ());
     match req {
-        Err(e) => return e.to_string(),
+        Err(e) => return Err(e.to_string()),
         _ => {}
     }
     for row in req.unwrap(){
