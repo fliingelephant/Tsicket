@@ -11,6 +11,7 @@ use futures::future::{err, Either};
 use md5::compute;
 use reqwest::{get, Client};
 use serde::{Deserialize, Serialize};
+use actix_service::ServiceExt;
 
 use super::{APP_ID, EVENT_LIST, SECRET};
 use super::sponsors::{QuerySponsor, QuerySponsorByID};
