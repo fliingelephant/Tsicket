@@ -18,10 +18,10 @@ use md5::compute;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
+use super::events::{EventsRet, QueryEventByID};
 use crate::db::events::{Event};
 use crate::db::sponsors;
 use crate::db::moment;
-use super::events::EventsRet;
 use super::EVENT_LIST;
 use super::update::update_events;
 use crate::utils::auth::{identify_sponsor};
@@ -156,7 +156,7 @@ pub fn publish_event(
                             event_capacity: new_event.event_capacity,
                             current_participants: 0,
                             left_tickets: new_event.left_tickets,
-                            event_status: 2,
+                            event_status: 0,
                             event_location: new_event.event_location.clone(),
                             event_time: new_event.event_time.clone(),
                             update_type: 2,
@@ -172,6 +172,153 @@ pub fn publish_event(
             }
         },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
+pub fn cancel_event(
+    event: Json<QueryEventByID>,
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            // TODO: 检查是否是主办方自己的活动
+            let mut events = (*EVENT_LIST).lock().unwrap();
+            let status: i8;
+            match events.get(&event.event_id) {
+                Some(event) => {
+                    status = event.event_status % 10;
+                }
+                None => {
+                    status = -1;
+                }
+            }
+            match status {
+                -1 => Ok(HttpResponse::UnprocessableEntity().json("Event does not exist; Otherwise has been canceled or finished its booking.")),
+                _ => {
+                    events.get_mut(&event.event_id).unwrap().event_status += (4 - status) * 10;
+                    events.get_mut(&event.event_id).unwrap().update_type = 2;
+                    drop(events);
+                    update_events();
+                    Ok(HttpResponse::Ok().finish())
+                }
+            }
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn advertise_event(
+    event: Json<QueryEventByID>,
+    id: Identity
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            let mut events = (*EVENT_LIST).lock().unwrap();
+            let status: i8;
+            let ad_status: i8;
+            match events.get(&event.event_id) {
+                Some(event) => {
+                    status = event.event_status % 10;
+                    ad_status = event.event_status / 10;
+                }
+                None => {
+                    status = -1;
+                    ad_status = -1;
+                }
+            }
+            match status {
+                -1 => Ok(HttpResponse::UnprocessableEntity().json("Event does not exist; Otherwise has been canceled or finished its booking.")),
+                0 => Ok(HttpResponse::UnprocessableEntity().json("Event has not yet been reviewed.")),
+                1 => {
+                    match ad_status {
+                        0 => {
+                            events.get_mut(&event.event_id).unwrap().event_status = 11;
+                            drop(events);
+                            update_events();
+                            Ok(HttpResponse::Ok().finish())
+                        }
+                        1 => Ok(HttpResponse::UnprocessableEntity().json("Already in application for advertisement.")),
+                        2 => Ok(HttpResponse::UnprocessableEntity().json("Already advertising now.")),
+                        _ => Ok(HttpResponse::InternalServerError().finish())
+                    }
+                }
+                2 => {
+                    match ad_status {
+                        0 => {
+                            events.get_mut(&event.event_id).unwrap().event_status = 12;
+                            drop(events);
+                            update_events();
+                            Ok(HttpResponse::Ok().finish())
+                        }
+                        1 => Ok(HttpResponse::UnprocessableEntity().json("Already in application for advertisement.")),
+                        2 => Ok(HttpResponse::UnprocessableEntity().json("Already advertising now.")),
+                        _ => Ok(HttpResponse::InternalServerError().finish())
+                    }
+                }
+                _ => Ok(HttpResponse::UnprocessableEntity().json("Event does not exist; Otherwise has been canceled or finished its booking.")),
+            }
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn cancel_advertise_event(
+    event: Json<QueryEventByID>,
+    id: Identity,
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_sponsor(&id) {
+        Ok(sponsor_name) => {
+            let mut events = (*EVENT_LIST).lock().unwrap();
+            let status: i8;
+            let ad_status: i8;
+            match events.get(&event.event_id) {
+                Some(event) => {
+                    status = event.event_status % 10;
+                    ad_status = event.event_status / 10;
+                }
+                None => {
+                    status = -1;
+                    ad_status = -1;
+                }
+            }
+            match status {
+                -1 => Ok(HttpResponse::UnprocessableEntity().json("No such event.")),
+                0 => Ok(HttpResponse::UnprocessableEntity().json("Event has not yet been reviewed.")),
+                1 => {
+                    match ad_status {
+                        0 => Ok(HttpResponse::UnprocessableEntity().json("Not in application for advertisement now.")),
+                        1 => {
+                            events.get_mut(&event.event_id).unwrap().event_status = 1;
+                            drop(events);
+                            update_events();
+
+                            Ok(HttpResponse::Ok().finish())
+                        }
+                        2 => Ok(HttpResponse::UnprocessableEntity().json("Already advertising now.")),
+                        _ => Ok(HttpResponse::UnprocessableEntity().json("Something seems to be wrong."))
+                    }
+                }
+                2 => {
+                    match ad_status {
+                        0 => Ok(HttpResponse::UnprocessableEntity().json("Not in application for advertisement now.")),
+                        1 => {
+                            events.get_mut(&event.event_id).unwrap().event_status = 2;
+                            drop(events);
+                            update_events();
+
+                            Ok(HttpResponse::Ok().finish())
+                        }
+                        2 => Ok(HttpResponse::UnprocessableEntity().json("Already advertising now.")),
+                        _ => Ok(HttpResponse::UnprocessableEntity().json("Something seems to be wrong."))
+                    }
+                }
+                _ => Ok(HttpResponse::UnprocessableEntity().json("Event has been canceled or finished its booking.")),
+            }
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish())
     })
 }
 

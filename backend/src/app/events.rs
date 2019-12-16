@@ -55,7 +55,7 @@ pub fn get_broadcast_events(
             let mut count = 0;
             for (_, event) in &(*EVENT_LIST.lock().unwrap()) {
                 if (event.left_tickets > 0)
-                    && (event.event_status == 2) {
+                    && (event.event_status % 10 == 2) {
                     list.push(BroadCastEventInfo {
                         event_id: event.event_id.clone(),
                         event_name: event.event_name.clone(),
