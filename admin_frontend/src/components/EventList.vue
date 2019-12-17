@@ -38,7 +38,7 @@
         </el-table-column>
 
         <el-table-column
-                prop="event_status"
+                prop="event_string"
                 label="活动状态">
         </el-table-column>
 
@@ -49,9 +49,10 @@
           <template slot-scope="scope">
             <el-button @click="eventInfo(scope.row)" type="text" size="small">查看</el-button>
             <el-button @click="changeEvent(scope.row)" type="text" size="small">编辑</el-button>
-            <el-button disabled type="text" size="small">结束抢票</el-button>
-            <el-button disabled type="text" size="small">取消活动</el-button>
-            <el-button disabled type="text" size="small">申请推广</el-button>
+            <el-button v-if="stop_state.indexOf(scope.row.event_status)!==-1" type="text" size="small"  @click="stopEvent(scope.row)">结束抢票</el-button>
+            <el-button v-if="cancel_state.indexOf(scope.row.event_status)!==-1" disabled type="text" size="small" >取消活动</el-button>
+            <el-button v-if="apply_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="postApply(scope.row)">申请推广</el-button>
+            <el-button v-if="drop_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="dropApply(scope.row)">撤销推广申请</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -69,7 +70,7 @@
     </el-main>
 
     <el-footer>
-      <div class="list-footer" @click="help">查看帮助</div>
+      <div class="list-footer"><a @click="help" style="cursor: pointer">查看帮助</a></div>
     </el-footer>
 
   </el-container>
@@ -81,7 +82,27 @@
         data() {
             return({
                 events: [],
-                states: ['未审核','抢票未开始','抢票中','抢票结束','活动结束','未通过审核','活动取消'],
+                states: {
+                    0 : "待审核",
+                    1 : "抢票未开始",
+                    2 : "抢票开始",
+                    3 : "抢票结束",
+                    4 : "活动取消",
+                    10 : "非法状态",
+                    11 : "抢票未开始（推广申请中）",
+                    12 : "抢票开始（推广申请中）",
+                    13 : "抢票结束",
+                    14 : "活动取消",
+                    20 : "非法状态",
+                    21 : "抢票未开始（推广中）",
+                    22 : "抢票开始（推广中）",
+                    23 : "抢票结束",
+                    24 : "活动取消"
+                },
+                cancel_state: [],
+                stop_state: [1,2,11,12,21,22],
+                apply_state: [1,2],
+                drop_state : [11,12],
                 currentPage:1,
                 pageSize:10
             })
@@ -110,6 +131,7 @@
                 this.currentPage = page;
             },
             testLogIn(){
+
                 if(!this.$store.state.username){
                     this.$message({
                         message: '请登录',
@@ -123,6 +145,9 @@
                     this.$axios.get("/sponsors").then(response => {
                         if(response.status===200) {
                             this.events=response.data.events
+                            for(let i=0 ; i< this.events.length; i++){
+                                this.events[i].event_string = this.states[this.events[i].event_status]
+                            }
                         }
                         else{
                             this.$message({
@@ -138,6 +163,66 @@
                             })
                     })
                 }
+            },
+            postApply(row){
+                this.$axios.post("/sponsors/advertise/"+row.event_id).then(response => {
+                    if (response.status === 200) {
+                        this.$router.go(0)
+
+                    } else {
+                        this.$message({
+                            message: '处理失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+                    this.$message({
+                        message: '处理失败',
+                        type: 'error'
+                    })
+                })
+            },
+            dropApply(row){
+                let data={
+                    "event_id": row.event_id
+                }
+                this.$axios.delete("/sponsors/advertise/"+row.event_id).then(response => {
+                    if (response.status === 200) {
+                        this.$router.go(0)
+
+                    } else {
+                        this.$message({
+                            message: '处理失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+                    this.$message({
+                        message: '处理失败',
+                        type: 'error'
+                    })
+                })
+            },
+            stopEvent(row){
+                let data={
+                    "event_id": row.event_id
+                }
+                this.$axios.delete("/sponsors/book/"+row.event_id).then(response => {
+                    if (response.status === 200) {
+                        this.$router.go(0)
+
+                    } else {
+                        this.$message({
+                            message: '处理失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+                    this.$message({
+                        message: '处理失败',
+                        type: 'error'
+                    })
+                })
             },
         },
     }
@@ -161,7 +246,6 @@
     text-align: center;
     font-size: 14px;
     color:#038bff;
-    cursor: pointer;
   }
   .add-event{
     text-align: right;

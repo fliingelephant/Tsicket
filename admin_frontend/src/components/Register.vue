@@ -7,26 +7,31 @@
 
     <el-main>
       <el-form>
+
         <el-form-item>
           <el-row :gutter="20">
-            <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>用户名</div></el-col>
-            <el-col :span="12"><el-input
+            <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>用户ID</div></el-col>
+            <el-col :span="12">
+              <el-input
                     type="text"
                     v-model="username"
                     auto-complete="off"
-            ></el-input></el-col>
-            <el-col :span="8"><div class="hint-text">字母开头，6至32字符(字母、数字、下划线)</div></el-col>
+              ></el-input>
+            </el-col>
+            <el-col :span="8"><div class="hint-text">用于登录，字母开头，6至32字符(字母、数字、下划线)</div></el-col>
           </el-row>
         </el-form-item>
 
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>密码</div></el-col>
-            <el-col :span="12"><el-input
+            <el-col :span="12">
+              <el-input
                     type="password"
                     v-model="password"
                     auto-complete="off"
-            ></el-input></el-col>
+              ></el-input>
+            </el-col>
             <el-col :span="8"><div class="hint-text">6至32字符(字母、数字、特殊符号)</div></el-col>
           </el-row>
         </el-form-item>
@@ -34,11 +39,13 @@
         <el-form-item >
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>确认密码</div></el-col>
-            <el-col :span="12"><el-input
+            <el-col :span="12">
+              <el-input
                     type="password"
                     v-model="confirm"
                     auto-complete="off"
-            ></el-input></el-col>
+              ></el-input>
+            </el-col>
             <el-col :span="8"><div class="hint-text">6至32字符(字母、数字、特殊符号)</div></el-col>
           </el-row>
         </el-form-item>
@@ -46,44 +53,48 @@
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>机构/个人名称</div></el-col>
-            <el-col :span="12"><el-input
+            <el-col :span="12">
+              <el-input
                     type="text"
                     v-model="name"
                     auto-complete="off"
-            ></el-input></el-col>
-            <el-col :span="8"><div class="hint-text">后期不可修改</div></el-col>
+              ></el-input>
+            </el-col>
+            <el-col :span="8"><div class="hint-text">请如实填写，后期不可修改</div></el-col>
           </el-row>
         </el-form-item>
 
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>电子邮箱</div></el-col>
-            <el-col :span="12"><el-input
+            <el-col :span="12">
+              <el-input
                     type="text"
                     v-model="email"
                     auto-complete="off"
-            ></el-input></el-col>
+              ></el-input>
+            </el-col>
           </el-row>
         </el-form-item>
 
         <el-form-item>
           <el-row :gutter="20">
             <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>联系电话</div></el-col>
-            <el-col :span="12"><el-input
+            <el-col :span="12">
+              <el-input
                     type="text"
                     v-model="phone"
                     auto-complete="off"
-            ></el-input></el-col>
+              ></el-input>
+            </el-col>
           </el-row>
         </el-form-item>
 
       </el-form>
 
       <el-row :gutter="20">
-        <el-col :span="3">
+        <el-col :span="10">
           <el-button type="primary" @click="reg">注册</el-button>
-        </el-col>
-        <el-col :span="3">
           <el-button @click="pageReturn">返回</el-button>
         </el-col>
       </el-row>
@@ -142,7 +153,7 @@
                     },err=>{
                         if(err.response.status===422)
                             this.$message({
-                                message: '注册失败：用户名被占用',
+                                message: '注册失败：用户ID或机构名称被占用',
                                 type: 'error'
                             })
                     })

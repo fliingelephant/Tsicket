@@ -24,7 +24,7 @@
             <el-form-item>
               <el-row :gutter="20">
                 <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动状态</div></el-col>
-                <el-col :span="12"><div class="event-text">{{info.event_status}}</div></el-col>
+                <el-col :span="12"><div class="event-text">{{states[info.event_status]}}</div></el-col>
               </el-row>
             </el-form-item>
 
@@ -79,15 +79,13 @@
 
             <el-form-item v-if="info.event_picture">
               <el-row :gutter="20">
-                <el-col :span="4"><div class="event-text">活动图片</div></el-col>
-                <el-col :span="16">
-                  <img :src="info.event_picture" height="400">
+                <el-col :span="5"><div class="event-text">活动图片</div></el-col>
+                <el-col :span="11">
+                  <img :src="info.event_picture" height="200">
                 </el-col>
 
               </el-row>
             </el-form-item>
-
-
 
           </el-form>
         </el-tab-pane>
@@ -162,6 +160,23 @@
         data() {
             return {
                 info:'',
+                states: {
+                    0 : "待审核",
+                    1 : "抢票未开始",
+                    2 : "抢票开始",
+                    3 : "抢票结束",
+                    4 : "活动取消",
+                    10 : "非法状态",
+                    11 : "抢票未开始（推广申请中）",
+                    12 : "抢票开始（推广申请中）",
+                    13 : "抢票结束",
+                    14 : "活动取消",
+                    20 : "非法状态",
+                    21 : "抢票未开始（推广中）",
+                    22 : "抢票开始（推广中）",
+                    23 : "抢票结束",
+                    24 : "活动取消"
+                },
                 notice_data:[],
                 moment_data:[],
                 active_name:'first'
