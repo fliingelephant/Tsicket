@@ -42,16 +42,13 @@
 .flex-column {
 	display: -webkit-box;
 	display: -webkit-flex;
-	display: -ms-flexbox;
 	display: flex;
 	-webkit-box-orient: vertical;
 	-webkit-box-direction: normal;
 	-webkit-flex-direction: column;
-	    -ms-flex-direction: column;
 	        flex-direction: column;
 	-webkit-box-pack: justify;
 	-webkit-justify-content: space-between;
-	    -ms-flex-pack: justify;
 	        justify-content: space-between;
 }
 .toolbar {
@@ -69,7 +66,6 @@
 }
 .cuIcon-likefill {
 	-webkit-transition: opacity 1s ease-in 0s;
-	-o-transition: opacity 1s ease-in 0s;
 	transition: opacity 1s ease-in 0s;
 }
 

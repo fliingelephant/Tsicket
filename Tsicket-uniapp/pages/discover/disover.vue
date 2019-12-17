@@ -120,7 +120,14 @@
 			};
 		},
 		onLoad() {
-
+			uni.showShareMenu({})
+		},
+		onShareAppMessage(res) {
+			return {
+			    title: app.globalData.sharetitle,
+			    path: '/pages/index/index',
+				imageUrl: app.globalData.shareimg
+			}
 		},
 		methods: {
 			cardSwiper(e) {
@@ -139,7 +146,7 @@
 				console.log(e)
 				console.log(id)
 				uni.request({
-					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/appreciate',
+					url: app.globalData.apiurl + 'users/appreciate',
 					method: 'POST',
 					data: {
 						openid: app.globalData.openid,

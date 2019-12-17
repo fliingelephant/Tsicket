@@ -1,18 +1,18 @@
 <template>
 	<view class="activity-mini-card">
-		<image :src="activity.bgUrl" class="imgcard"></image>
+		<image :src="activity.img_url" class="imgcard"></image>
 		<view class="card-back"></view>
-		<view class="info padding flex align-start justify-between text-white" @click="$emit('clickCard', activity.id)">
+		<view class="info padding flex align-start justify-between text-white" @click="$emit('clickCard', activity.event_id)">
 			<view class="text-left flex-column info-flex">
-				<view class="text-xxl">{{activity.name}}
+				<view class="text-xxl">{{activity.event_name}}
 					<view class="line-round"></view>
-					<view class="text-df">{{activity.intro}}</view>
+					<view class="text-df">{{activity.event_introduction}}</view>
 				</view>
-				<view class="text-df">{{activity.start}}</view>
+				<view class="text-df">{{activity.start_time}}</view>
 			</view>
 			<view class="text-right flex-column info-flex">
 				<view></view>
-				<text class="like" :class="activity.like ? 'cuIcon-likefill' : 'cuIcon-like'" @click.stop="$emit('like', activity.id)"></text>
+				<text class="like" :class="activity.like ? 'cuIcon-likefill' : 'cuIcon-like'" @click.stop="$emit('like', activity.event_id)"></text>
 			</view>
 		</view>
 	</view>

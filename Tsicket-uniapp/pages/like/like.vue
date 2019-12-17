@@ -101,6 +101,7 @@
 						like: true
 					}
 				],
+				likeindex: 0,
 				current: 0,
 				tabs: [
 					"喜爱"
@@ -108,7 +109,27 @@
 			};
 		},
 		onLoad() {
-
+			uni.request({
+				url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
+				data: {
+					index: this.likeindex
+				},
+				header: {
+					'content-type': 'application/json' ,//自定义请求头信息
+					'cookie': app.globalData.cookie
+				},
+				success: (res) => {
+					console.log(res);
+				}
+			})
+			uni.showShareMenu({})
+		},
+		onShareAppMessage(res) {
+			return {
+			    title: app.globalData.sharetitle,
+			    path: '/pages/index/index',
+				imageUrl: app.globalData.shareimg
+			}
 		},
 		methods: {
 			cardSwiper(e) {
@@ -131,8 +152,9 @@
 				})
 			},
 			like(id) {
+				console.log(id)
 				uni.request({
-					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like', //仅为示例，并非真实接口地址。
+					url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
 					method: 'POST',
 					data: {
 						openid: app.globalData.openid,

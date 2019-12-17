@@ -51,12 +51,9 @@
 				<swiper class="tab-swiper" :current="current" @change="swiperChange">
 					<swiper-item>
 						<scroll-view scroll-y class="tab-scroll padding">
-							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
-							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
-							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
-							<activity-prepare :activity="activity" :sponsor="sponsor" :message="message" @like="like" @clickCard="activityPage"></activity-prepare>
-
-
+							<activity-prepare v-for="(item, index) in userActivity" :key="index" :activity="activity" @clickSponsor="sponsorPage"
+							 @detail="activityPage" @announcement="announcementPage" @QRcode="QRcodePage" @cancel="cancelActivity" @like="likeActivity(index)"
+							 @clickCard="activityPage"></activity-prepare>
 						</scroll-view>
 					</swiper-item>
 					<swiper-item>
@@ -89,30 +86,30 @@
 				tabs: [
 					"活动日程", "报名中"
 				],
+				userActivity: [{
+					end_time: "2019-12-02 19:00:00",
+					event_id: "7fb985ec8326b57e24611777e91bc8f8",
+					sponsor_name: "123456",
+					start_time: "2019-12-01 01:00:00"
+				}],
+				
 				activity: {
-					id: 0,
-					name: '活动名',
-					intro: '活动介绍语',
-					tickets: 80,
-					location: '活动地点',
-					start: '2019年xx月xx日',
-					end: '',
-					sponsorid: 100,
-					sponsorname: 'xx学生会',
-					type: 1,
-					state: 200,
-					like: true
+					event_name: '活动名',
+					event_location: '活动地点',
+					like: true,
+					end_time: "2019-12-02 19:00:00",
+					event_id: "7fb985ec8326b57e24611777e91bc8f8",
+					sponsor_name: "123456",
+					start_time: "2019-12-01 01:00:00"
 				},
 				sponsor: {
 					avatarUrl: '',
 					name: 'xx学生会'
-				},
-				message: {
-
 				}
 			};
 		},
 		onLoad() {
+
 			if (app.globalData.userInfo) {
 				this.userInfo = app.globalData.userInfo
 				console.log(this.userInfo)
@@ -136,19 +133,59 @@
 					}
 				})
 			}
+
+			if (app.globalData.tsinghuaid) {
+				this.hasTsinghuaInfo = true
+				this.tsinghuaid = app.globalData.tsinghuaid
+			}
+			uni.showShareMenu({})
 		},
 		onShow() {
+			uni.request({
+				url: app.globalData.apiurl + 'users/view', //仅为示例，并非真实接口地址。
+				header: {
+					'content-type': 'application/json', //自定义请求头信息
+					'cookie': app.globalData.cookie
+				},
+				success: (res) => {
+					console.log(res.data)
+					this.follow = res.data.follow
+					this.history = res.data.history
+					this.like = res.data.like
+				},
+				fail: (res) => {
+					console.log('viewfail')
+				}
+			})
+
+			uni.request({
+				url: app.globalData.apiurl + 'users/book', //仅为示例，并非真实接口地址。
+				header: {
+					'content-type': 'application/json', //自定义请求头信息
+					'cookie': app.globalData.cookie
+				},
+				success: (res) => {
+					console.log('users/book')
+					console.log(res)
+					this.userActivity = res.data.events.map( function(e) { e.like = true})//res.data.events
+					
+				},
+				fail: (res) => {
+					console.log('viewfail')
+				}
+			})
+
 			if (app.globalData.token) {
 				console.log('token:' + app.globalData.token),
 					uni.request({
-						url: 'http://2019-a18.iterator-traits.com:8080/apis/users/tsinghuaid', //仅为示例，并非真实接口地址。
+						url: app.globalData.apiurl + 'users/tsinghuaid', //仅为示例，并非真实接口地址。
 						method: 'POST',
 						data: {
-							openid: app.globalData.openid,
 							token: app.globalData.token
 						},
 						header: {
-							'content-type': 'application/json' //自定义请求头信息
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
 							console.log('调用绑定')
@@ -156,7 +193,8 @@
 							this.hasUserInfo = true
 							this.hasTsinghuaInfo = true
 							this.tsinghuaid = res.data.tsinghuaid
-
+							app.globalData.tsinghuaid = res.data.tsinghuaid
+							app.globalData.token = undefined
 						},
 						fail: (res) => {
 							console.log('绑定失败')
@@ -165,32 +203,22 @@
 				app.globalData.token = undefined
 			}
 		},
+		onShareAppMessage(res) {
+			return {
+			    title: app.globalData.sharetitle,
+			    path: '/pages/index/index',
+				imageUrl: app.globalData.shareimg
+			}
+		},
 		methods: {
 			cardSwiper(e) {
 				this.cardCur = e.detail.current
-			},
-			activitydetail(e) {
-				uni.navigateTo({
-					url: "../activity/activity"
-				})
 			},
 			getUserInfo(e) {
 				console.log(e)
 				app.globalData.userInfo = e.detail.userInfo
 				this.userInfo = e.detail.userInfo
-				uni.request({
-					url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-					data: {
-						id: this.userInfo.id
-					},
-					header: {
-						'content-type': 'application/json' //自定义请求头信息
-					},
-					success: (res) => {
-						console.log(res.data);
-						this.hasUserInfo = true
-					}
-				});
+				this.hasUserInfo = true
 			},
 			tabSelect(e) {
 				this.current = e.currentTarget.dataset.id;
@@ -218,6 +246,54 @@
 				uni.navigateTo({
 					url: "../history/history"
 				})
+			},
+			sponsorPage(name) {
+				uni.navigateTo({
+					url: "../sponsor/sponsor?id=" + name
+				})
+			},
+			activityPage(id) {
+				uni.navigateTo({
+					url: "../activity/activity?id=" + id
+				})
+			},
+			announcementPage(id) {
+
+			},
+			QRcodePage(id) {
+
+			},
+			cancelActivity(index) {
+				uni.request({
+					url: app.globalData.apiurl + 'users/book/' + this.userActivity[index].event_id, //仅为示例，并非真实接口地址。
+					method: 'DELETE',
+					header: {
+						'content-type': 'application/json', //自定义请求头信息
+						'cookie': app.globalData.cookie
+					},
+					success: (res) => {
+						console.log(res);
+						this.userActivity.splice(index, 1)
+					},
+					fail: (res) => {
+						
+					}
+				})
+			},
+			likeActivity(index) {
+				uni.request({
+					url: app.globalData.apiurl + 'users/like/' + id,
+					method: 'POST',
+					header: {
+						'content-type': 'application/json', //自定义请求头信息
+						'cookie': app.globalData.cookie
+					},
+					success: (res) => {
+						console.log(index)
+						console.log(id)
+						this.userActivity[index].like = res.data.like
+					}
+				});
 			},
 			identification() {
 				console.log(123)

@@ -2,8 +2,8 @@
 	<view class="follow-list">
 		<view v-for="(item, index) in followlist" :key="index" class="listitem padding-lr flex align-center justify-between text-black" @click="$emit('clickitem',index)">
 			<view class="flex align-center">
-				<view class="cu-avatar round margin-right"></view>
-				<text>{{item.username}}</text>
+				<view class="cu-avatar round margin-right" :style="{backgroundImage: 'url(' + item.avatar_url + ')'}"></view>
+				<text>{{item.name}}</text>
 			</view>
 			<text class="follow-icon" :class="item.follow ? 'cuIcon-check' : 'cuIcon-friendadd'" @click.stop="$emit('follow',index)"></text>
 		</view>
@@ -15,7 +15,7 @@
 		name: 'activity-mini-card',
 		props: {
 			followlist: {
-				type: Object
+				type: Array
 			}
 		},
 		methods: {

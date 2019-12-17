@@ -30,75 +30,42 @@
 	export default {
 		data() {
 			return {
-				followlist: [{
-						username: 'xx社团',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx学生会',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx社团2',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx学生会2',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx社团3',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx学生会3',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx社团4',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx学生会4',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx社团5',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx学生会5',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx社团6',
-						follow: true,
-						id: 0
-					},
-					{
-						username: 'xx学生会6',
-						follow: true,
-						id: 0
-					}
-				],
+				followlist: [],
+				followindex: 0,
 				current: 0,
+				more: true,
 				tabs: [
 					"关注"
 				]
 			};
 		},
 		onLoad() {
-
+			uni.request({
+				url: app.globalData.apiurl + 'users/follow', //仅为示例，并非真实接口地址。
+				data: {
+					index: this.followindex
+				},
+				header: {
+					'content-type': 'application/json', //自定义请求头信息
+					'cookie': app.globalData.cookie
+				},
+				success: (res) => {
+					console.log(res);
+					res.data.list.forEach(item => {
+						item.follow = true
+					})
+					this.followlist = res.data.list
+					this.more = res.data.more
+				}
+			});
+			uni.showShareMenu({})
+		},
+		onShareAppMessage(res) {
+			return {
+				title: app.globalData.sharetitle,
+				path: '/pages/index/index',
+				imageUrl: app.globalData.shareimg
+			}
 		},
 		methods: {
 			cardSwiper(e) {
@@ -120,21 +87,17 @@
 			},
 			follow(index) {
 				uni.request({
-					url: 'http://2019-a18.iterator-traits.com:8080/apis/users/like', //仅为示例，并非真实接口地址。
+					url: app.globalData.apiurl + 'users/follow/' + this.followlist[index].name, //仅为示例，并非真实接口地址。
 					method: 'POST',
-					data: {
-						openid: app.globalData.openid,
-						sponsorid: this.followlist[index].id
-					},
 					header: {
-						'content-type': 'application/json' //自定义请求头信息
+						'content-type': 'application/json', //自定义请求头信息
+						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
 						console.log(res.data);
-						//this.followlist[index].follow = !this.followlist[index].follow
+						this.followlist[index].follow = res.data.follow
 					}
 				})
-				this.followlist[index].follow = !this.followlist[index].follow
 			}
 		}
 	}
