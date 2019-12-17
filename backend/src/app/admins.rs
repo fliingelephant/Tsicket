@@ -153,8 +153,8 @@ pub fn cancel_event(
                 -1 => Ok(HttpResponse::UnprocessableEntity().finish()),
                 1 => {
                     let mut event = events.get_mut(&event_id).unwrap();
-                    event.event_status += 3;
-                    event.update_type = 2;
+                    event.event_status += 2;
+                    event.update_type = 1;
                     drop(events);
                     update_events();
                     
@@ -162,8 +162,8 @@ pub fn cancel_event(
                 }
                 2 => {
                     let mut event = events.get_mut(&event_id).unwrap();
-                    event.event_status += 2;
-                    event.update_type = 2;
+                    event.event_status += 1;
+                    event.update_type = 1;
                     drop(events);
                     update_events();
                     
