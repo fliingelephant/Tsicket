@@ -706,6 +706,8 @@ pub fn get_available_enrolled_events(
 pub struct EventBriefInfo {
     pub like: bool,
     pub event_id: String,
+    pub event_name: String,
+    pub event_time: String,
     pub sponsor_name: String,
     pub sponsor_avatar: String,
     pub start_time: String,
@@ -726,6 +728,7 @@ pub fn get_all_enrolled_events(
             match users::get_user_records(&openid) {
                 Ok(records) => {
                     let mut events: Vec<EventBriefInfo> = vec![];
+                    let event_list = (*EVENT_LIST).lock().unwrap();
                     for record in records {
                         let like: bool;
                         match users::check_user_like(&openid, &record.event_id) {
@@ -749,9 +752,24 @@ pub fn get_all_enrolled_events(
                                 /pic/default_avatar.jpg".to_string();
                             }
                         }
+                        let event_name: String;
+                        let event_time: String;
+                        match event_list.get(&record.event_id) {
+                            Some(event) => {
+                                event_name = event.event_name.clone();
+                                event_time = event.event_time.clone();
+                            }
+                            None => {
+                                event_name = "".to_string();
+                                event_time = "".to_string();
+                            }
+                        }
+                            
                         events.push(EventBriefInfo {
                             like: like,
                             event_id: record.event_id,
+                            event_name: event_name.clone(),
+                            event_time: event_time.clone(),
                             sponsor_name: record.sponsor_name,
                             sponsor_avatar: sponsor_avatar,
                             start_time: record.start_time,
@@ -992,6 +1010,42 @@ pub fn get_sponsor_moments(
     })
 }
 
+#[allow(dead_code)]
+pub fn get_followed_sponsor_moments(
+    id: Identity,
+    Query(query_list): Query<QueryList>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match moment::get_user_follow_sponsor_moments_sorted(&openid) {
+                Ok(moments) => {
+                    let index = query_list.index;
+
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= moments.len() {  // if no more sponsors followed
+                        more = false;
+                        end = moments.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    let mut moments_ret = vec![];
+                    for i in index..end {
+                        moments_ret.push(moments[i].clone());
+                    }
+                    Ok(HttpResponse::Ok().json(MomentsRet { // 200 OK
+                        more: more,
+                        moments: moments_ret,
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
 #[derive(Deserialize)]
 pub struct QueryListWithEventID {
     pub index: usize,
@@ -1005,6 +1059,79 @@ pub fn get_event_moments(
     result(match identify_user(&id) {
         Ok(_) => {
             match moment::get_event_moments_sorted(&query_list.event_id) {
+                Ok(moments) => {
+                    let index = query_list.index;
+
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= moments.len() {  // if no more sponsors followed
+                        more = false;
+                        end = moments.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    let mut moments_ret = vec![];
+                    for i in index..end {
+                        moments_ret.push(moments[i].clone());
+                    }
+                    Ok(HttpResponse::Ok().json(MomentsRet { // 200 OK
+                        more: more,
+                        moments: moments_ret,
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+/*
+#[allow(dead_code)]
+pub fn get_random_moments(
+    id: Identity,
+    Query(query_list): Query<QueryList>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            // TODO
+            match moment::get_random_moments_sorted(&openid) {
+                Ok(moments) => {
+                    let index = query_list.index;
+
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= moments.len() {  // if no more sponsors followed
+                        more = false;
+                        end = moments.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    let mut moments_ret = vec![];
+                    for i in index..end {
+                        moments_ret.push(moments[i].clone());
+                    }
+                    Ok(HttpResponse::Ok().json(MomentsRet { // 200 OK
+                        more: more,
+                        moments: moments_ret,
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+*/
+#[allow(dead_code)]
+pub fn get_liked_event_moments(
+    id: Identity,
+    Query(query_list): Query<QueryList>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match moment::get_user_like_event_moments_ordered(&openid) {
                 Ok(moments) => {
                     let index = query_list.index;
 

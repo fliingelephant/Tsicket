@@ -157,7 +157,7 @@ pub fn check_sponsor_by_id(id: &String)->Result<bool, String> {
         else if  num == "1"{
             return Ok(true);
         }
-        else{
+        else {
             return Err("Something wrong in database".to_string());
         }
     }

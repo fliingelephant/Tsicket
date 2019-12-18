@@ -132,7 +132,7 @@ pub fn review_event(
 }
 
 #[allow(dead_code)]
-pub fn cancel_event(
+pub fn cancel_review_event(
     id: Identity,
     req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
@@ -153,7 +153,7 @@ pub fn cancel_event(
                 -1 => Ok(HttpResponse::UnprocessableEntity().finish()),
                 1 => {
                     let mut event = events.get_mut(&event_id).unwrap();
-                    event.event_status += 2;
+                    event.event_status += 3;
                     event.update_type = 1;
                     drop(events);
                     update_events();
@@ -162,7 +162,57 @@ pub fn cancel_event(
                 }
                 2 => {
                     let mut event = events.get_mut(&event_id).unwrap();
-                    event.event_status += 1;
+                    event.event_status += 2;
+                    event.update_type = 1;
+                    drop(events);
+                    update_events();
+                    
+                    Ok(HttpResponse::Ok().finish())
+                }
+                _ => Ok(HttpResponse::UnprocessableEntity().finish())
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[allow(dead_code)]
+pub fn cancel_event(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            let event_id = req.match_info().query("event_id").to_string();
+            let mut events =  (*EVENT_LIST).lock().unwrap();
+            let event_status: i8;
+            match events.get(&event_id) {
+                Some(event) => {
+                    event_status = event.event_status % 10;
+                }
+                None => {
+                    event_status = -1;
+                }
+            }
+            match event_status {
+                -1 => {
+                    match admins::cancel_event(&event_id) {
+                        Ok(_) => Ok(HttpResponse::Ok().finish()),
+                        Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
+                    }
+                }
+                1 => {
+                    let mut event = events.get_mut(&event_id).unwrap();
+                    event.event_status += 3;
+                    event.update_type = 1;
+                    drop(events);
+                    update_events();
+                    
+                    Ok(HttpResponse::Ok().finish())
+                }
+                2 => {
+                    let mut event = events.get_mut(&event_id).unwrap();
+                    event.event_status += 2;
                     event.update_type = 1;
                     drop(events);
                     update_events();

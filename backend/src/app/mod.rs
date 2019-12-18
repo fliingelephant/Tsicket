@@ -132,6 +132,15 @@ fn routes(app: &mut web::ServiceConfig) {
                     .service(web::resource("users/moments/{event_id}")
                         .route(web::get().to_async(users::get_event_moments))
                     )
+                    .service(web::resource("users/momentsfollow")
+                        .route(web::get().to_async(users::get_followed_sponsor_moments))
+                    )
+                    .service(web::resource("users/momentslike")
+                        .route(web::get().to_async(users::get_liked_event_moments))
+                    )
+                    //.service(web::resource("users/moments/random")
+                    //    .route(web::get().to_async(users::get_random_moments))
+                    //)
                     .service(web::resource("users/pic/{filename}")
                          .route(web::get().to_async(users::get_pic))
                          .route(web::post().to_async(users::update_pic))
@@ -142,7 +151,7 @@ fn routes(app: &mut web::ServiceConfig) {
                      .service(web::resource("users/tsinghuaid")
                         .route(web::get().to_async(users::get_tsinghua_id))
                         .route(web::post().to_async(users::bind_tsinghua_id))
-                    )
+                     )
                     
                     
                      /* Sponsor routes ↓ */
@@ -200,7 +209,10 @@ fn routes(app: &mut web::ServiceConfig) {
                      )
                      .service(web::resource("admins/review/{event_id}")
                          .route(web::post().to_async(admins::review_event))
-                         .route(web::delete().to_async(admins::cancel_event))
+                         .route(web::delete().to_async(admins::cancel_review_event))
+                     )
+                     .service(web::resource("admins/cancel/{event_id}")
+                         .route(web::put().to_async(admins::cancel_event))
                      )
                      
                      
