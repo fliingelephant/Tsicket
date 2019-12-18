@@ -3,7 +3,7 @@ use serde::{Serialize};
 pub use crate::app::POOL;
 use crate::db::users;
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 pub struct Moment {
      pub sponsor_name: String,
      pub event_id: String,

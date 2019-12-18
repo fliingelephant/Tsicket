@@ -18,6 +18,7 @@ use super::{APP_ID, EVENT_LIST, RECORD, SECRET};
 use super::sponsors::{QuerySponsor, QuerySponsorByID};
 use super::events::{QueryEvent, QueryEventByID, EventsRet};
 use crate::db::events;
+use crate::db::moment;
 use crate::db::records::{Record};
 use crate::db::sponsors;
 use crate::db::users;
@@ -315,15 +316,27 @@ pub fn unfo(
 
 #[derive(Serialize)]
 struct SponsorInfo {
+    avatar_url: String,
+    follow: bool,
     id: String,
     name: String,
+    to_start: usize,
+    history: usize
+}
+
+#[derive(Serialize)]
+struct FollowedSponsorInfo {
     avatar_url: String,
+    id: String,
+    name: String,
+    to_start: usize,
+    history: usize
 }
 
 #[derive(Serialize)]
 struct FollowListRet {
     more: bool,
-    list: Vec<SponsorInfo>,
+    list: Vec<FollowedSponsorInfo>,
 }
 
 pub fn get_follow_list(
@@ -335,7 +348,7 @@ pub fn get_follow_list(
             match users::get_user_follows(&openid) {
                 Ok(name_list) => {
                     let index = query_list.index;
-                    let mut list: Vec<SponsorInfo> = vec![];
+                    let mut list: Vec<FollowedSponsorInfo> = vec![];
 
                     let more: bool;
                     let end: usize;
@@ -349,10 +362,30 @@ pub fn get_follow_list(
                     for i in index..end {
                         match sponsors::get_info_by_name(&name_list[i]) {
                             Ok(sponsor) => {
-                                list.push(SponsorInfo {
+                                let mut history_num = 0;
+                                let mut to_start_num = 0;
+                                let events = sponsors::get_sponsor_events(&sponsor.sponsor_name).unwrap();
+                                for event in events {
+                                    let status = event.event_status % 10;
+                                    match status {
+                                        3 => {
+                                            history_num += 1;
+                                        }
+                                        1 => {
+                                            to_start_num += 1;
+                                        }
+                                        2 => {
+                                            to_start_num += 1;
+                                        }
+                                        _ => {}
+                                    }
+                                }
+                                list.push(FollowedSponsorInfo {
+                                    avatar_url: sponsor.head_portrait.clone(),
+                                    history: history_num,
                                     id: sponsor.id.clone(),
                                     name: name_list[i].clone(),
-                                    avatar_url: "https://image.baidu.com/search/detail?ct=503316480&z=0&ipn=d&word=影流之主&step_word=&hs=0&pn=48&spn=0&di=2670&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=0&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=undefined&cs=562893584%2C1346842489&os=32714240%2C1997607233&simid=3364286120%2C229005232&adpicid=0&lpn=0&ln=777&fr=&fmq=1575227579031_R&fm=&ic=undefined&s=undefined&hd=undefined&latest=undefined&copyright=undefined&se=&sme=&tab=0&width=undefined&height=undefined&face=undefined&ist=&jit=&cg=&bdtype=11&oriquery=&objurl=http%3A%2F%2Fpic.fxsw.net%2Fup%2F2019-11%2F2019112310749555.jpg&fromurl=ippr_z2C%24qAzdH3FAzdH3Fooo_z%26e3Buxfo_z%26e3BgjpAzdH3Fip4sAzdH3Fd8la_z%26e3Bip4s&gsm=&rpstart=0&rpnum=0&islist=&querylist=&force=undefined".to_string().clone(),
+                                    to_start: to_start_num,
                                 })
                             },
                             Err(_) => {
@@ -485,40 +518,37 @@ pub fn get_like_list(
             match users::get_user_likes(&openid) {
                 Ok(id_list) => {
                     let index = query_list.index;
-                    if id_list.len() <= index {
-                        Ok(HttpResponse::BadRequest().finish()) // 400 Bad Request
-                    } else {
-                        let mut more = true;
-                        let mut list: Vec<EventInfo> = vec![];
+                    let mut list: Vec<EventInfo> = vec![];
 
-                        if index + 6 >= id_list.len() {  // if no more events liked
-                            more = false;
-                        }
-                        for i in index..(index + 5) {
-                            match events::get_info_by_id(&id_list[i]) {
-                                Ok(event) => {
-                                    list.push(EventInfo {
-                                        event_id: id_list[i].clone(),
-                                        event_name: event.event_name.clone(),
-                                        img_url: event.event_picture.clone(),
-                                        intro: event.event_introduction.clone(),
-                                        start_time: event.start_time.clone(),
-                                    })
-                                },
-                                Err(e) => {
-                                    break;
-                                }
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= id_list.len() {  // if no more events liked
+                        more = false;
+                        end = id_list.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    for i in index..end {
+                        match events::get_info_by_id(&id_list[i]) {
+                            Ok(event) => {
+                                list.push(EventInfo {
+                                    event_id: id_list[i].clone(),
+                                    event_name: event.event_name.clone(),
+                                    img_url: event.event_picture.clone(),
+                                    intro: event.event_introduction.clone(),
+                                    start_time: event.start_time.clone(),
+                                })
+                            },
+                            Err(_) => {
+                                break;
                             }
                         }
-                        if list.len() == 6 {
-                            Ok(HttpResponse::Ok().json(LikeListRet { // 200 OK
-                                more: more,
-                                list: list,
-                            }))
-                        } else {
-                            Ok(HttpResponse::UnprocessableEntity().finish())
-                        }
                     }
+                    Ok(HttpResponse::Ok().json(LikeListRet { // 200 OK
+                        more: more,
+                        list: list,
+                    }))
                 },
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
             }
@@ -548,7 +578,7 @@ pub fn book_event(
             match events.get_mut(&event_id) {
                 Some(mut event) => {
                     println!("{} is booking {}", openid, event_id);
-                    if (event.event_status == 2) && (event.left_tickets > 0) {
+                    if (event.event_status % 10 == 2) && (event.left_tickets > 0) {
                         event.left_tickets -= 1;
                         event.update_type = 1;
                         let index_str = event_id + "_" + &openid;
@@ -611,13 +641,37 @@ pub fn get_sponsor_info(
     req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
-        Ok(_) => {
+        Ok(openid) => {
             let sponsor_name = req.match_info().query("sponsor_name").to_string();
+            let follow = users::check_user_follow(&openid, &sponsor_name).unwrap();
+            let mut to_start_num = 0;
+            let mut history_num = 0;
+
+            let events = sponsors::get_sponsor_events(&sponsor_name).unwrap();
+            for event in events {
+                let status = event.event_status % 10;
+                match status {
+                    3 => {
+                        history_num += 1;
+                    }
+                    1 => {
+                        to_start_num += 1;
+                    }
+                    2 => {
+                        to_start_num += 1;
+                    }
+                    _ => {}
+                }
+            }
+
             match sponsors::get_info_by_name(&sponsor_name) {
-                Ok(sponsor) => Ok(HttpResponse::Ok().json(SponsorInfo {
+                Ok(sponsor) => Ok(HttpResponse::Ok().json(SponsorInfo { // 200 OK
+                    avatar_url: sponsor.head_portrait,
+                    follow: follow,
+                    history: history_num,
                     id: sponsor.id,
                     name: sponsor.sponsor_name,
-                    avatar_url: sponsor.head_portrait,
+                    to_start: to_start_num,
                 })),
                 Err(e) => {
                     println!("{}", e);
@@ -650,8 +704,10 @@ pub fn get_available_enrolled_events(
 
 #[derive(Serialize)]
 pub struct EventBriefInfo {
+    pub like: bool,
     pub event_id: String,
     pub sponsor_name: String,
+    pub sponsor_avatar: String,
     pub start_time: String,
     pub end_time: String,
 }
@@ -671,9 +727,33 @@ pub fn get_all_enrolled_events(
                 Ok(records) => {
                     let mut events: Vec<EventBriefInfo> = vec![];
                     for record in records {
+                        let like: bool;
+                        match users::check_user_like(&openid, &record.event_id) {
+                            Ok(flag) => {
+                                like = flag;
+                            }
+                            Err(_) => {
+                                like = false;
+                                //return Ok(HttpResponse::UnprocessableEntity().json(e));
+                            }
+                        }
+
+                        let sponsor_avatar: String;
+                        match sponsors::get_avatar_by_name(&record.sponsor_name) {
+                            Ok(avatar_url) => {
+                                sponsor_avatar = avatar_url.clone();
+                            }
+                            Err(e) => {
+                                println!("{}", e);
+                                sponsor_avatar = "http://2019-a18.iterator-traits.com/apis/sponsors\
+                                /pic/default_avatar.jpg".to_string();
+                            }
+                        }
                         events.push(EventBriefInfo {
+                            like: like,
                             event_id: record.event_id,
                             sponsor_name: record.sponsor_name,
+                            sponsor_avatar: sponsor_avatar,
                             start_time: record.start_time,
                             end_time: record.end_time
                         })
@@ -827,7 +907,7 @@ pub fn cancel_book_event(
             let mut events = (*EVENT_LIST).lock().unwrap();
             match events.get_mut(&event_id) {
                 Some(mut event) => {
-                    if event.event_status >=2 {
+                    if event.event_status % 10 >=2 {
                         event.left_tickets += 1;
                         event.update_type = 1;
                         let index_str = event_id + "_" + &openid;
@@ -862,5 +942,175 @@ pub fn cancel_book_event(
             }
         }
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[derive(Serialize)]
+pub struct MomentsRet {
+    pub more: bool,
+    pub moments: Vec<moment::Moment>
+}
+
+#[derive(Deserialize)]
+pub struct QueryListWithSponsorName {
+    pub index: usize,
+    pub sponsor_name: String
+}
+
+pub fn get_sponsor_moments(
+    id: Identity,
+    Query(query_list): Query<QueryListWithSponsorName>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(_) => {
+            match moment::get_sponsor_moments_sorted(&query_list.sponsor_name) {
+                Ok(moments) => {
+                    let index = query_list.index;
+
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= moments.len() {  // if no more sponsors followed
+                        more = false;
+                        end = moments.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    let mut moments_ret = vec![];
+                    for i in index..end {
+                        moments_ret.push(moments[i].clone());
+                    }
+                    Ok(HttpResponse::Ok().json(MomentsRet { // 200 OK
+                        more: more,
+                        moments: moments_ret,
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[derive(Deserialize)]
+pub struct QueryListWithEventID {
+    pub index: usize,
+    pub event_id: String
+}
+
+pub fn get_event_moments(
+    id: Identity,
+    Query(query_list): Query<QueryListWithEventID>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(_) => {
+            match moment::get_event_moments_sorted(&query_list.event_id) {
+                Ok(moments) => {
+                    let index = query_list.index;
+
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= moments.len() {  // if no more sponsors followed
+                        more = false;
+                        end = moments.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    let mut moments_ret = vec![];
+                    for i in index..end {
+                        moments_ret.push(moments[i].clone());
+                    }
+                    Ok(HttpResponse::Ok().json(MomentsRet { // 200 OK
+                        more: more,
+                        moments: moments_ret,
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[derive(Serialize)]
+pub struct UserEventInfo {
+    pub like: bool,
+    pub event_id: String,
+	pub sponsor_name: String,
+    pub event_name: String,
+    pub start_time: String,
+    pub event_time: String,
+    pub end_time: String,
+    pub event_type: i8,
+    pub event_introduction: String,
+    pub event_picture: String,
+    pub event_capacity: i32,
+    pub current_participants: i32,
+    pub left_tickets: i32,
+    pub event_status: i8,
+    pub event_location: String,
+}
+
+#[derive(Serialize)]
+pub struct UserEventsRet {
+    pub events: Vec<UserEventInfo>,
+    pub more: bool
+}
+
+#[allow(dead_code)]
+pub fn get_sponsor_events(
+    id: Identity,
+    Query(query_list): Query<QueryListWithSponsorName>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match sponsors::get_sponsor_events(&query_list.sponsor_name) {
+                Ok(events) => {
+                    let index = query_list.index;
+
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= events.len() {  // if no more sponsors followed
+                        more = false;
+                        end = events.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    let mut events_ret = vec![];
+                    for i in index..end {
+                        let event = &events[i];
+                        let like = match users::check_user_like(&openid, &event.event_id) {
+                            Ok(flag) => flag,
+                            Err(_) => false
+                        };
+                        events_ret.push(UserEventInfo {
+                            like: like,
+                            event_id: event.event_id.clone(),
+                            sponsor_name: event.sponsor_name.clone(),
+                            event_name: event.event_name.clone(),
+                            start_time: event.start_time.clone(),
+                            event_time: event.event_time.clone(),
+                            end_time: event.end_time.clone(),
+                            event_type: event.event_type,
+                            event_introduction: event.event_introduction.clone(),
+                            event_picture: event.event_picture.clone(),
+                            event_capacity: event.event_capacity,
+                            current_participants: event.current_participants,
+                            left_tickets: event.left_tickets,
+                            event_status: event.event_status,
+                            event_location: event.event_location.clone(),
+                       });
+                    }
+                    Ok(HttpResponse::Ok().json(UserEventsRet { // 200 OK
+                        more: more,
+                        events: events_ret,
+                    }))
+                },
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }

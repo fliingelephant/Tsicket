@@ -86,6 +86,26 @@ pub fn get_sponsor_events_id(name: &String)
     return Ok(event_id_list);
 }
 
+pub fn get_sponsor_all_events_num(name: &String)
+    -> Result<usize, String> {
+    let command = format!("SELECT event_id FROM event WHERE sponsor_name='{name}';", name = name);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {}
+    }
+
+    let mut num = 0;
+    for row in res.unwrap() {
+        let result = row.unwrap().unwrap();
+        num += 1;
+    }
+
+    return Ok(num);
+}
+
 pub fn get_sponsor_events(name: &String)-> Result<Vec<Event>, String> {
     let command = format!("SELECT * FROM event WHERE sponsor_name='{name}'", name = name);
 
@@ -151,6 +171,26 @@ pub struct Sponsor{
     pub head_portrait: String,
     pub email: String,
     pub phone_number: String,
+}
+
+pub fn get_avatar_by_name(name: &String)
+    -> Result<String, String> {
+    let command = format!("SELECT head_portrait From sponsor_account WHERE sponsor_name='{name}';",
+         name=name);
+    println!("{}", command);
+
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    
+    for row in res.unwrap() {
+        let info = row.unwrap().unwrap();
+        return Ok(format_string(&info[0].as_sql(true)));
+    }
+
+    return Err("No such sponsor".to_string());
 }
 
 pub fn get_info_by_name(name: &String)->Result<Sponsor, String>{
