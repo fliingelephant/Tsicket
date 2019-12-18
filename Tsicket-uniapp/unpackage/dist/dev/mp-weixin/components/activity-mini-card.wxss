@@ -1,26 +1,25 @@
 
-.activity-mini-card{
+.activity-mini-card {
 	width: 100%;
 	margin-bottom: 40rpx;
+	height: 250rpx;
+	border-radius: 20rpx 20rpx 20rpx 20rpx;
+	background-color: #007AFF;
 }
 .collapse {
 	width: 100%;
 	padding: 40rpx 40rpx 40rpx 40rpx;
 }
 .imgcard {
-	position: absolute;
-	width: 100%;
+	width: inherit;
 	height: 250rpx;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
-	z-index: -1;
 }
 .card-back {
-	position: absolute;
-	width: 100%;
+	width: inherit;
 	height: 250rpx;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
 	background-color: #007AFF;
-	z-index: -2;
 }
 .line-round {
 	margin-top: 5rpx;
@@ -62,6 +61,4 @@
 	-webkit-transition: opacity 1s ease-in 0s;
 	transition: opacity 1s ease-in 0s;
 }
-
-
 

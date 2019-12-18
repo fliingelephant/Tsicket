@@ -191,6 +191,77 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var app = getApp();var _default =
 
@@ -201,39 +272,20 @@ var app = getApp();var _default =
       userInfo: {},
       hasUserInfo: false,
       hasTsinghuaInfo: false,
-      tsinghuaid: '2017010000',
+      tsinghuaid: 'xxxxxxxxxx',
       canIUse: uni.canIUse('button.open-type.getUserInfo'),
-      like: 123,
-      follow: 10,
-      history: 23,
+      like: 0,
+      follow: 0,
+      history: 0,
       current: 0,
       tabs: [
-      "活动日程", "报名中"],
-
-      userActivity: [{
-        end_time: "2019-12-02 19:00:00",
-        event_id: "7fb985ec8326b57e24611777e91bc8f8",
-        sponsor_name: "123456",
-        start_time: "2019-12-01 01:00:00" }],
-
-
-      activity: {
-        event_name: '活动名',
-        event_location: '活动地点',
-        like: true,
-        end_time: "2019-12-02 19:00:00",
-        event_id: "7fb985ec8326b57e24611777e91bc8f8",
-        sponsor_name: "123456",
-        start_time: "2019-12-01 01:00:00" },
-
-      sponsor: {
-        avatarUrl: '',
-        name: 'xx学生会' } };
-
+      "活动日程"
+      //, "报名中"
+      ],
+      userActivity: [] };
 
   },
   onLoad: function onLoad() {var _this = this;
-
     if (app.globalData.userInfo) {
       this.userInfo = app.globalData.userInfo;
       console.log(this.userInfo);
@@ -259,56 +311,23 @@ var app = getApp();var _default =
     }
 
     if (app.globalData.tsinghuaid) {
-      this.hasTsinghuaInfo = true;
       this.tsinghuaid = app.globalData.tsinghuaid;
+      this.hasTsinghuaInfo = true;
     }
+    this.loadpage();
     uni.showShareMenu({});
   },
   onShow: function onShow() {var _this2 = this;
-    uni.request({
-      url: app.globalData.apiurl + 'users/view', //仅为示例，并非真实接口地址。
-      header: {
-        'content-type': 'application/json', //自定义请求头信息
-        'cookie': app.globalData.cookie },
-
-      success: function success(res) {
-        console.log(res.data);
-        _this2.follow = res.data.follow;
-        _this2.history = res.data.history;
-        _this2.like = res.data.like;
-      },
-      fail: function fail(res) {
-        console.log('viewfail');
-      } });
-
-
-    uni.request({
-      url: app.globalData.apiurl + 'users/book', //仅为示例，并非真实接口地址。
-      header: {
-        'content-type': 'application/json', //自定义请求头信息
-        'cookie': app.globalData.cookie },
-
-      success: function success(res) {
-        console.log('users/book');
-        console.log(res);
-        _this2.userActivity = res.data.events.map(function (e) {e.like = true;}); //res.data.events
-
-      },
-      fail: function fail(res) {
-        console.log('viewfail');
-      } });
-
-
     if (app.globalData.token) {
       console.log('token:' + app.globalData.token),
       uni.request({
-        url: app.globalData.apiurl + 'users/tsinghuaid', //仅为示例，并非真实接口地址。
+        url: app.globalData.apiurl + 'users/tsinghuaid',
         method: 'POST',
         data: {
           token: app.globalData.token },
 
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -327,6 +346,9 @@ var app = getApp();var _default =
       app.globalData.token = undefined;
     }
   },
+  onPullDownRefresh: function onPullDownRefresh() {
+    this.loadpage();
+  },
   onShareAppMessage: function onShareAppMessage(res) {
     return {
       title: app.globalData.sharetitle,
@@ -335,6 +357,60 @@ var app = getApp();var _default =
 
   },
   methods: {
+    loadpage: function loadpage() {var _this3 = this;
+      uni.request({
+        url: app.globalData.apiurl + 'users/view', //仅为示例，并非真实接口地址。
+        header: {
+          'content-type': 'application/json', //自定义请求头信息
+          'cookie': app.globalData.cookie },
+
+        success: function success(res) {
+          console.log(res.data);
+          _this3.follow = res.data.follow;
+          _this3.history = res.data.history;
+          _this3.like = res.data.like;
+        },
+        fail: function fail(res) {
+          uni.showToast({
+            title: '错误',
+            icon: 'none' });
+
+        } });
+
+
+      uni.request({
+        url: app.globalData.apiurl + 'users/book', //仅为示例，并非真实接口地址。
+        header: {
+          'content-type': 'application/json', //自定义请求头信息
+          'cookie': app.globalData.cookie },
+
+        success: function success(res) {
+          console.log('users/book');
+          console.log(res);
+          res.data.events.forEach(function (res, index) {
+            res.isUnfold = false;
+            res.delay = '' + (index + 1) * 0.1 + 's';
+            res.cancel = undefined;
+            setTimeout(function () {
+              res.delay = undefined;
+            }, (index + 11) * 100);
+          });
+          _this3.userActivity = res.data.events;
+          uni.stopPullDownRefresh();
+          uni.showToast({
+            title: '加载成功',
+            icon: 'none' });
+
+
+        },
+        fail: function fail(res) {
+          uni.showToast({
+            title: '错误',
+            icon: 'none' });
+
+        } });
+
+    },
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
     },
@@ -367,9 +443,9 @@ var app = getApp();var _default =
     },
     historyPage: function historyPage() {
       console.log("historypage");
-      uni.navigateTo({
-        url: "../history/history" });
-
+      // uni.navigateTo({
+      // 	url: "../history/history"
+      // })
     },
     sponsorPage: function sponsorPage(name) {
       uni.navigateTo({
@@ -387,7 +463,7 @@ var app = getApp();var _default =
     QRcodePage: function QRcodePage(id) {
 
     },
-    cancelActivity: function cancelActivity(index) {var _this3 = this;
+    cancelActivity: function cancelActivity(index) {var _this4 = this;
       uni.request({
         url: app.globalData.apiurl + 'users/book/' + this.userActivity[index].event_id, //仅为示例，并非真实接口地址。
         method: 'DELETE',
@@ -397,30 +473,37 @@ var app = getApp();var _default =
 
         success: function success(res) {
           console.log(res);
-          _this3.userActivity.splice(index, 1);
+          _this4.userActivity[index].delay = undefined;
+          _this4.userActivity[index].cancel = 'animation-delete-slide-left';
+          setTimeout(function () {
+            _this4.userActivity[index].isUnfold = false;
+            _this4.userActivity.splice(index, 1);
+          }, 2000);
         },
         fail: function fail(res) {
 
         } });
 
     },
-    likeActivity: function likeActivity(index) {var _this4 = this;
+    likeActivity: function likeActivity(index) {var _this5 = this;
       uni.request({
-        url: app.globalData.apiurl + 'users/like/' + id,
+        url: app.globalData.apiurl + 'users/like/' + this.userActivity[index].event_id,
         method: 'POST',
         header: {
           'content-type': 'application/json', //自定义请求头信息
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
-          console.log(index);
-          console.log(id);
-          _this4.userActivity[index].like = res.data.like;
+          _this5.userActivity[index].like = res.data.like;
+          _this5.like += res.data.like ? 1 : -1;
         } });
 
     },
+    unfold: function unfold(index) {
+      this.userActivity[index].isUnfold = !this.userActivity[index].isUnfold;
+    },
     identification: function identification() {
-      console.log(123);
+      console.log("前往认证");
       uni.navigateToMiniProgram({
         appId: "wx1ebe3b2266f4afe0",
         path: "pages/index/index",

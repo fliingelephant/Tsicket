@@ -10,7 +10,7 @@
 					</view>
 					<view class="text-left flex justify-start text-sm">
 						<view class="padding-right-xl">
-							<view class="text-xl text-bold">{{sponsor.tostart}}</view>
+							<view class="text-xl text-bold">{{sponsor.to_start}}</view>
 							待开始
 						</view>
 						<view class="padding-right-xl">
@@ -19,16 +19,16 @@
 						</view>
 						<view class="padding-right-xl">
 							<view class="text-xl text-bold">{{sponsor.message}}</view>
-							动态
+							<!-- 动态 -->
 						</view>
 					</view>
 				</view>
-				<view class="cu-avatar xxl round" :style="{backgroundImage: 'url(' + sponsor.avatarUrl + ')'}"></view>
+				<view class="cu-avatar xxl round" :style="{backgroundImage: 'url(' + sponsor.avatar_url + ')'}"></view>
 			</view>
 			<view class="toolbar flex align-stretch text-center">
 				<view class="flex-sub flex align-center justify-center">
 					<button open-type="share" @click="share">
-						<view class= "flex align-center justify-center sharbutton">
+						<view class="flex align-center justify-center">
 							<text class="cuIcon-share"></text>
 						</view>
 					</button>
@@ -52,13 +52,22 @@
 			<view class="tab-swiper-view">
 				<swiper class="tab-swiper" :current="current" @change="swiperChange">
 					<swiper-item>
-						<scroll-view scroll-y class="tab-scroll">
-							<activity-mini-card v-for="(item,index) in activitylist" :key="index" :activity="item" @like="like" @clickCard="activityPage"></activity-mini-card>
+						<scroll-view scroll-y class="tab-scroll" @scrolltolower='loadactivity'>
+							<view class="flex-column">
+								<activity-mini-card v-for="(item,index) in activitylist" :class="[item.delay ? 'animation-slide-bottom' : '']"
+								 :style="[{animationDelay: item.delay}]" :key="item.event_id" :activity="item" @like="like(index)" @clickCard="activityPage(item.event_id)"></activity-mini-card>
+							</view>
+							<view v-if="activitymore" style="height: 80rpx"></view>
 						</scroll-view>
 					</swiper-item>
 					<swiper-item>
-						<scroll-view scroll-y class="tab-scroll">
-							<message v-for="(item, index) in messagelist" :key="index" :activity="item.activity" :sponsor="sponsor" :message="item" @appreciate="appreciate" @activityPage='activityPage'></message>
+						<scroll-view scroll-y class="tab-scroll" @scrolltolower='loadmoment'>
+							<view class="flex-column">
+								<message v-for="(item, index) in momentlist" class="moment" :class="[item.delay?'animation-slide-right':'']"
+								 :style="[{animationDelay: item.delay}]" :key="index":message="item" @appreciate="appreciate"
+								 @activityPage='activityPage'></message>
+							</view>
+							<view v-if="momentmore" style="height: 80rpx"></view>
 						</scroll-view>
 					</swiper-item>
 				</swiper>
@@ -73,119 +82,18 @@
 	export default {
 		data() {
 			return {
-				id: 0,
 				url: "/static/cardback0.jpg",
-				activitylist: [{
-						id: 0,
-						name: '活动名',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: false
-					},
-					{
-						id: 1,
-						name: '活动名',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: false
-					},
-					{
-						id: 2,
-						name: '活动名',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: false
-					}
-				],
+				sponsor: {},
+				activitylist: [],
+				activityindex: 0,
+				activitymore: true,
+				momentlist: [],
+				momentindex: 0,
+				momentmore: true,
 				current: 0,
 				tabs: [
 					"活动", "动态"
 				],
-				sponsor: {
-					id: 0,
-					avatarUrl: '',
-					name: 'xx学生会',
-					tostart: 2,
-					history: 13,
-					message: 28,
-					follow: true,
-				},
-				messagelist: [{
-						"id": 0,
-						text: "测试文本123412351123",
-						"appreciate": false,
-						activity: {
-							id: 0,
-							name: '活动名',
-							intro: '活动介绍语',
-							tickets: 80,
-							location: '活动地点',
-							start: '2019年xx月xx日',
-							end: '',
-							sponsorid: 100,
-							sponsorname: 'xx学生会',
-							type: 1,
-							state: 200
-						}
-					},
-					{
-						"id": 1,
-						text: "测试文本12341231231245124",
-						"appreciate": false,
-						activity: {
-							id: 1,
-							name: '活动名1',
-							intro: '活动介绍语',
-							tickets: 80,
-							location: '活动地点',
-							start: '2019年xx月xx日',
-							end: '',
-							sponsorid: 100,
-							sponsorname: 'xx学生会',
-							type: 1,
-							state: 200
-						}
-					},
-					{
-						"id": 2,
-						text: "测试文本123532151212341233",
-						"appreciate": false,
-						activity: {
-							id: 2,
-							name: '活动名2',
-							intro: '活动介绍语',
-							tickets: 80,
-							location: '活动地点',
-							start: '2019年xx月xx日',
-							end: '',
-							sponsorid: 100,
-							sponsorname: 'xx学生会',
-							type: 1,
-							state: 200
-						}
-					}
-				]
 			};
 		},
 		onLoad(option) {
@@ -201,96 +109,115 @@
 			uni.showShareMenu({})
 		},
 		onShareAppMessage(res) {
+			console.log(res)
 			return {
-			    title: '清易票-' + this.sponsor.name,
+				title: '清易票-' + this.sponsor.name,
 				//imageUrl: app.globalData.shareimg
 			}
 		},
 		methods: {
 			loadpage() {
+				this.momentindex = 0
+				this.momentlist = []
+				this.momentmore = true
+				this.activityindex = 0
+				this.activitylist = []
+				this.activitymore = true
 				uni.request({
 					url: app.globalData.apiurl + 'sponsors/view/' + this.sponsor.name,
 					//method: 'POST',
-					data: {
-						sponsor_name: this.sponsor.name,
-					},
 					header: {
 						'content-type': 'application/json', //自定义请求头信息
 						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
 						console.log(res)
-						this.sponsor.tostart = res.data.tostart
-						this.sponsor.history = res.data.history
-						this.sponsor.message = res.data.message
+						this.sponsor = res.data
 					}
 				})
-				uni.request({
-					url: app.globalData.apiurl + 'users/follow/' + this.sponsor.name,
-					header: {
-						'content-type': 'application/json' ,//自定义请求头信息
-						'cookie': app.globalData.cookie
-					},
-					success: (res) => {
-						console.log(res)
-						this.sponsor.follow = res.data.follow
-					}
-				})
-				uni.request({
-					url: app.globalData.apiurl + 'events/moments', //仅为示例，并非真实接口地址。
-					data: {
-						'sponsor_name': this.sponsor.name
-					},
-					header: {
-						'content-type': 'application/json', //自定义请求头信息
-						'cookie': app.globalData.cookie
-					},
-					success: (res) => {
-						console.log(res.data);
-						//this.activitylist = res.data
-					}
-				});
+				if (this.current == 0) {
+					this.loadactivity()
+				} else {
+					this.loadmoment()
+				}
 			},
-			tabSelect(e) {
-				this.current = e.currentTarget.dataset.id;
-				console.log(this.current)
-				if ((this.current == 1) && (!this.messagelist[0])) {
+			loadactivity(e) {
+				console.log(e)
+				if (this.activitymore) {
+					console.log('loadactivity' + this.momentindex)
 					uni.request({
-						url: app.globalData.apiurl + 'events/moments', //仅为示例，并非真实接口地址。
+						url: app.globalData.apiurl + 'users/events',
 						data: {
-							'sponsor_name': sponsor.name
+							index: this.activityindex,
+							sponsor_name: this.sponsor.name,
 						},
 						header: {
 							'content-type': 'application/json', //自定义请求头信息
 							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
-							console.log(res.data);
-							this.messagelist = res.data.moments
+							console.log(res)
+							res.data.events.forEach((item, index) => {
+								item.sponsor_avatar = this.sponsor.avatar_url
+								item.delay = '' + (index + 1) * 0.1 + 's'
+								setTimeout(() => {
+									item.delay = undefined
+								}, (index + 11) * 100)
+							})
+							this.activitylist = this.activitylist.concat(res.data.events)
+							this.activitymore = res.data.more
+							this.activityindex += res.data.events.length
+							if(this.activityindex == 0) {
+								this.activityindex = -1
+							}
 						}
-					});
+					})
 				}
+			},
+			loadmoment(e) {
+				console.log(e)
+				if (this.momentmore) {
+					console.log('loadmoment' + this.momentindex)
+					uni.request({
+						url: app.globalData.apiurl + 'users/moments',
+						data: {
+							'index': this.momentindex,
+							'sponsor_name': this.sponsor.name
+						},
+						header: {
+							'content-type': 'application/json',
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res)
+							res.data.moments.forEach((item, index) => {
+								item.delay = '' + (index + 1) * 0.1 + 's'
+								setTimeout(() => {
+									item.delay = undefined
+								}, (index + 11) * 100)
+							})
+							this.momentlist = this.momentlist.concat(res.data.moments)
+							this.momentmore = res.data.more
+							this.momentindex += res.data.moments.length
+							if(this.momentindex == 0) {
+								this.momentindex = -1
+							}
+						}
+					})
+				}
+			},
+			tabSelect(e) {
+				this.current = e.currentTarget.dataset.id;
 			},
 			navChange(index) {
 				this.current = index;
 			},
 			swiperChange(e) {
 				this.current = e.detail.current;
-				if ((this.current == 1) && (!this.messagelist[0])) {
-					uni.request({
-						url: app.globalData.apiurl + 'events/moments', //仅为示例，并非真实接口地址。
-						data: {
-							'sponsor_name': sponsor.name
-						},
-						header: {
-							'content-type': 'application/json', //自定义请求头信息
-							'cookie': app.globalData.cookie
-						},
-						success: (res) => {
-							console.log(res.data);
-							this.messagelist = res.data.moments
-						}
-					});
+				if (this.current == 0 && this.activityindex != -1) {
+					this.loadactivity()
+				} else if (this.momentindex != -1) {
+					this.loadmoment()
 				}
 			},
 			share() {
@@ -301,34 +228,33 @@
 					url: app.globalData.apiurl + 'users/follow/' + this.sponsor.name,
 					method: 'POST',
 					header: {
-						'content-type': 'application/json' ,//自定义请求头信息
+						'content-type': 'application/json', //自定义请求头信息
 						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
 						console.log(res.data);
 						this.sponsor.follow = res.data.follow
 					}
-				});
+				})
 			},
-			appreciate(id){
-				uni.request({
-					url: app.globalData.apiurl + 'users/appreciate',
-					method: 'POST',
-					data: {
-						openid: app.globalData.openid,
-						messageid: id,
-						session: '',
-					},
-					header: {
-						'content-type': 'application/json' //自定义请求头信息
-					},
-					success: (res) => {
-						console.log(res.data);
-					}
-				});
-				var index = this.messagelist.findIndex((item) => {return item.id == id})
-				console.log(index)
-				this.messagelist[index].appreciate = !this.messagelist[index].appreciate
+			appreciate(index) {
+				// uni.request({
+				// 	url: app.globalData.apiurl + 'users/appreciate',
+				// 	method: 'POST',
+				// 	data: {
+				// 		openid: app.globalData.openid,
+				// 		messageid: id,
+				// 		session: '',
+				// 	},
+				// 	header: {
+				// 		'content-type': 'application/json', 
+				// 		'cookie': app.globalData.cookie
+				// 	},
+				// 	success: (res) => {
+				// 		console.log(res.data);
+				// 		this.momentlist[index].appreciate = !this.momentlist[index].appreciate
+				// 	}
+				// });
 			},
 			activityPage(id) {
 				var page = getCurrentPages()
@@ -341,25 +267,20 @@
 					})
 				}
 			},
-			like(id) {
+			like(index) {
+				//console.log(id)
 				uni.request({
-					url: app.globalData.apiurl + 'users/like',
+					url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id, //仅为示例，并非真实接口地址。
 					method: 'POST',
-					data: {
-						openid: app.globalData.openid,
-						eventid: id,
-						session: '',
-					},
 					header: {
-						'content-type': 'application/json' //自定义请求头信息
+						'content-type': 'application/json', //自定义请求头信息
+						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
 						console.log(res.data);
+						this.activitylist[index].like = res.data.like
 					}
-				});
-				var index = this.activitylist.findIndex((item) => {return item.id == id})
-				console.log(index)
-				this.activitylist[index].like = !this.activitylist[index].like
+				})
 			}
 		}
 	}
@@ -415,7 +336,7 @@
 		width: 100%;
 		font-size: 48rpx;
 	}
-	
+
 	button {
 		font-size: 48rpx;
 		width: 100%;
@@ -424,11 +345,11 @@
 		border: none;
 		background: none;
 	}
-	
+
 	button:after {
 		border: none;
 	}
-	
+
 	button>view {
 		width: 100%;
 		height: 100%;

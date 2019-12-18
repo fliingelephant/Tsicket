@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/user/user",
+    "pages/discover/disover",
+    "pages/activity/activity",
+    "pages/following/following",
+    "pages/sponsor/sponsor",
+    "pages/like/like",
+    "pages/history/history",
+    "pages/search/search"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "清易票",
+    "navigationBarBackgroundColor": "#81D3F8",
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#FFFFFF",
+    "backgroundColorTop": "#81D3F8",
+    "enablePullDownRefresh": true
+  },
+  "tabBar": {
+    "color": "#D7D7D7",
+    "selectedColor": "#81D3F8",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "主页"
+      },
+      {
+        "pagePath": "pages/discover/disover",
+        "text": "动态"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "个人"
+      }
+    ]
+  },
+  "permission": {},
+  "navigateToMiniProgramAppIdList": [
+    "wx1ebe3b2266f4afe0"
+  ],
+  "usingComponents": {
+    "message": "/components/message",
+    "activity-mini-card": "/components/activity-mini-card",
+    "activity-prepare": "/components/activity-prepare",
+    "activity-check": "/components/activity-check",
+    "follow-list": "/components/follow-list"
+  },
+  "sitemapLocation": "sitemap.json"
+}

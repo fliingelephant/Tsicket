@@ -148,12 +148,30 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var app = getApp();var _default =
 
 {
   data: function data() {
     return {
+      scrollTop: 0,
       followlist: [],
       followindex: 0,
       current: 0,
@@ -163,26 +181,20 @@ var app = getApp();var _default =
 
 
   },
-  onLoad: function onLoad() {var _this = this;
-    uni.request({
-      url: app.globalData.apiurl + 'users/follow', //仅为示例，并非真实接口地址。
-      data: {
-        index: this.followindex },
-
-      header: {
-        'content-type': 'application/json', //自定义请求头信息
-        'cookie': app.globalData.cookie },
-
-      success: function success(res) {
-        console.log(res);
-        res.data.list.forEach(function (item) {
-          item.follow = true;
-        });
-        _this.followlist = res.data.list;
-        _this.more = res.data.more;
-      } });
-
+  onLoad: function onLoad() {
+    this.loadpage();
     uni.showShareMenu({});
+  },
+  onPageScroll: function onPageScroll(res) {
+    this.scrollTop = res.scrollTop;
+  },
+  onPullDownRefresh: function onPullDownRefresh() {
+    this.followindex = 0;
+    this.more = true;
+    this.loadpage();
+  },
+  onReachBottom: function onReachBottom() {
+    this.loadpage();
   },
   onShareAppMessage: function onShareAppMessage(res) {
     return {
@@ -192,6 +204,46 @@ var app = getApp();var _default =
 
   },
   methods: {
+    loadpage: function loadpage() {var _this = this;
+      if (this.more) {
+        uni.request({
+          url: app.globalData.apiurl + 'users/follow', //仅为示例，并非真实接口地址。
+          data: {
+            index: this.followindex },
+
+          header: {
+            'content-type': 'application/json', //自定义请求头信息
+            'cookie': app.globalData.cookie },
+
+          success: function success(res) {
+            console.log(res);
+            if (_this.followindex == 0) {
+              _this.followlist = [];
+            }
+            res.data.list.forEach(function (item, index) {
+              item.follow = true;
+              item.delay = '' + (index + 5) * 0.1 + 's';
+              setTimeout(function () {
+                item.delay = undefined;
+              }, (index + 11) * 100);
+            });
+            _this.followlist = _this.followlist.concat(res.data.list);
+            if (_this.followindex != 0) {
+              setTimeout(function () {
+                uni.pageScrollTo({
+                  scrollTop: _this.scrollTop + 300,
+                  duration: 500 });
+
+                console.log("top" + _this.scrollTop);
+              }, 200);
+            }
+            _this.more = res.data.more;
+            _this.followindex += res.data.list.length;
+            uni.stopPullDownRefresh();
+          } });
+
+      }
+    },
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
     },
@@ -206,7 +258,7 @@ var app = getApp();var _default =
     },
     sponsorPage: function sponsorPage(index) {
       uni.navigateTo({
-        url: "../sponsor/sponsor?id=" + this.followlist[index].id });
+        url: "../sponsor/sponsor?id=" + this.followlist[index].name });
 
     },
     follow: function follow(index) {var _this2 = this;

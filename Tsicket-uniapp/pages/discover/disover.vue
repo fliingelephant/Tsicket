@@ -14,21 +14,30 @@
 			<view class="tab-swiper-view">
 				<swiper class="tab-swiper" :current="current" @change="swiperChange">
 					<swiper-item class="tab-swiper-item" style="height: 100%;">
-						<scroll-view scroll-y class="tab-scroll">
-							<message v-for="(item, index) in messagelist" :key="index" :activity="item.activity" :sponsor="item.sponsor"
-							 :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
+						<scroll-view scroll-y class="tab-scroll" @scrolltolower='loadmoment'>
+							<view class="flex-column">
+								<message v-for="(item, index) in momentlist0" :class="[item.delay? momentanimation[0] :'']" :style="[{animationDelay: item.delay}]"
+								 :key="index" :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
+							</view>
+							<view v-if="momentmore0" style="height: 80rpx"></view>
 						</scroll-view>
 					</swiper-item>
 					<swiper-item>
-						<scroll-view scroll-y class="tab-scroll">
-							<message v-for="(item, index) in messagelist" :key="index" :activity="item.activity" :sponsor="item.sponsor"
-							 :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
+						<scroll-view scroll-y class="tab-scroll" @scrolltolower='loadmoment'>
+							<view class="flex-column">
+								<message v-for="(item, index) in momentlist1" :class="[item.delay? momentanimation[1] :'']" :style="[{animationDelay: item.delay}]"
+								 :key="index" :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
+							</view>
+							<view v-if="momentmore1" style="height: 80rpx"></view>
 						</scroll-view>
 					</swiper-item>
 					<swiper-item>
-						<scroll-view scroll-y class="tab-scroll">
-							<message v-for="(item, index) in messagelist.slice(1,3)" :key="index" :activity="item.activity" :sponsor="item.sponsor"
-							 :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
+						<scroll-view scroll-y class="tab-scroll" @scrolltolower='loadmoment'>
+							<view class="flex-column">
+								<message v-for="(item, index) in momentlist2" :class="[item.delay? momentanimation[2] :'']" :style="[{animationDelay: item.delay}]"
+								 :key="index" :message="item" @appreciate="appreciate" @sponsorPage='sponsorPage' @activityPage='activityPage'></message>
+							</view>
+							<view v-if="momentmore2" style="height: 80rpx"></view>
 						</scroll-view>
 					</swiper-item>
 				</swiper>
@@ -43,97 +52,61 @@
 	export default {
 		data() {
 			return {
-				messagelist: [{
-						"id": 0,
-						text: "测试文本123412351123",
-						"appreciate": false,
-						activity: {
-							id: 0,
-							name: '活动名',
-							intro: '活动介绍语',
-							tickets: 80,
-							location: '活动地点',
-							start: '2019年xx月xx日',
-							end: '',
-							sponsorid: 100,
-							sponsorname: 'xx学生会',
-							type: 1,
-							state: 200
-						},
-						sponsor: {
-							id: 0,
-							avatarUrl: '',
-							name: 'xx学生会',
-						}
-					},
-					{
-						"id": 1,
-						text: "测试文本12341231231245124",
-						"appreciate": false,
-						activity: {
-							id: 1,
-							name: '活动名1',
-							intro: '活动介绍语',
-							tickets: 80,
-							location: '活动地点',
-							start: '2019年xx月xx日',
-							end: '',
-							sponsorid: 100,
-							sponsorname: 'xx学生会',
-							type: 1,
-							state: 200
-						},
-						sponsor: {
-							id: 1,
-							avatarUrl: '',
-							name: 'xx学生会2',
-						}
-					},
-					{
-						"id": 2,
-						text: "测试文本123532151212341233",
-						"appreciate": false,
-						activity: {
-							id: 2,
-							name: '活动名2',
-							intro: '活动介绍语',
-							tickets: 80,
-							location: '活动地点',
-							start: '2019年xx月xx日',
-							end: '',
-							sponsorid: 100,
-							sponsorname: 'xx学生会',
-							type: 1,
-							state: 200
-						},
-						sponsor: {
-							id: 2,
-							avatarUrl: '',
-							name: 'xx学生会3',
-						}
-					}
-				],
+				momentlist0: [],
+				momentmore0: true,
+				momentindex0: 0,
+				momentlist1: [],
+				momentmore1: true,
+				momentindex1: 0,
+				momentlist2: [],
+				momentindex2: 0,
+				momentanimation: ['animation-slide-bottom', 'animation-slide-right', 'animation-slide-right'],
 				current: 0,
 				tabs: [
-					"参加", "关注收藏", "广场"
+					"喜爱", "关注"//, "广场"
 				]
 			};
 		},
 		onLoad() {
+			this.loadpage()
 			uni.showShareMenu({})
+		},
+		onPullDownRefresh() {
+			this.momentanimation[this.current] = 'animation-slide-bottom'
+			this.loadpage()
 		},
 		onShareAppMessage(res) {
 			return {
-			    title: app.globalData.sharetitle,
-			    path: '/pages/index/index',
+				title: app.globalData.sharetitle,
+				path: '/pages/index/index',
 				imageUrl: app.globalData.shareimg
 			}
 		},
 		methods: {
-			cardSwiper(e) {
-				this.cardCur = e.detail.current
+			loadpage() {
+				if (this.current == 0) {
+					this.momentlist0 = []
+					this.momentmore0 = true
+					this.momentindex0 = 0
+				} else if (this.current == 1) {
+					this.momentlist1 = []
+					this.momentmore1 = true
+					this.momentindex1 = 0
+				} else {
+					this.momentlist2 = []
+					this.momentmore2 = true
+					this.momentindex2 = 0
+				}
+				this.loadmoment()
 			},
 			tabSelect(e) {
+				if (this.current == e.currentTarget.dataset.id) {
+					this.current = e.currentTarget.dataset.id
+					uni.showLoading({
+						title: '刷新中'
+					})
+					this.loadpage()
+				}
 				this.current = e.currentTarget.dataset.id;
 			},
 			navChange(index) {
@@ -141,10 +114,85 @@
 			},
 			swiperChange(e) {
 				this.current = e.detail.current;
+				console.log(this.current)
+				this.loadmoment()
 			},
-			appreciate(e,id) {
+			loadmoment(e) {
 				console.log(e)
-				console.log(id)
+				if ((this.current == 0) && (this.momentindex0 != -1)) {
+					uni.request({
+						url: app.globalData.apiurl + 'users/momentslike',
+						data: {
+							index: this.momentindex0
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res.data);
+							res.data.moments.forEach((item, index) => {
+								item.delay = '' + (index + 1) * 0.1 + 's'
+								setTimeout(() => {
+									item.delay = undefined
+								}, (index + 11) * 100)
+							})
+							this.momentlist0 = this.momentlist0.concat(res.data.moments)
+							this.momentmore0 = res.data.more
+							this.momentindex0 += res.data.moments.length
+							uni.hideLoading()
+						}
+					})
+				} else if ((this.current == 1) && (this.momentindex1 != -1)) {
+					uni.request({
+						url: app.globalData.apiurl + 'users/momentsfollow',
+						data: {
+							index: this.momentindex1
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res.data);
+							res.data.moments.forEach((item, index) => {
+								item.delay = '' + (index + 1) * 0.1 + 's'
+								setTimeout(() => {
+									item.delay = undefined
+								}, (index + 11) * 100)
+							})
+							this.momentlist1 = this.momentlist1.concat(res.data.moments)
+							this.momentmore1 = res.data.more
+							this.momentindex1 += res.data.moments.length
+							uni.hideLoading()
+						}
+					});
+				} else if ((this.current == 2) && (this.momentindex2 != -1)) {
+					uni.request({
+						url: app.globalData.apiurl + 'users/moments/like',
+						data: {
+							index: this.momentmore2
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res.data);
+							res.data.moments.forEach((item, index) => {
+								item.delay = '' + (index + 1) * 0.1 + 's'
+								setTimeout(() => {
+									item.delay = undefined
+								}, (index + 11) * 100)
+							})
+							this.momentlist2 = this.momentlist2.concat(res.data.moments)
+							this.momentmore2 = res.data.more
+							uni.hideLoading()
+						}
+					});
+				}
+			},
+			appreciate(id) {
 				uni.request({
 					url: app.globalData.apiurl + 'users/appreciate',
 					method: 'POST',

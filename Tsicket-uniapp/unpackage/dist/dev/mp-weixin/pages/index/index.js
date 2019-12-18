@@ -168,35 +168,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 var app = getApp();var _default =
 
 {
   data: function data() {
     return {
+      keyword: '',
+      scrollTop: 0,
+      activityindex: 0,
+      reload: false,
       cardCur: 0,
+      more: true,
       swiperList: [],
       dotStyle: false,
-      towerStart: 0,
-      direction: '',
       url: "/static/cardback0.jpg",
-      activitylist: [
-        //	{
-        // 	event_id: 0,
-        // 	event_name: '活动名',
-        // 	event_introdution: '活动介绍语',
-        // 	event_picture: '',
-        // 	left_tickets: 80,
-        // 	event_location: '活动地点',
-        // 	start_time: '2019年xx月xx日',
-        // 	end_time: '',
-        // 	sponsor_name: 'xx学生会',
-        // 	event_type: 1,
-        // 	event_status: 200,
-        // 	reserved: false,
-        // 	like: false
-        // }
-      ],
+      activitylist: [],
       current: 0,
       tabs: [
       "介绍", "动态"] };
@@ -214,23 +202,18 @@ var app = getApp();var _default =
     }
 
     uni.showShareMenu({});
-    // app.globalData.cookieReadyCallback = function(res) {
-    // 	uni.request({
-    // 		url: 'http://2019-a18.iterator-traits.com/apis/users/broadcast',
-    // 		//method: 'POST',
-    // 		/* data: {
-    // 			index: 0
-    // 		}, */
-    // 		header: {
-    // 			'content-type': 'application/json', //自定义请求头信息
-    // 			'cookie': app.globalData.cookie
-    // 		},
-    // 		success: (res) => {
-    // 			console.log(res.data);
-    // 		}
-    // 	})
-    // }
-    //console.log(app.cookieReadyCallback)
+
+  },
+  onPageScroll: function onPageScroll(res) {
+    this.scrollTop = res.scrollTop;
+  },
+  onPullDownRefresh: function onPullDownRefresh() {
+    this.more = true;
+    this.activityindex = 0;
+    this.loadpage();
+  },
+  onReachBottom: function onReachBottom() {
+    this.loadactivity(false);
   },
   onShareAppMessage: function onShareAppMessage(res) {
     return {
@@ -240,24 +223,7 @@ var app = getApp();var _default =
 
   },
   methods: {
-    loadpage: function loadpage(cookie) {var _this = this;
-      console.log('cookieReadyCallback');
-      console.log(cookie);
-      /* uni.request({
-                           	url: 'http://2019-a18.iterator-traits.com/apis/users/newactivities',
-                           	method: 'POST',
-                           	data: {
-                           		index: 0
-                           	},
-                           	header: {
-                           		'content-type': 'application/json', //自定义请求头信息
-                           		'cookie': cookie
-                           	},
-                           	success: (res) => {
-                           		
-                           		console.log(res);
-                           	}
-                           }) */
+    loadpage: function loadpage() {var _this = this;
       uni.showLoading({
         title: '加载中' });
 
@@ -268,58 +234,72 @@ var app = getApp();var _default =
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
+          _this.swiperList = [];
+          _this.reload = false;
           console.log(res);
           console.log(res.data);
           _this.swiperList = res.data.list;
+          _this.reload = true;
           if (_this.activitylist != []) {
-            uni.showToast({
-              title: '加载成功',
-              icon: 'none' });
-
+            uni.stopPullDownRefresh();
           }
         } });
 
-      uni.request({
-        url: app.globalData.apiurl + 'admins',
-        //method: 'POST',
-        /* data: {
-        	index: 0
-        }, */
-        header: {
-          'content-type': 'application/json', //自定义请求头信息
-          'cookie': cookie },
+      this.loadactivity(true);
+    },
+    loadactivity: function loadactivity(reload) {var _this2 = this;
+      if (this.more) {
+        uni.request({
+          url: app.globalData.apiurl + 'users/index',
+          data: {
+            index: this.activityindex },
 
-        success: function success(res) {
-          console.log(res);
-          console.log(res.data);
-          var temp = res.data.events;
-          temp.forEach(function (res) {
-            res.like = true;
-          });
-          _this.activitylist = temp;
-          console.log(_this.activitylist);
-          if (_this.swiperList != []) {
-            uni.showToast({
-              title: '加载成功',
-              icon: 'none' });
+          header: {
+            'content-type': 'application/json', //自定义请求头信息
+            'cookie': app.globalData.cookie },
 
-          }
-        } });
+          success: function success(res) {
+            console.log(res);
+            console.log(res.data);
+            if (res.data.events) {
+              res.data.events.forEach(function (res, index) {
+                //res.like = true
+                res.delay = '' + (index + 5) * 0.1 + 's';
+                setTimeout(function () {
+                  res.delay = undefined;
+                }, (index + 11) * 100);
+              });
+              if (reload) {
+                _this2.activitylist = [];
+                uni.showToast({
+                  title: "加载成功",
+                  icon: 'none' });
 
-      /* uni.request({
-              	url: 'http://2019-a18.iterator-traits.com/apis/users',
-              	//method: 'POST',
-              	header: {
-              		'content-type': 'application/json', //自定义请求头信息
-              		'cookie': cookie
-              	},
-              	success: (res) => {
-              		console.log(res)
-              		console.log(res.data);
-              	}
-              }) */
+              } else {
+                setTimeout(function () {
+                  uni.pageScrollTo({
+                    scrollTop: _this2.scrollTop + 300,
+                    duration: 500 });
 
+                  console.log("top" + _this2.scrollTop);
+                }, 200);
+              }
+              _this2.activitylist = _this2.activitylist.concat(res.data.events);
+              _this2.activityindex += res.data.events.length;
+              _this2.more = res.data.more;
+              console.log(_this2.activitylist);
+            } else {
+              uni.showToast({
+                title: "加载失败",
+                icon: 'none' });
 
+            }
+            if (_this2.swiperList != []) {
+              uni.stopPullDownRefresh();
+            }
+          } });
+
+      }
     },
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
@@ -332,9 +312,18 @@ var app = getApp();var _default =
         url: "../activity/activity?id=" + id });
 
     },
-    like: function like(id) {var _this2 = this;
+    InputBlur: function InputBlur(e) {
+      console.log(e);
+    },
+    searchPage: function searchPage() {
+      console.log(this.keyword);
+      uni.navigateTo({
+        url: "../search/search?keyword=" + this.keyword });
+
+    },
+    like: function like(index) {var _this3 = this;
       uni.request({
-        url: app.globalData.apiurl + 'users/like/' + id,
+        url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id,
         method: 'POST',
         header: {
           'content-type': 'application/json', //自定义请求头信息
@@ -342,13 +331,8 @@ var app = getApp();var _default =
 
         success: function success(res) {
           console.log(res.data);
-          console.log(id);
-          var index = _this2.activitylist.findIndex(function (item) {
-            return item.event_id == id;
-          });
           console.log(index);
-          _this2.activitylist[index].like = res.data.like;
-          console.log(_this2.activitylist[index]);
+          _this3.activitylist[index].like = res.data.like;
         } });
 
     } } };exports.default = _default;

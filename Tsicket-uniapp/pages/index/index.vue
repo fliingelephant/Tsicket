@@ -1,30 +1,31 @@
 <template>
-	<view>
-		<view class="cu-bar search">
-			<text class="cuIcon-roundadd margin-left" style="font-size: 48rpx"></text>
+	<view class="flex-page">
+		<view class="cu-bar search animation-fade">
+			<!-- <text class="cuIcon-roundadd margin-left" style="font-size: 48rpx"></text> -->
 			<view class="search-form round">
 				<text class="cuIcon-search"></text>
-				<input @focus="InputFocus" @blur="InputBlur" :adjust-position="false" type="text" placeholder="搜索活动、组织(暂未实现功能)"
-				 confirm-type="search"></input>
+				<input v-model="keyword" @blur="InputBlur" :adjust-position="false" type="text" placeholder="根据活动名,组织搜索活动"
+				 confirm-type="search" @confirm="searchPage"></input>
 			</view>
 			<view class="action">
-				<button class="cu-btn shadow-blur round">搜索</button>
+				<button class="cu-btn shadow-blur round" @click="searchPage">搜索</button>
 			</view>
 		</view>
 		<swiper class="card-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
 		 :autoplay="true" interval="5000" duration="500" @change="cardSwiper" indicator-color="#8799a3"
 		 indicator-active-color="#0081ff">
 			<swiper-item v-for="(item,index) in swiperList" :key="index" :class="cardCur==index?'cur':''" @click="swiperActivity">
-				<view class="swiper-item">
+				<view class="swiper-item" :class="reload ? 'animation-fade' : '' ">
 					<image :src="item.img_url" mode="aspectFill"></image>
 					<!-- v-if="item.type=='image'" <video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video> -->
 				</view>
 			</swiper-item>
 		</swiper>
 		<view class="padding">
-			<scroll-view>
-				<activity-mini-card v-for="(item,index) in activitylist" :key="index" :activity="item" @like="like" @clickCard="activityPage"></activity-mini-card>
-			</scroll-view>
+			<view class="flex-column">
+				<activity-mini-card v-for="(item,index) in activitylist" :class="[item.delay?'animation-slide-bottom':'']" :style="[{animationDelay: item.delay}]"
+				 :key="index" :activity="item" @like="like(index)" @clickCard="activityPage"></activity-mini-card>
+			</view>
 		</view>
 	</view>
 	<!-- <view class="content">
@@ -41,29 +42,16 @@
 	export default {
 		data() {
 			return {
+				keyword: '',
+				scrollTop: 0,
+				activityindex: 0,
+				reload: false,
 				cardCur: 0,
+				more: true,
 				swiperList: [],
 				dotStyle: false,
-				towerStart: 0,
-				direction: '',
 				url: "/static/cardback0.jpg",
-				activitylist: [
-					//	{
-					// 	event_id: 0,
-					// 	event_name: '活动名',
-					// 	event_introdution: '活动介绍语',
-					// 	event_picture: '',
-					// 	left_tickets: 80,
-					// 	event_location: '活动地点',
-					// 	start_time: '2019年xx月xx日',
-					// 	end_time: '',
-					// 	sponsor_name: 'xx学生会',
-					// 	event_type: 1,
-					// 	event_status: 200,
-					// 	reserved: false,
-					// 	like: false
-					// }
-				],
+				activitylist: [],
 				current: 0,
 				tabs: [
 					"介绍", "动态"
@@ -79,52 +67,30 @@
 				console.log('nocookie')
 				app.globalData.cookieReadyCallback = this.loadpage
 			}
-			
+
 			uni.showShareMenu({})
-			// app.globalData.cookieReadyCallback = function(res) {
-			// 	uni.request({
-			// 		url: 'http://2019-a18.iterator-traits.com/apis/users/broadcast',
-			// 		//method: 'POST',
-			// 		/* data: {
-			// 			index: 0
-			// 		}, */
-			// 		header: {
-			// 			'content-type': 'application/json', //自定义请求头信息
-			// 			'cookie': app.globalData.cookie
-			// 		},
-			// 		success: (res) => {
-			// 			console.log(res.data);
-			// 		}
-			// 	})
-			// }
-			//console.log(app.cookieReadyCallback)
+
+		},
+		onPageScroll(res) {
+			this.scrollTop = res.scrollTop
+		},
+		onPullDownRefresh() {
+			this.more = true
+			this.activityindex = 0
+			this.loadpage()
+		},
+		onReachBottom() {
+			this.loadactivity(false)
 		},
 		onShareAppMessage(res) {
 			return {
-			    title: app.globalData.sharetitle,
-			    path: '/pages/index/index',
+				title: app.globalData.sharetitle,
+				path: '/pages/index/index',
 				imageUrl: app.globalData.shareimg
 			}
 		},
 		methods: {
-			loadpage(cookie) {
-				console.log('cookieReadyCallback')
-				console.log(cookie)
-				/* uni.request({
-					url: 'http://2019-a18.iterator-traits.com/apis/users/newactivities',
-					method: 'POST',
-					data: {
-						index: 0
-					},
-					header: {
-						'content-type': 'application/json', //自定义请求头信息
-						'cookie': cookie
-					},
-					success: (res) => {
-						
-						console.log(res);
-					}
-				}) */
+			loadpage() {
 				uni.showLoading({
 					title: '加载中'
 				})
@@ -135,58 +101,72 @@
 						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
+						this.swiperList = []
+						this.reload = false
 						console.log(res)
 						console.log(res.data);
 						this.swiperList = res.data.list
+						this.reload = true
 						if (this.activitylist != []) {
-							uni.showToast({
-								title: '加载成功',
-								icon: 'none',
-							})
+							uni.stopPullDownRefresh()
 						}
 					}
 				})
-				uni.request({
-					url: app.globalData.apiurl + 'admins',
-					//method: 'POST',
-					/* data: {
-						index: 0
-					}, */
-					header: {
-						'content-type': 'application/json', //自定义请求头信息
-						'cookie': cookie
-					},
-					success: (res) => {
-						console.log(res)
-						console.log(res.data)
-						var temp = res.data.events
-						temp.forEach(res => {
-							res.like = true
-						})
-						this.activitylist = temp
-						console.log(this.activitylist)
-						if (this.swiperList != []) {
-							uni.showToast({
-								title: '加载成功',
-								icon: 'none',
-							})
+				this.loadactivity(true)
+			},
+			loadactivity(reload) {
+				if (this.more) {
+					uni.request({
+						url: app.globalData.apiurl + 'users/index',
+						data: {
+							index: this.activityindex
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res)
+							console.log(res.data)
+							if (res.data.events) {
+								res.data.events.forEach((res, index) => {
+									//res.like = true
+									res.delay = '' + (index + 5) * 0.1 + 's'
+									setTimeout(() => {
+										res.delay = undefined
+									}, (index + 11) * 100)
+								})
+								if (reload) {
+									this.activitylist = []
+									uni.showToast({
+										title: "加载成功",
+										icon: 'none'
+									})
+								} else {
+									setTimeout(() => {
+										uni.pageScrollTo({
+											scrollTop: this.scrollTop + 300,
+											duration: 500,
+										})
+										console.log("top" + this.scrollTop)
+									}, 200)
+								}
+								this.activitylist = this.activitylist.concat(res.data.events)
+								this.activityindex += res.data.events.length
+								this.more = res.data.more
+								console.log(this.activitylist)
+							} else {
+								uni.showToast({
+									title: "加载失败",
+									icon: 'none'
+								})
+							}
+							if (this.swiperList != []) {
+								uni.stopPullDownRefresh()
+							}
 						}
-					}
-				})
-				/* uni.request({
-					url: 'http://2019-a18.iterator-traits.com/apis/users',
-					//method: 'POST',
-					header: {
-						'content-type': 'application/json', //自定义请求头信息
-						'cookie': cookie
-					},
-					success: (res) => {
-						console.log(res)
-						console.log(res.data);
-					}
-				}) */
-
-
+					})
+				}
 			},
 			cardSwiper(e) {
 				this.cardCur = e.detail.current
@@ -199,9 +179,18 @@
 					url: "../activity/activity?id=" + id,
 				})
 			},
-			like(id) {
+			InputBlur(e) {
+				console.log(e)
+			},
+			searchPage(){
+				console.log(this.keyword)
+				uni.navigateTo({
+					url: "../search/search?keyword=" + this.keyword
+				})
+			},
+			like(index) {
 				uni.request({
-					url: app.globalData.apiurl + 'users/like/' + id,
+					url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id,
 					method: 'POST',
 					header: {
 						'content-type': 'application/json', //自定义请求头信息
@@ -209,13 +198,8 @@
 					},
 					success: (res) => {
 						console.log(res.data)
-						console.log(id)
-						var index = this.activitylist.findIndex((item) => {
-							return item.event_id == id
-						})
 						console.log(index)
 						this.activitylist[index].like = res.data.like
-						console.log(this.activitylist[index])
 					}
 				});
 			}
@@ -262,7 +246,6 @@
 	}
 
 	.activity-list {
-
 		padding: 10rpx;
 	}
 </style>

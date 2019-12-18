@@ -161,90 +161,43 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var app = getApp();var _default =
 
 {
   data: function data() {
     return {
-      messagelist: [{
-        "id": 0,
-        text: "测试文本123412351123",
-        "appreciate": false,
-        activity: {
-          id: 0,
-          name: '活动名',
-          intro: '活动介绍语',
-          tickets: 80,
-          location: '活动地点',
-          start: '2019年xx月xx日',
-          end: '',
-          sponsorid: 100,
-          sponsorname: 'xx学生会',
-          type: 1,
-          state: 200 },
-
-        sponsor: {
-          id: 0,
-          avatarUrl: '',
-          name: 'xx学生会' } },
-
-
-      {
-        "id": 1,
-        text: "测试文本12341231231245124",
-        "appreciate": false,
-        activity: {
-          id: 1,
-          name: '活动名1',
-          intro: '活动介绍语',
-          tickets: 80,
-          location: '活动地点',
-          start: '2019年xx月xx日',
-          end: '',
-          sponsorid: 100,
-          sponsorname: 'xx学生会',
-          type: 1,
-          state: 200 },
-
-        sponsor: {
-          id: 1,
-          avatarUrl: '',
-          name: 'xx学生会2' } },
-
-
-      {
-        "id": 2,
-        text: "测试文本123532151212341233",
-        "appreciate": false,
-        activity: {
-          id: 2,
-          name: '活动名2',
-          intro: '活动介绍语',
-          tickets: 80,
-          location: '活动地点',
-          start: '2019年xx月xx日',
-          end: '',
-          sponsorid: 100,
-          sponsorname: 'xx学生会',
-          type: 1,
-          state: 200 },
-
-        sponsor: {
-          id: 2,
-          avatarUrl: '',
-          name: 'xx学生会3' } }],
-
-
-
+      momentlist0: [],
+      momentmore0: true,
+      momentindex0: 0,
+      momentlist1: [],
+      momentmore1: true,
+      momentindex1: 0,
+      momentlist2: [],
+      momentindex2: 0,
+      momentanimation: ['animation-slide-bottom', 'animation-slide-right', 'animation-slide-right'],
       current: 0,
       tabs: [
-      "参加", "关注收藏", "广场"] };
-
+      "喜爱", "关注" //, "广场"
+      ] };
 
   },
   onLoad: function onLoad() {
+    this.loadpage();
     uni.showShareMenu({});
+  },
+  onPullDownRefresh: function onPullDownRefresh() {
+    this.momentanimation[this.current] = 'animation-slide-bottom';
+    this.loadpage();
   },
   onShareAppMessage: function onShareAppMessage(res) {
     return {
@@ -254,10 +207,30 @@ var app = getApp();var _default =
 
   },
   methods: {
-    cardSwiper: function cardSwiper(e) {
-      this.cardCur = e.detail.current;
+    loadpage: function loadpage() {
+      if (this.current == 0) {
+        this.momentlist0 = [];
+        this.momentmore0 = true;
+        this.momentindex0 = 0;
+      } else if (this.current == 1) {
+        this.momentlist1 = [];
+        this.momentmore1 = true;
+        this.momentindex1 = 0;
+      } else {
+        this.momentlist2 = [];
+        this.momentmore2 = true;
+        this.momentindex2 = 0;
+      }
+      this.loadmoment();
     },
     tabSelect: function tabSelect(e) {
+      if (this.current == e.currentTarget.dataset.id) {
+        this.current = e.currentTarget.dataset.id;
+        uni.showLoading({
+          title: '刷新中' });
+
+        this.loadpage();
+      }
       this.current = e.currentTarget.dataset.id;
     },
     navChange: function navChange(index) {
@@ -265,10 +238,85 @@ var app = getApp();var _default =
     },
     swiperChange: function swiperChange(e) {
       this.current = e.detail.current;
+      console.log(this.current);
+      this.loadmoment();
     },
-    appreciate: function appreciate(e, id) {
+    loadmoment: function loadmoment(e) {var _this = this;
       console.log(e);
-      console.log(id);
+      if (this.current == 0 && this.momentindex0 != -1) {
+        uni.request({
+          url: app.globalData.apiurl + 'users/momentslike',
+          data: {
+            index: this.momentindex0 },
+
+          header: {
+            'content-type': 'application/json', //自定义请求头信息
+            'cookie': app.globalData.cookie },
+
+          success: function success(res) {
+            console.log(res.data);
+            res.data.moments.forEach(function (item, index) {
+              item.delay = '' + (index + 1) * 0.1 + 's';
+              setTimeout(function () {
+                item.delay = undefined;
+              }, (index + 11) * 100);
+            });
+            _this.momentlist0 = _this.momentlist0.concat(res.data.moments);
+            _this.momentmore0 = res.data.more;
+            _this.momentindex0 += res.data.moments.length;
+            uni.hideLoading();
+          } });
+
+      } else if (this.current == 1 && this.momentindex1 != -1) {
+        uni.request({
+          url: app.globalData.apiurl + 'users/momentsfollow',
+          data: {
+            index: this.momentindex1 },
+
+          header: {
+            'content-type': 'application/json', //自定义请求头信息
+            'cookie': app.globalData.cookie },
+
+          success: function success(res) {
+            console.log(res.data);
+            res.data.moments.forEach(function (item, index) {
+              item.delay = '' + (index + 1) * 0.1 + 's';
+              setTimeout(function () {
+                item.delay = undefined;
+              }, (index + 11) * 100);
+            });
+            _this.momentlist1 = _this.momentlist1.concat(res.data.moments);
+            _this.momentmore1 = res.data.more;
+            _this.momentindex1 += res.data.moments.length;
+            uni.hideLoading();
+          } });
+
+      } else if (this.current == 2 && this.momentindex2 != -1) {
+        uni.request({
+          url: app.globalData.apiurl + 'users/moments/like',
+          data: {
+            index: this.momentmore2 },
+
+          header: {
+            'content-type': 'application/json', //自定义请求头信息
+            'cookie': app.globalData.cookie },
+
+          success: function success(res) {
+            console.log(res.data);
+            res.data.moments.forEach(function (item, index) {
+              item.delay = '' + (index + 1) * 0.1 + 's';
+              setTimeout(function () {
+                item.delay = undefined;
+              }, (index + 11) * 100);
+            });
+            _this.momentlist2 = _this.momentlist2.concat(res.data.moments);
+            _this.momentmore2 = res.data.more;
+            uni.hideLoading();
+          } });
+
+      }
+    },
+    appreciate: function appreciate(id) {
       uni.request({
         url: app.globalData.apiurl + 'users/appreciate',
         method: 'POST',

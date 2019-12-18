@@ -4,10 +4,10 @@
 		<view class="card-back" :class="{'unfold':isUnfold}"></view>
 		<view class="info padding flex align-start justify-between text-white" @click="isUnfold=!isUnfold">
 			<view class="text-left flex-column info-flex">
-				<view class="text-xxl">{{activity.name}}
+				<view class="text-xxl">{{activity.event_name}}
 					<view class="line-round"></view>
-					<view class="text-df">{{activity.start}}</view>
-					<view class="text-df">{{activity.location}}</view>
+					<view class="text-df">{{activity.start_time}}</view>
+					<view class="text-df">{{activity.event_location}}</view>
 					<view class="text-df">其他信息</view>
 				</view>
 				<view class="text-df"></view>
@@ -16,21 +16,21 @@
 				<view>
 					<view class="text-sm">资格审核中</view>
 				</view>
-				<view class="flex align-end justify-end" @click.stop="$emit('clickSponsor', sponsor.id)">
-					<view class="padding-right-xs text-sm">{{activity.sponsorname}}</view>
-					<view class="cu-avatar round solids"></view>
+				<view class="flex align-end justify-end" @click.stop="$emit('clickSponsor', activity.sponsor_name)">
+					<view class="padding-right-xs text-sm">{{activity.sponsor_name}}</view>
+					<view class="cu-avatar round solids" :style="{backgroundImage: 'url(' + activity.sponsor_avatar + ')'}"></view>
 				</view>
 			</view>
 		</view>
 		<view class="toolbar flex align-stretch text-center" :class="{'unfold':isUnfold}">
-			<view class="flex-sub flex align-center justify-center" @click="$emit('detail', message.id)">
+			<view class="flex-sub flex align-center justify-center" @click="$emit('detail', activity.event_id)">
 				<text class="cuIcon-news" @click.stop="$emit('detail', activity.id)"></text>
 			</view>
-			<view class="flex-sub flex align-center justify-center" @click="$emit('cancel', message.id)">
+			<view class="flex-sub flex align-center justify-center" @click="$emit('cancel', activity.event_id)">
 				<text class="cuIcon-delete" @click.stop="$emit('cancel', activity.id)"></text>
 			</view>
-			<view class="flex-sub flex align-center justify-center" @click="$emit('like', message.id)">
-				<text class="cuIcon-like" @click.stop="$emit('like', activity.id)"></text>
+			<view class="flex-sub flex align-center justify-center" @click="$emit('like', activity.event_id)">
+				<text class="cuIcon-like" @click.stop="$emit('like', activity.event_id)"></text>
 			</view>
 		</view>
 	</view>

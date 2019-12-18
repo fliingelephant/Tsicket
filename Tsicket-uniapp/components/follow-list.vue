@@ -1,6 +1,7 @@
 <template>
 	<view class="follow-list">
-		<view v-for="(item, index) in followlist" :key="index" class="listitem padding-lr flex align-center justify-between text-black" @click="$emit('clickitem',index)">
+		<view v-for="(item, index) in followlist" :key="index" class="listitem padding-lr flex align-center justify-between text-black"
+		 :class="[item.delay?'animation-slide-right':'']" :style="[{animationDelay: item.delay}]" @click="$emit('clickitem',index)">
 			<view class="flex align-center">
 				<view class="cu-avatar round margin-right" :style="{backgroundImage: 'url(' + item.avatar_url + ')'}"></view>
 				<text>{{item.name}}</text>
@@ -27,14 +28,14 @@
 </script>
 
 <style>
-	.listitem{
+	.listitem {
 		margin-bottom: 20rpx;
 		width: 100%;
 		height: 100rpx;
 		border-radius: 20rpx 20rpx 20rpx 20rpx;
 		background-color: #F2F2F2;
 	}
-	
+
 	.collapse {
 		width: 100%;
 		padding: 40rpx 40rpx 40rpx 40rpx;
@@ -88,18 +89,16 @@
 	.tab-swiper-view {
 		height: calc(100vh - 480rpx - 80rpx)
 	}
-	
+
 	.like {
 		font-size: 60rpx;
 	}
-	
+
 	.follow-icon {
 		font-size: 48rpx;
 	}
-	
+
 	.cuIcon-likefill {
 		transition: opacity 1s ease-in 0s;
 	}
-	
-	
 </style>

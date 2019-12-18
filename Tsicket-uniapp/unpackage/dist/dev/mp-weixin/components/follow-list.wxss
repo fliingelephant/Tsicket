@@ -1,5 +1,5 @@
 
-.listitem{
+.listitem {
 	margin-bottom: 20rpx;
 	width: 100%;
 	height: 100rpx;
@@ -68,6 +68,4 @@
 	-webkit-transition: opacity 1s ease-in 0s;
 	transition: opacity 1s ease-in 0s;
 }
-
-
 

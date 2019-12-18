@@ -9,6 +9,12 @@ image.card {
 	justify-content: space-between;
 }
 
+.flex-column {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
 .tabs {
 	flex-grow: 1;
 	width: 100%;

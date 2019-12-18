@@ -28,4 +28,46 @@
 .tab-swiper-view {
 	height: calc(100vh - 400rpx - 80rpx)
 }
+.animation-delete-slide-left {
+	-webkit-animation-duration: .8s;
+	        animation-duration: .8s;
+	-webkit-animation-timing-function: ease-in-out;
+	        animation-timing-function: ease-in-out;
+	-webkit-animation-fill-mode: both;
+	        animation-fill-mode: both;
+	-webkit-animation-name: delete-slide-left;
+	        animation-name: delete-slide-left
+}
+@-webkit-keyframes delete-slide-left {
+0% {
+		opacity: 1;
+}
+70% {
+		opacity: 0;
+		-webkit-transform: translateX(-150%);
+		        transform: translateX(-150%);
+		height: 440rpx;
+}
+100% {
+		-webkit-transform: translateX(-150%);
+		        transform: translateX(-150%);
+		height: 1rpx;
+}
+}
+@keyframes delete-slide-left {
+0% {
+		opacity: 1;
+}
+70% {
+		opacity: 0;
+		-webkit-transform: translateX(-150%);
+		        transform: translateX(-150%);
+		height: 440rpx;
+}
+100% {
+		-webkit-transform: translateX(-150%);
+		        transform: translateX(-150%);
+		height: 1rpx;
+}
+}
 
