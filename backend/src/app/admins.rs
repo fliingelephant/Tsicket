@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use super::{ADMIN_ID, ADMIN_PASSWORD_WITH_SALT, EVENT_LIST};
 use super::events::{QueryEventByID};
 use super::update::{update_events};
-use crate::db::admins;
+use crate::db::{admins, sponsors};
 
 use crate::utils::auth::{identify_admin};
 
@@ -339,5 +339,22 @@ pub fn cancel_advertise(
             }
         }
         Err(_) => Ok(HttpResponse::Unauthorized().finish())
+    })
+}
+
+#[allow(dead_code)]
+pub fn get_sponsor_info(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            let sponsor_name = req.match_info().query("sponsor_name").to_string();
+            match sponsors::get_info_by_name(&sponsor_name) {
+                Ok(sponsor) => Ok(HttpResponse::Ok().json(sponsor)),
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
+            }
+        },
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
