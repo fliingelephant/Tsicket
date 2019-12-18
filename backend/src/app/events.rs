@@ -108,6 +108,7 @@ pub struct EventInfoWithSponsorAvatar {
     pub event_introduction: String,
     pub event_picture: String,
     pub event_capacity: i32,
+    pub event_status: i8,
     pub current_participants: i32,
     pub left_tickets: i32,
     pub event_location: String,
@@ -153,6 +154,7 @@ pub fn get_event_info(
                 event_capacity: event.event_capacity,
                 current_participants: event.current_participants,
                 left_tickets: event.left_tickets,
+                event_status: event.event_status,
                 event_location: event.event_location.clone(),
             }))
         } else {
@@ -193,6 +195,7 @@ pub fn alter_event_info(
                     event.event_type = alter_event.event_type;
                     event.event_introduction = alter_event.event_introduction.clone();
                     event.event_picture = alter_event.event_picture.clone();
+                    event.event_status %= 10; 
                     event.left_tickets += alter_event.event_capacity - event.event_capacity;
                     if event.left_tickets < 0 {
                         event.left_tickets = 0;
