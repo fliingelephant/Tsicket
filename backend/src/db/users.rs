@@ -65,7 +65,7 @@ pub fn set_tsinghua_id(id: &String, tsinghua_id: &String)->Result<(), String>{
 }
 
 pub fn check_user_by_id(id: &String)->Result<bool, String>{
-    let command = format!("select count(*) from user_account where account_id='{id}';", id=id);
+    let command = format!("SELECT COUNT(*) FROM user_account WHERE account_id='{id}';", id=id);
 
     let res = POOL.prep_exec(command, ());
     match res {

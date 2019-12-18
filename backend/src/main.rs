@@ -146,7 +146,6 @@ fn main() {
 //    match s {
 //        Err(e) => println!("{}", e),
 //        Ok(o) => {
-//            println!("{}", o.len());
 //            for sponsor in o{
 //                println!("id:{}, name:{}, head:{}, email:{}, number:{}",
 //                         sponsor.id, sponsor.sponsor_name, sponsor.head_portrait, sponsor.email, sponsor.phone_number);

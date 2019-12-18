@@ -241,7 +241,6 @@ pub fn get_all_sponsor_info()->Result<Vec<Sponsor>, String>{
     let mut sponsors: Vec<Sponsor> = Vec::new();
     for row in res.unwrap(){
         let info = row.unwrap().unwrap();
-        println!("{}", info.len());
         let sponsor = Sponsor{
             id: format_string(&info[0].as_sql(true)),
             sponsor_name: format_string(&info[1].as_sql(true)),
