@@ -24,7 +24,7 @@
             <el-col :span="16">
               <!--上传图片-->
               <el-upload
-                :action="url+new Date().toISOString()"
+                :action="url+time_string"
                 :limit="9"
                 multiple
                 accept="image/png,image/jpeg"
@@ -33,7 +33,8 @@
                 :on-remove="handleRemove"
                 :on-success="uploadSuccess"
                 :on-error="uploadError"
-                :show-file-list="true">
+                :show-file-list="true"
+                >
                 <i class="el-icon-plus"></i>
               </el-upload>
             </el-col>
@@ -61,14 +62,38 @@
                 filelist:[],
                 url:'apis/sponsors/pic/',
                 script:'这是一个动态',
-                picture:''
+                picture:'',
+                event_name:'',
+                time_string:'',
             })
         },
         methods:{
+            getEventName(){
+                let data={
+                    "event_id":this.$route.params.id
+                }
+                this.$axios.post("/events/view",data).then(response => {
+                    if(response.status===200) {
+                        this.event_name=response.data.event_name
+                    }
+                    else{
+                        this.$message({
+                            message: '查询活动名称失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+                    this.$message({
+                        message: '查询活动名称失败',
+                        type: 'error'
+                    })
+                })
+            },
             pageReturn() {
                 this.$router.push('/EventInfo/'+this.$route.params.id)
             },
             beforeUploadPicture(file) {
+                this.time()
                 if(file.size > 10*1024*1024){
                     this.$message.error("上传图片不能大于10M");
                     return false;
@@ -99,6 +124,7 @@
                         pics.push(this.filelist[i].url)
                     }
                     let data = {
+                        "event_name": this.event_name,
                         "text": this.script,
                         "pictures": pics
                     }
@@ -118,7 +144,14 @@
                         })
                     })
                 }
+            },
+            time(){
+                this.time_string=new Date().toISOString()
             }
+        },
+        mounted(){
+            this.getEventName()
+            this.time()
         }
     }
 </script>

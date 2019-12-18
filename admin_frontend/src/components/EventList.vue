@@ -50,7 +50,7 @@
             <el-button @click="eventInfo(scope.row)" type="text" size="small">查看</el-button>
             <el-button @click="changeEvent(scope.row)" type="text" size="small">编辑</el-button>
             <el-button v-if="stop_state.indexOf(scope.row.event_status)!==-1" type="text" size="small"  @click="stopEvent(scope.row)">结束抢票</el-button>
-            <el-button v-if="cancel_state.indexOf(scope.row.event_status)!==-1" disabled type="text" size="small" >取消活动</el-button>
+            <el-button v-if="cancel_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="cnacelEvent(scope.row)">取消活动</el-button>
             <el-button v-if="apply_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="postApply(scope.row)">申请推广</el-button>
             <el-button v-if="drop_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="dropApply(scope.row)">撤销推广申请</el-button>
           </template>
@@ -99,7 +99,7 @@
                     23 : "抢票结束",
                     24 : "活动取消"
                 },
-                cancel_state: [],
+                cancel_state: [0,1,2,10,11,12,20,21,22],
                 stop_state: [1,2,11,12,21,22],
                 apply_state: [1,2],
                 drop_state : [11,12],
@@ -204,26 +204,59 @@
                 })
             },
             stopEvent(row){
-                let data={
-                    "event_id": row.event_id
-                }
-                this.$axios.delete("/sponsors/book/"+row.event_id).then(response => {
-                    if (response.status === 200) {
-                        this.$router.go(0)
+                this.$confirm('提前终止抢票不可撤回，是否确认提前终止抢票？','请确认',{
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
 
-                    } else {
+                }).then(()=>{
+                    this.$axios.delete("/sponsors/book/"+row.event_id).then(response => {
+                        if (response.status === 200) {
+                            this.$router.go(0)
+
+                        }
+                        else {
+                            this.$message({
+                                message: '处理失败',
+                                type: 'error'
+                            })
+                        }
+                    },err=>{
                         this.$message({
                             message: '处理失败',
                             type: 'error'
                         })
-                    }
-                },err=>{
-                    this.$message({
-                        message: '处理失败',
-                        type: 'error'
                     })
-                })
+
+                }).catch(()=>{})
             },
+            cnacelEvent(row) {
+                this.$confirm('取消活动不可撤回，是否确认取消活动？','请确认',{
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+
+                }).then(()=>{
+                    this.$axios.put("/admins/cancel/"+row.event_id).then(response => {
+                        if (response.status === 200) {
+                            this.$router.go(0)
+
+                        } else {
+                            this.$message({
+                                message: '处理失败',
+                                type: 'error'
+                            })
+                        }
+                    },err=>{
+                        this.$message({
+                            message: '处理失败',
+                            type: 'error'
+                        })
+                    })
+
+                }).catch(()=>{})
+
+            }
         },
     }
 </script>

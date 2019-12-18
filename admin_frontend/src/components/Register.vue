@@ -10,7 +10,7 @@
 
         <el-form-item>
           <el-row :gutter="20">
-            <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>用户ID</div></el-col>
+            <el-col :span="4"><div class="register-text"><a class="compulsory">*</a>主办方ID</div></el-col>
             <el-col :span="12">
               <el-input
                     type="text"

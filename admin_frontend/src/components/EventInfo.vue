@@ -3,8 +3,8 @@
 
     <el-header class="header">
       <el-row>
-        <el-col :span="16"><div>活动详情</div></el-col>
-        <el-col :span="4"><div class="add-event"><el-button @click="addNotice" disabled>发布通知</el-button></div></el-col>
+        <el-col :span="20"><div>活动详情</div></el-col>
+<!--        <el-col :span="4"><div class="add-event"><el-button @click="addNotice" disabled>发布通知</el-button></div></el-col>-->
         <el-col :span="4"><div class="add-event"><el-button @click="addMoment">添加动态</el-button></div></el-col>
       </el-row>
     </el-header>
