@@ -120,18 +120,16 @@ pub fn cancel_event(event_id: &String)->Result<(), String>{
     match rs {
         Err(e) => return Err(e.to_string()),
         Ok(o) => {
-            if o{
-                return Ok(());
-            }
-            else{
+            if o {
+                let command = format!("UPDATE event SET event_status='4' WHERE event_id='{event_id}'", event_id=event_id);
+                let res = POOL.prep_exec(command, ());
+                match res {
+                    Err(e) => return Err(e.to_string()),
+                    Ok(o) => return Ok(()),
+                }
+            } else {
                 return Err("No such event.".to_string());
             }
         }
-    }
-    let command = format!("UPDATE event SET event_status='4' WHERE event_id='{event_id}'", event_id=event_id);
-    let res = POOL.prep_exec(command, ());
-    match res {
-        Err(e) => return Err(e.to_string()),
-        Ok(o) => return Ok(()),
     }
 }
