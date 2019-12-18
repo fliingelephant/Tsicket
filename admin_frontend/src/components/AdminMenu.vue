@@ -38,7 +38,7 @@
           >
             <template slot-scope="scope">
               <el-button @click="eventInfo(scope.row)" type="text" size="small">查看</el-button>
-              <el-button v-if="pass_state.indexOf(scope.row.event_status)!==-1" @click="passExamine(scope.row)" type="text" size="small">通过审核</el-button>
+              <el-button v-if="pass_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="passExamine(scope.row)">通过审核</el-button>
               <el-button v-if="post_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="passAdvertise(scope.row)">通过推广申请</el-button>
               <el-button v-if="drop_state.indexOf(scope.row.event_status)!==-1" type="text" size="small" @click="dropAdvertise(scope.row)">中止推广</el-button>
             </template>
@@ -59,6 +59,37 @@
 
 
       </el-tab-pane>
+      <el-tab-pane label="主办方信息" name="second">
+        <el-table
+                :data="sponsors.slice((sponsor_page-1)*sponsor_size,sponsor_page*sponsor_size)"
+                style="width: 100%">
+
+          <el-table-column
+                  prop="sponsor_name"
+                  label="主办方名称">
+          </el-table-column>
+
+          <el-table-column
+                  prop="phone_number"
+                  label="电话号码">
+          </el-table-column>
+
+          <el-table-column
+                  prop="email"
+                  label="电子邮箱">
+          </el-table-column>
+
+        </el-table>
+        <el-pagination
+                @size-change="sponsorSizeChange"
+                @current-change="sponsorCurrentChange"
+                :current-page="sponsor_page"
+                :page-sizes="[10, 20]"
+                :page-size="sponsor_size"
+                :total="sponsors.length"
+                layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+      </el-tab-pane>
 
     </el-tabs>
     </el-main>
@@ -73,6 +104,7 @@
         data() {
             return {
                 events:[],
+                sponsors:[],
                 states: {
                     0 : "待审核",
                     1 : "抢票未开始",
@@ -95,11 +127,14 @@
                 drop_state:[21,22],
                 activeName: 'first',
                 currentPage:1,
-                pageSize:10
+                pageSize:10,
+                sponsor_page:1,
+                sponsor_size:10,
             };
         },
         mounted(){
             this.getEvents()
+            this.getSponsors()
         },
         methods: {
             getEvents(){
@@ -122,11 +157,35 @@
                     })
                 })
             },
+            getSponsors(){
+                this.$axios.get('/admins/sponsors').then(response => {
+                    if (response.status === 200) {
+                        this.sponsors=response.data.sponsors
+
+                    } else {
+                        this.$message({
+                            message: '获取活动失败',
+                            type: 'error'
+                        })
+                    }
+                },err=>{
+                    this.$message({
+                        message: '获取活动失败',
+                        type: 'error'
+                    })
+                })
+            },
             handleSizeChange: function(val) {
                 this.pageSize = val;
             },
             handleCurrentChange: function(page) {
                 this.currentPage = page;
+            },
+            sponsorSizeChange: function(val) {
+                this.sponsor_size = val;
+            },
+            sponsorCurrentChange: function(page) {
+                this.sponsor_page = page;
             },
             eventInfo(row){
                 this.$router.push('/AdminEvent/'+row.event_id)
