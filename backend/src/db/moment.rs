@@ -7,6 +7,7 @@ use crate::db::users;
 pub struct Moment {
      pub sponsor_name: String,
      pub event_id: String,
+     pub event_name: String,
      pub moment_id: String,
      pub text: String,
      pub pictures: Vec<String>,
@@ -60,7 +61,7 @@ pub fn get_event_moments_sorted(event_id: &String) ->Result<Vec<Moment>, String>
      let mut moments:Vec<Moment> = Vec::new();
      for row in res.unwrap(){
          let info = row.unwrap().unwrap();
-         let pcs = format_string(&info[4].as_sql(true));
+         let pcs = format_string(&info[5].as_sql(true));
          let pts: Vec<&str> = pcs.split('&').collect();
          let mut pictures: Vec<String> = Vec::new();
          for pc in pts{
@@ -69,10 +70,11 @@ pub fn get_event_moments_sorted(event_id: &String) ->Result<Vec<Moment>, String>
          let moment = Moment{
              sponsor_name: format_string(&info[0].as_sql(true)),
              event_id: format_string(&info[1].as_sql(true)),
-             moment_id: format_string(&info[2].as_sql(true)),
-             text: format_string(&info[3].as_sql(true)),
+             event_name: format_string(&info[2].as_sql(true)),
+             moment_id: format_string(&info[3].as_sql(true)),
+             text: format_string(&info[4].as_sql(true)),
              pictures,
-             time: format_string(&info[5].as_sql(true))
+             time: format_string(&info[6].as_sql(true))
          };
          moments.push(moment);
      }
@@ -90,7 +92,7 @@ pub fn get_sponsor_moments_sorted(sponsor_name: &String) ->Result<Vec<Moment>, S
     let mut moments:Vec<Moment> = Vec::new();
     for row in res.unwrap(){
         let info = row.unwrap().unwrap();
-        let pcs = format_string(&info[3].as_sql(true));
+        let pcs = format_string(&info[5].as_sql(true));
         let pts: Vec<&str> = pcs.split('&').collect();
         let mut pictures: Vec<String> = Vec::new();
         for pc in pts{
@@ -99,10 +101,11 @@ pub fn get_sponsor_moments_sorted(sponsor_name: &String) ->Result<Vec<Moment>, S
         let moment = Moment{
             sponsor_name: format_string(&info[0].as_sql(true)),
             event_id: format_string(&info[1].as_sql(true)),
-            moment_id: format_string(&info[2].as_sql(true)),
-            text: format_string(&info[3].as_sql(true)),
+            event_name: format_string(&info[2].as_sql(true)),
+            moment_id: format_string(&info[3].as_sql(true)),
+            text: format_string(&info[4].as_sql(true)),
             pictures,
-            time: format_string(&info[5].as_sql(true))
+            time: format_string(&info[6].as_sql(true))
         };
         moments.push(moment);
     }
@@ -164,7 +167,7 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                 Ok(o) => {
                     for row in o{
                         let info = row.unwrap().unwrap();
-                        let pcs = format_string(&info[3].as_sql(true));
+                        let pcs = format_string(&info[5].as_sql(true));
                         let pts: Vec<&str> = pcs.split('&').collect();
                         let mut pictures: Vec<String> = Vec::new();
                         for pc in pts{
@@ -173,10 +176,11 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                         let moment = Moment{
                             sponsor_name: format_string(&info[0].as_sql(true)),
                             event_id: format_string(&info[1].as_sql(true)),
-                            moment_id: format_string(&info[2].as_sql(true)),
-                            text: format_string(&info[3].as_sql(true)),
+                            event_name: format_string(&info[2].as_sql(true)),
+                            moment_id: format_string(&info[3].as_sql(true)),
+                            text: format_string(&info[4].as_sql(true)),
                             pictures,
-                            time: format_string(&info[5].as_sql(true))
+                            time: format_string(&info[6].as_sql(true))
                         };
                         moments.push(moment);
                     }
@@ -209,7 +213,7 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                 Ok(o) => {
                     for row in o{
                         let info = row.unwrap().unwrap();
-                        let pcs = format_string(&info[3].as_sql(true));
+                        let pcs = format_string(&info[5].as_sql(true));
                         let pts: Vec<&str> = pcs.split('&').collect();
                         let mut pictures: Vec<String> = Vec::new();
                         for pc in pts{
@@ -218,10 +222,11 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                         let moment = Moment{
                             sponsor_name: format_string(&info[0].as_sql(true)),
                             event_id: format_string(&info[1].as_sql(true)),
-                            moment_id: format_string(&info[2].as_sql(true)),
-                            text: format_string(&info[3].as_sql(true)),
+                            event_name: format_string(&info[2].as_sql(true)),
+                            moment_id: format_string(&info[3].as_sql(true)),
+                            text: format_string(&info[4].as_sql(true)),
                             pictures,
-                            time: format_string(&info[5].as_sql(true))
+                            time: format_string(&info[6].as_sql(true))
                         };
                         moments.push(moment);
                     }
