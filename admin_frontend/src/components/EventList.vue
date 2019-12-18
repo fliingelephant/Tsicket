@@ -142,7 +142,7 @@
             },
             getEvents(){
                 if(!!this.$store.state.username){
-                    this.$axios.get("/sponsors").then(response => {
+                    this.$axios.get("/sponsors/events").then(response => {
                         if(response.status===200) {
                             this.events=response.data.events
                             for(let i=0 ; i< this.events.length; i++){
