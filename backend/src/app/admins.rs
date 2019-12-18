@@ -358,3 +358,21 @@ pub fn get_sponsor_info(
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
+
+#[allow(dead_code)]
+pub fn get_all_sponsor_info(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            let sponsor_name = req.match_info().query("sponsor_name").to_string();
+            /*match sponsors::get_
+                Ok(sponsor) => Ok(HttpResponse::Ok().json(sponsor)),
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
+            }*/
+            Ok(HttpResponse::NotImplemented().finish())
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
