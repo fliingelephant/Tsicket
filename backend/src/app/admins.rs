@@ -359,20 +359,24 @@ pub fn get_sponsor_info(
     })
 }
 
+#[derive(Serialize)]
+pub struct AllSponsorInfo {
+    pub sponsors: Vec<sponsors::Sponsor>
+}
+
 #[allow(dead_code)]
 pub fn get_all_sponsor_info(
     id: Identity,
-    req: HttpRequest
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_admin(&id) {
         Ok(_) => {
-            let sponsor_name = req.match_info().query("sponsor_name").to_string();
-            /*match sponsors::get_
-                Ok(sponsor) => Ok(HttpResponse::Ok().json(sponsor)),
+            match sponsors::get_all_sponsor_info() {
+                Ok(sponsors) => Ok(HttpResponse::Ok().json(AllSponsorInfo {
+                    sponsors: sponsors
+                })),
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
-            }*/
-            Ok(HttpResponse::NotImplemented().finish())
+            }
         }
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
-}
+} 
