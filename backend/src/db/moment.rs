@@ -161,7 +161,7 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                 if names != "("{
                     names = names + ", "
                 }
-                names = names + sponsor.as_ref();
+                names = names + "'" + sponsor.as_ref() + "'" ;
             }
             names = names + ")";
             let command = format!("SELECT * FROM moment WHERE sponsor_name IN {names} ORDER BY `time` DESC;", names=names);
@@ -207,7 +207,7 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                 if ids != "("{
                     ids = ids + ", "
                 }
-                ids = ids + event.as_ref();
+                ids = ids + "'" + event.as_ref() + "'";
             }
             ids = ids + ")";
             let command = format!("SELECT * FROM moment WHERE event_id IN {ids} ORDER BY `time` DESC;", ids=ids);

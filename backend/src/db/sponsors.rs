@@ -229,3 +229,27 @@ pub fn alter_sponsor_info(
         Ok(o) =>Ok(()),
     }
 }
+
+pub fn get_all_sponsor_info()->Result<Vec<Sponsor>, String>{
+    let command = "SELECT account_id, sponsor_name, head_portrait, email, phone_number From sponsor_account;";
+    println!("{}", command);
+    let res = POOL.prep_exec(command, ());
+    match res {
+        Err(e) => return Err(e.to_string()),
+        _ => {},
+    }
+    let mut sponsors: Vec<Sponsor> = Vec::new();
+    for row in res.unwrap(){
+        let info = row.unwrap().unwrap();
+        println!("{}", info.len());
+        let sponsor = Sponsor{
+            id: format_string(&info[0].as_sql(true)),
+            sponsor_name: format_string(&info[1].as_sql(true)),
+            head_portrait: format_string(&info[2].as_sql(true)),
+            email: format_string(&info[3].as_sql(true)),
+            phone_number: format_string(&info[4].as_sql(true))
+        };
+        sponsors.push(sponsor);
+    }
+    return Ok(sponsors);
+}

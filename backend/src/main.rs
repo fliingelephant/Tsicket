@@ -132,7 +132,7 @@ fn main() {
             }
         },
     }*/
-//    let s = db::moment::get_user_like_event_moments_ordered(&"123".to_string());
+//    let s = db::moment::get_user_like_event_moments_ordered(&"oXkuv4ne9bcnE1aoVQvHkLNMMQy4".to_string());
 //    match s{
 //        Err(e) => println!("{}", e),
 //        Ok(o) => {
@@ -141,5 +141,16 @@ fn main() {
 //                         moment.sponsor_name, moment.event_id, moment.moment_id, moment.text, moment.time);
 //            }
 //        },
+//    }
+//    let s = db::sponsors::get_all_sponsor_info();
+//    match s {
+//        Err(e) => println!("{}", e),
+//        Ok(o) => {
+//            println!("{}", o.len());
+//            for sponsor in o{
+//                println!("id:{}, name:{}, head:{}, email:{}, number:{}",
+//                         sponsor.id, sponsor.sponsor_name, sponsor.head_portrait, sponsor.email, sponsor.phone_number);
+//            }
+//        }
 //    }
 }
