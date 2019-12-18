@@ -1043,8 +1043,14 @@ pub fn get_followed_sponsor_moments(
                             Err(_) => "http://2019-a18.iterator-traits.com/apis/sponsors/pic/default_avatar.jpg".to_string()
                         };
                         moments_ret.push(MomentWithAvatar {
-                            moment: moments[i].clone(),
-                            sponsor_avatar: sponsor_avatar.clone()
+                            sponsor_avatar: sponsor_avatar.clone(),
+                            sponsor_name: moments[i].sponsor_name.clone(),
+                            event_id: moments[i].event_id.clone(),
+                            event_name: moments[i].event_name.clone(),
+                            moment_id: moments[i].moment_id.clone(),
+                            text: moments[i].text.clone(),
+                            pictures: moments[i].pictures.clone(),
+                            time: moments[i].time.clone(),
                         });
                     }
                     Ok(HttpResponse::Ok().json(MomentsRetWithAvatar { // 200 OK
@@ -1068,7 +1074,13 @@ pub struct QueryListWithEventID {
 #[derive(Serialize)]
 pub struct MomentWithAvatar {
     pub sponsor_avatar: String,
-    pub moment: moment::Moment
+    pub sponsor_name: String,
+    pub event_id: String,
+    pub event_name: String,
+    pub moment_id: String,
+    pub text: String,
+    pub pictures: Vec<String>,
+    pub time: String,
 }
 
 #[derive(Serialize)]
@@ -1105,8 +1117,14 @@ pub fn get_event_moments(
                             Err(_) => "http://2019-a18.iterator-traits.com/apis/sponsors/pic/default_avatar.jpg".to_string()
                         };
                         moments_ret.push(MomentWithAvatar {
-                            moment: moments[i].clone(),
-                            sponsor_avatar: sponsor_avatar.clone()
+                            sponsor_avatar: sponsor_avatar.clone(),
+                            sponsor_name: moments[i].sponsor_name.clone(),
+                            event_id: moments[i].event_id.clone(),
+                            event_name: moments[i].event_name.clone(),
+                            moment_id: moments[i].moment_id.clone(),
+                            text: moments[i].text.clone(),
+                            pictures: moments[i].pictures.clone(),
+                            time: moments[i].time.clone(),
                         });
                     }
                     Ok(HttpResponse::Ok().json(MomentsRetWithAvatar { // 200 OK
@@ -1185,8 +1203,14 @@ pub fn get_liked_event_moments(
                             Err(_) => "http://2019-a18.iterator-traits.com/apis/sponsors/pic/default_avatar.jpg".to_string()
                         };
                         moments_ret.push(MomentWithAvatar {
-                            moment: moments[i].clone(),
-                            sponsor_avatar: sponsor_avatar.clone()
+                            sponsor_avatar: sponsor_avatar.clone(),
+                            sponsor_name: moments[i].sponsor_name.clone(),
+                            event_id: moments[i].event_id.clone(),
+                            event_name: moments[i].event_name.clone(),
+                            moment_id: moments[i].moment_id.clone(),
+                            text: moments[i].text.clone(),
+                            pictures: moments[i].pictures.clone(),
+                            time: moments[i].time.clone(),
                         });
                     }
                     
