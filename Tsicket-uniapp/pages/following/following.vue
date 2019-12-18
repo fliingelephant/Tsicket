@@ -1,5 +1,5 @@
 <template>
-	<view class="flex-page">
+	<!-- 	<view class="flex-page">
 		<view class="tabs padding-top">
 			<view class="nav" :current="current" @change="navChange">
 				<scroll-view scroll-x class="bg-white nav">
@@ -21,6 +21,23 @@
 				</swiper>
 			</view>
 		</view>
+	</view> -->
+	<view>
+		<view class="tabs padding-top">
+			<view class="nav" :current="current" @change="navChange">
+				<scroll-view scroll-x class="bg-white nav">
+					<view class="flex text-center">
+						<view class="flex-sub tab" :class="index==current?'tab-choose':''" v-for="(item,index) in tabs" :key="index" @tap="tabSelect"
+						 :data-id="index">
+							{{item}}
+						</view>
+					</view>
+				</scroll-view>
+			</view>
+		</view>
+		<view class="padding flex-column" id="likelist">
+			<follow-list :followlist="followlist" @clickitem="sponsorPage" @follow="follow"></follow-list>
+		</view>
 	</view>
 </template>
 
@@ -30,6 +47,7 @@
 	export default {
 		data() {
 			return {
+				scrollTop: 0,
 				followlist: [],
 				followindex: 0,
 				current: 0,
@@ -40,25 +58,19 @@
 			};
 		},
 		onLoad() {
-			uni.request({
-				url: app.globalData.apiurl + 'users/follow', //仅为示例，并非真实接口地址。
-				data: {
-					index: this.followindex
-				},
-				header: {
-					'content-type': 'application/json', //自定义请求头信息
-					'cookie': app.globalData.cookie
-				},
-				success: (res) => {
-					console.log(res);
-					res.data.list.forEach(item => {
-						item.follow = true
-					})
-					this.followlist = res.data.list
-					this.more = res.data.more
-				}
-			});
+			this.loadpage()
 			uni.showShareMenu({})
+		},
+		onPageScroll(res) {
+			this.scrollTop = res.scrollTop
+		},
+		onPullDownRefresh() {
+			this.followindex = 0
+			this.more = true
+			this.loadpage()
+		},
+		onReachBottom() {
+			this.loadpage()
 		},
 		onShareAppMessage(res) {
 			return {
@@ -68,6 +80,46 @@
 			}
 		},
 		methods: {
+			loadpage() {
+				if (this.more) {
+					uni.request({
+						url: app.globalData.apiurl + 'users/follow', //仅为示例，并非真实接口地址。
+						data: {
+							index: this.followindex
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res);
+							if (this.followindex == 0) {
+								this.followlist = []
+							}
+							res.data.list.forEach((item, index) => {
+								item.follow = true
+								item.delay = '' + (index + 5) * 0.1 + 's'
+								setTimeout(() => {
+									item.delay = undefined
+								}, (index + 11) * 100)
+							})
+							this.followlist = this.followlist.concat(res.data.list)
+							if (this.followindex != 0) {
+								setTimeout(() => {
+									uni.pageScrollTo({
+										scrollTop: this.scrollTop + 300,
+										duration: 500,
+									})
+									console.log("top" + this.scrollTop)
+								}, 200)
+							}
+							this.more = res.data.more
+							this.followindex += res.data.list.length
+							uni.stopPullDownRefresh()
+						}
+					})
+				}
+			},
 			cardSwiper(e) {
 				this.cardCur = e.detail.current
 			},
@@ -82,7 +134,7 @@
 			},
 			sponsorPage(index) {
 				uni.navigateTo({
-					url: "../sponsor/sponsor?id=" + this.followlist[index].id
+					url: "../sponsor/sponsor?id=" + this.followlist[index].name
 				})
 			},
 			follow(index) {

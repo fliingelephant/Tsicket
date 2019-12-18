@@ -95,20 +95,6 @@
 			if (res.referrerInfo && res.referrerInfo.appId) {
 				if (res.referrerInfo.extraData) {
 					this.globalData.token = res.referrerInfo.extraData.token
-					// uni.request({
-					// url: 'http://154.8.167.168:8080', //仅为示例，并非真实接口地址。
-					// data: {
-					// 	token: this.globalData.token
-					// },
-					// header: {
-					// 	'content-type': 'application/json' //自定义请求头信息
-					// },
-					// success: (res) => {
-					// 	console.log(res.data);
-					// 	this.hasUserInfo = true
-					// 	this.hasTsinghuaInfo = true
-					// }
-					//})
 				}
 			}
 		},
@@ -122,6 +108,7 @@
 	/*每个页面公共css */
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
+	@import "colorui/animation.css";
 	@import "app.css";
 	/*你的项目css */
 </style>

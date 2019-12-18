@@ -143,110 +143,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
 
 var app = getApp();var _default =
 
 {
   data: function data() {
     return {
-      likelist: [{
-        id: 0,
-        name: '活动名',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 1,
-        name: '活动名1',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 2,
-        name: '活动名2',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 3,
-        name: '活动名3',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 4,
-        name: '活动名4',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true }],
-
-
+      scrollTop: 0,
+      likelist: [],
       likeindex: 0,
       current: 0,
+      more: true,
       tabs: [
       "喜爱"] };
 
 
   },
   onLoad: function onLoad() {
-    uni.request({
-      url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
-      data: {
-        index: this.likeindex },
-
-      header: {
-        'content-type': 'application/json', //自定义请求头信息
-        'cookie': app.globalData.cookie },
-
-      success: function success(res) {
-        console.log(res);
-      } });
-
+    this.loadpage();
     uni.showShareMenu({});
+  },
+  onPageScroll: function onPageScroll(res) {
+    this.scrollTop = res.scrollTop;
+  },
+  onPullDownRefresh: function onPullDownRefresh() {
+    this.likeindex = 0;
+    this.more = true;
+    this.loadpage();
+  },
+  onReachBottom: function onReachBottom() {
+    this.loadpage();
   },
   onShareAppMessage: function onShareAppMessage(res) {
     return {
@@ -256,6 +182,48 @@ var app = getApp();var _default =
 
   },
   methods: {
+    loadpage: function loadpage() {var _this = this;
+      if (this.more) {
+        uni.request({
+          url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
+          data: {
+            index: this.likeindex },
+
+          header: {
+            'content-type': 'application/json', //自定义请求头信息
+            'cookie': app.globalData.cookie },
+
+          success: function success(res) {
+            console.log(res);
+            console.log(res.data.list.length);
+            if (_this.likeindex == 0) {
+              _this.likelist = [];
+            }
+            res.data.list.forEach(function (item, index) {
+              item.like = true;
+              item.event_introduction = '';
+              item.delay = '' + (index + 5) * 0.1 + 's';
+              setTimeout(function () {
+                item.delay = undefined;
+              }, (index + 11) * 100);
+            });
+            _this.likelist = _this.likelist.concat(res.data.list);
+            if (_this.likeindex != 0) {
+              setTimeout(function () {
+                uni.pageScrollTo({
+                  scrollTop: _this.scrollTop + 300,
+                  duration: 500 });
+
+                console.log("top" + _this.scrollTop);
+              }, 200);
+            }
+            _this.more = res.data.more;
+            _this.likeindex += res.data.list.length;
+            uni.stopPullDownRefresh();
+          } });
+
+      }
+    },
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
     },
@@ -268,35 +236,26 @@ var app = getApp();var _default =
     swiperChange: function swiperChange(e) {
       this.current = e.detail.current;
     },
-    activityPage: function activityPage(id) {
+    activityPage: function activityPage(index) {
       uni.navigateTo({
-        url: "../activity/activity?id=" + this.likelist.find(function (item) {
-          return item.id == id;
-        }).id });
+        url: "../activity/activity?id=" + this.likelist[index].event_id });
 
     },
-    like: function like(id) {
-      console.log(id);
+    like: function like(index) {var _this2 = this;
+      //console.log(id)
       uni.request({
-        url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
+        url: app.globalData.apiurl + 'users/like/' + this.likelist[index].event_id, //仅为示例，并非真实接口地址。
         method: 'POST',
-        data: {
-          openid: app.globalData.openid,
-          eventid: id },
-
         header: {
-          'content-type': 'application/json' //自定义请求头信息
-        },
+          'content-type': 'application/json', //自定义请求头信息
+          'cookie': app.globalData.cookie },
+
         success: function success(res) {
           console.log(res.data);
-          //var index = this.likelist.findIndex(item => {return item.id == id})
-          //this.likelist[index].like = !this.likelist[index].like
+          _this2.likelist[index].like = res.data.like;
+          _this2.likeindex += res.data.like.length;
         } });
 
-      var index = this.likelist.findIndex(function (item) {
-        return item.id == id;
-      });
-      this.likelist[index].like = !this.likelist[index].like;
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

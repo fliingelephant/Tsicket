@@ -7,15 +7,18 @@
     "pages/following/following",
     "pages/sponsor/sponsor",
     "pages/like/like",
-    "pages/history/history"
+    "pages/history/history",
+    "pages/search/search"
   ],
   "subPackages": [],
   "window": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "清易票",
     "navigationBarBackgroundColor": "#81D3F8",
-    "backgroundTextStyle": "light",
-    "backgroundColor": "#FFFFFF"
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#FFFFFF",
+    "backgroundColorTop": "#81D3F8",
+    "enablePullDownRefresh": true
   },
   "tabBar": {
     "color": "#D7D7D7",
@@ -48,5 +51,5 @@
     "activity-check": "/components/activity-check",
     "follow-list": "/components/follow-list"
   },
-  "sitemapLocation": "sitemap73.json"
+  "sitemapLocation": "sitemap28.json"
 }

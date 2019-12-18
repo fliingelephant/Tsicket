@@ -1,5 +1,5 @@
 <template>
-	<view class="flex-page">
+	<view>
 		<view class="tabs padding-top">
 			<view class="nav" :current="current" @change="navChange">
 				<scroll-view scroll-x class="bg-white nav">
@@ -11,15 +11,10 @@
 					</view>
 				</scroll-view>
 			</view>
-			<view class="tab-swiper-view">
-				<swiper class="tab-swiper" :current="current" @change="swiperChange">
-					<swiper-item class="tab-swiper-item" style="height: 100%;">
-						<scroll-view scroll-y class="tab-scroll">
-							<activity-mini-card v-for="(item,index) in likelist" :key="index" :activity="item" @like="like" @clickCard="activityPage"></activity-mini-card>
-						</scroll-view>
-					</swiper-item>
-				</swiper>
-			</view>
+		</view>
+		<view class="padding flex-column" id="likelist">
+			<activity-mini-card v-for="(item,index) in likelist" :class="[item.delay ? 'animation-slide-bottom' : '']" :style="[{animationDelay: item.delay}]"
+			 :key="item.event_id" :activity="item" @like="like(index)" @clickCard="activityPage(index)"></activity-mini-card>
 		</view>
 	</view>
 </template>
@@ -30,108 +25,81 @@
 	export default {
 		data() {
 			return {
-				likelist: [{
-						id: 0,
-						name: '活动名',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: true
-					},
-					{
-						id: 1,
-						name: '活动名1',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: true
-					},
-					{
-						id: 2,
-						name: '活动名2',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: true
-					},
-					{
-						id: 3,
-						name: '活动名3',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: true
-					},
-					{
-						id: 4,
-						name: '活动名4',
-						intro: '活动介绍语',
-						tickets: 80,
-						location: '活动地点',
-						start: '2019年xx月xx日',
-						end: '',
-						sponsorid: 100,
-						sponsorname: 'xx学生会',
-						type: 1,
-						state: 200,
-						like: true
-					}
-				],
+				scrollTop: 0,
+				likelist: [],
 				likeindex: 0,
 				current: 0,
+				more: true,
 				tabs: [
 					"喜爱"
 				]
 			};
 		},
 		onLoad() {
-			uni.request({
-				url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
-				data: {
-					index: this.likeindex
-				},
-				header: {
-					'content-type': 'application/json' ,//自定义请求头信息
-					'cookie': app.globalData.cookie
-				},
-				success: (res) => {
-					console.log(res);
-				}
-			})
+			this.loadpage()
 			uni.showShareMenu({})
+		},
+		onPageScroll(res) {
+			this.scrollTop = res.scrollTop
+		},
+		onPullDownRefresh() {
+			this.likeindex = 0
+			this.more = true
+			this.loadpage()
+		},
+		onReachBottom() {
+			this.loadpage()
 		},
 		onShareAppMessage(res) {
 			return {
-			    title: app.globalData.sharetitle,
-			    path: '/pages/index/index',
+				title: app.globalData.sharetitle,
+				path: '/pages/index/index',
 				imageUrl: app.globalData.shareimg
 			}
 		},
 		methods: {
+			loadpage() {
+				if (this.more) {
+					uni.request({
+						url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
+						data: {
+							index: this.likeindex
+						},
+						header: {
+							'content-type': 'application/json', //自定义请求头信息
+							'cookie': app.globalData.cookie
+						},
+						success: (res) => {
+							console.log(res);
+							console.log(res.data.list.length)
+							if (this.likeindex == 0) {
+								this.likelist = []
+							}
+							res.data.list.forEach((item, index) => {
+								item.like = true
+								item.event_introduction = ''
+								item.delay = '' + (index + 5) * 0.1 + 's'
+								setTimeout(() => {
+									item.delay = undefined
+								}, (index + 11) * 100)
+							})
+							this.likelist = this.likelist.concat(res.data.list)
+							if (this.likeindex != 0) {
+								setTimeout(() => {
+									uni.pageScrollTo({
+										scrollTop: this.scrollTop + 300,
+										duration: 500,
+									})
+									console.log("top" + this.scrollTop)
+								}, 200)
+							}
+							this.more = res.data.more
+							this.likeindex += res.data.list.length
+							uni.stopPullDownRefresh()
+						}
+					})
+				}
+			},
 			cardSwiper(e) {
 				this.cardCur = e.detail.current
 			},
@@ -144,35 +112,26 @@
 			swiperChange(e) {
 				this.current = e.detail.current;
 			},
-			activityPage(id) {
+			activityPage(index) {
 				uni.navigateTo({
-					url: "../activity/activity?id=" + this.likelist.find(item => {
-						return item.id == id
-					}).id
+					url: "../activity/activity?id=" + this.likelist[index].event_id
 				})
 			},
-			like(id) {
-				console.log(id)
+			like(index) {
+				//console.log(id)
 				uni.request({
-					url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
+					url: app.globalData.apiurl + 'users/like/' + this.likelist[index].event_id, //仅为示例，并非真实接口地址。
 					method: 'POST',
-					data: {
-						openid: app.globalData.openid,
-						eventid: id
-					},
 					header: {
-						'content-type': 'application/json' //自定义请求头信息
+						'content-type': 'application/json', //自定义请求头信息
+						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
 						console.log(res.data);
-						//var index = this.likelist.findIndex(item => {return item.id == id})
-						//this.likelist[index].like = !this.likelist[index].like
+						this.likelist[index].like = res.data.like
+						this.likeindex += res.data.like.length
 					}
 				})
-				var index = this.likelist.findIndex(item => {
-					return item.id == id
-				})
-				this.likelist[index].like = !this.likelist[index].like
 			}
 		}
 	}

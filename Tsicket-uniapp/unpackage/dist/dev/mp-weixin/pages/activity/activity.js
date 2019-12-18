@@ -197,6 +197,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 var app = getApp();var _default =
 
@@ -205,43 +212,18 @@ var app = getApp();var _default =
     return {
       id: 0,
       url: "/static/cardback0.jpg",
-      activity: {
-        event_id: 0,
-        event_name: '活动名',
-        event_introdution: '活动介绍语',
-        event_picture: '',
-        left_tickets: 80,
-        event_location: '活动地点',
-        start_time: '2019年xx月xx日',
-        end_time: '',
-        sponsor_name: 'xx学生会',
-        event_type: 1,
-        event_status: 200,
-        reserved: false,
-        like: false },
-
+      activity: {},
       islike: false,
       isreserved: false,
       current: 0,
+      sponsor: {},
       tabs: [
       "介绍", "动态"],
 
-      sponsor: {
-        avatarUrl: '',
-        name: 'xx学生会',
-        id: 0 },
+      momentlist: [],
+      momentindex: 0,
+      momentmore: true };
 
-      messagelist: []
-      //[{
-      // 	"id": 0,
-      // 	"text": '1231241524',
-      // 	"appreciate": false
-      // },{
-      // 	"id": 1,
-      // 	"text": '1231241524124125',
-      // 	"appreciate": false
-      // }]
-    };
   },
   onLoad: function onLoad(option) {
     console.log(option);
@@ -266,6 +248,9 @@ var app = getApp();var _default =
   },
   methods: {
     loadpage: function loadpage() {var _this = this;
+      this.momentindex = 0;
+      this.momentlist = [];
+      this.momentmore = true;
       uni.request({
         url: app.globalData.apiurl + 'events/view',
         method: 'POST',
@@ -305,47 +290,66 @@ var app = getApp();var _default =
           _this.isreserved = res.data.enrolled;
         } });
 
+      if (this.current == 1) {
+        this.loadmoment();
+      }
     },
-    tabSelect: function tabSelect(e) {var _this2 = this;
-      this.current = e.currentTarget.dataset.id;
-      console.log(this.current);
-      if (this.current == 1 && !this.messagelist[0]) {
+    loadmoment: function loadmoment(e) {var _this2 = this;
+      console.log(e);
+      if (this.momentmore) {
+        console.log('loadmoment' + this.momentindex);
         uni.request({
-          url: app.globalData.apiurl + 'events/moments/' + this.activity.event_id, //仅为示例，并非真实接口地址。
+          url: app.globalData.apiurl + 'users/moments/' + this.activity.event_id, //仅为示例，并非真实接口地址。
+          data: {
+            event_id: this.activity.event_id,
+            index: this.momentindex },
+
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
-            console.log(res.data);
-            _this2.messagelist = res.data.moments;
+            console.log(res);
+            res.data.moments.forEach(function (item, index) {
+              item.delay = '' + (index + 1) * 0.1 + 's';
+              setTimeout(function () {
+                item.delay = undefined;
+              }, (index + 11) * 100);
+            });
+            _this2.momentlist = _this2.momentlist.concat(res.data.moments);
+            _this2.momentmore = res.data.more;
+            _this2.momentindex += res.data.moments.length;
+            if (_this2.momentindex == 0) {
+              _this2.momentindex = -1;
+            }
           } });
 
       }
+    },
+    tabSelect: function tabSelect(e) {
+      this.current = e.currentTarget.dataset.id;
     },
     navChange: function navChange(index) {
       this.current = index;
     },
-    swiperChange: function swiperChange(e) {var _this3 = this;
+    swiperChange: function swiperChange(e) {
       this.current = e.detail.current;
       console.log(this.current);
-      if (this.current == 1 && !this.messagelist[0]) {
-        uni.request({
-          url: app.globalData.apiurl + 'events/moments/' + this.activity.event_id, //仅为示例，并非真实接口地址。
-          method: 'GET',
-          header: {
-            'content-type': 'application/json', //自定义请求头信息
-            'cookie': app.globalData.cookie },
-
-          success: function success(res) {
-            console.log(res.data);
-            _this3.messagelist = res.data.moments;
-          } });
-
+      if (this.current == 1 && this.momentindex != -1) {
+        this.loadmoment();
       }
     },
-    reserve: function reserve() {var _this4 = this;
+    reserve: function reserve() {var _this3 = this;
       console.log('reserve');
+      if (app.globalData.tsinghuaid == undefined) {
+        uni.showModal({
+          title: '',
+          content: '请先前往个人页面绑定清华身份',
+          showCancel: false });
+
+        return;
+      }
+
       if (this.isreserved) {
         uni.showModal({
           title: '',
@@ -353,7 +357,7 @@ var app = getApp();var _default =
           success: function success(res) {
             if (res.confirm) {
               uni.request({
-                url: app.globalData.apiurl + 'users/book/' + _this4.activity.event_id, //仅为示例，并非真实接口地址。
+                url: app.globalData.apiurl + 'users/book/' + _this3.activity.event_id, //仅为示例，并非真实接口地址。
                 method: 'DELETE',
                 header: {
                   'content-type': 'application/json', //自定义请求头信息
@@ -362,7 +366,7 @@ var app = getApp();var _default =
                 success: function success(res) {
                   console.log(res);
                   if (res.data.success) {
-                    _this4.isreserved = false;
+                    _this3.isreserved = false;
                     uni.showToast({
                       icon: 'none',
                       title: '取消成功' });
@@ -382,13 +386,36 @@ var app = getApp();var _default =
           } });
 
       } else {
+        var content = undefined;
+        if (this.activity.left_tickets == 0) {
+          content = '该活动票已放完咯\r\n去看看其他活动吧';
+        }
+        switch (this.activity.event_status % 10) {
+          case 1:
+            content = '该活动要在' + this.activity.start_time + '才开始抢票哦\r\n加入喜爱能更轻松地找到该活动';
+            break;
+          case 3:
+            content = '该活动已结束发放\r\n去看看其他活动吧';
+            break;
+          case 4:
+            content = '该活动已取消\r\n去看看其他活动吧';
+            break;}
+
+        if (content) {
+          uni.showModal({
+            title: '',
+            content: content,
+            showCancel: false });
+
+          return;
+        }
         uni.showModal({
           title: '',
           content: '请确认是否参加\r\n' + this.activity.event_name,
           success: function success(res) {
             if (res.confirm) {
               uni.request({
-                url: app.globalData.apiurl + 'users/book/' + _this4.activity.event_id, //仅为示例，并非真实接口地址。
+                url: app.globalData.apiurl + 'users/book/' + _this3.activity.event_id, //仅为示例，并非真实接口地址。
                 method: 'POST',
                 header: {
                   'content-type': 'application/json', //自定义请求头信息
@@ -397,7 +424,7 @@ var app = getApp();var _default =
                 success: function success(res) {
                   console.log(res);
                   if (res.data.success) {
-                    _this4.isreserved = true;
+                    _this3.isreserved = true;
                     uni.showToast({
                       icon: 'none',
                       title: '抢票成功' });
@@ -421,7 +448,7 @@ var app = getApp();var _default =
     share: function share() {
       return 0;
     },
-    like: function like() {var _this5 = this;
+    like: function like() {var _this4 = this;
       uni.request({
         url: app.globalData.apiurl + 'users/like/' + this.activity.event_id,
         method: 'POST',
@@ -431,40 +458,40 @@ var app = getApp();var _default =
 
         success: function success(res) {
           console.log(res.data);
-          _this5.islike = res.data.like;
+          _this4.islike = res.data.like;
         } });
 
     },
     appreciate: function appreciate(id) {
-      uni.request({
-        url: app.globalData.apiurl + 'users/like',
-        method: 'POST',
-        data: {
-          openid: app.globalData.openid,
-          messageid: id,
-          session: '' },
-
-        header: {
-          'content-type': 'application/json' //自定义请求头信息
-        },
-        success: function success(res) {
-          console.log(res.data);
-        } });
-
-      var index = this.messagelist.findIndex(function (item) {
-        return item.id == id;
-      });
-      console.log(index);
-      this.messagelist[index].appreciate = !this.messagelist[index].appreciate;
+      // uni.request({
+      // 	url: app.globalData.apiurl + 'users/like',
+      // 	method: 'POST',
+      // 	data: {
+      // 		openid: app.globalData.openid,
+      // 		messageid: id,
+      // 		session: '',
+      // 	},
+      // 	header: {
+      // 		'content-type': 'application/json' //自定义请求头信息
+      // 	},
+      // 	success: (res) => {
+      // 		console.log(res.data);
+      // 	}
+      // });
+      // var index = this.momentlist.findIndex((item) => {
+      // 	return item.id == id
+      // })
+      // console.log(index)
+      // this.momentlist[index].appreciate = !this.momentlist[index].appreciate
     },
     sponsorPage: function sponsorPage() {
       var page = getCurrentPages();
       page = page[page.length - 2];
-      if (page.route == 'pages/sponsor/sponsor' && page.options.id == this.sponsor.name) {
+      if (page.route == 'pages/sponsor/sponsor' && page.options.id == this.activity.sponsor_name) {
         uni.navigateBack();
       } else {
         uni.navigateTo({
-          url: "../sponsor/sponsor?id=" + this.sponsor.name });
+          url: "../sponsor/sponsor?id=" + this.activity.sponsor_name });
 
       }
     } } };exports.default = _default;

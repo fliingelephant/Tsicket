@@ -232,6 +232,44 @@ var app = getApp();var _default =
 
   },
   onLoad: function onLoad() {
+    // uni.request({
+    // 	url: app.globalData.apiurl + 'admins/sponsors',
+    // 	header: {
+    // 		'content-type': 'application/json', //自定义请求头信息
+    // 		'cookie': app.globalData.cookie
+    // 	},
+    // 	success: (res) => {
+    // 		console.log(res.data);
+    // 		res.data.sponsors.forEach((res) => {
+    // 			uni.request({
+    // 				url: app.globalData.apiurl + 'users/follow/' + res.sponsor_name,
+    // 				method: 'POST',
+    // 				header: {
+    // 					'content-type': 'application/json', //自定义请求头信息
+    // 					'cookie': app.globalData.cookie
+    // 				},
+    // 				success: (res) => {
+    // 					console.log(res.data);
+    // 				}
+    // 			});
+    // 		})
+    // 	}
+    // });
+    uni.request({
+      url: app.globalData.apiurl + 'users/search',
+      method: 'POST',
+      data: {
+        index: 0,
+        keyword: 'xx' },
+
+      header: {
+        'content-type': 'application/json', //自定义请求头信息
+        'cookie': app.globalData.cookie },
+
+      success: function success(res) {
+        console.log(res.data);
+      } });
+
     uni.showShareMenu({});
   },
   onShareAppMessage: function onShareAppMessage(res) {
