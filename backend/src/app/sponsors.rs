@@ -539,8 +539,13 @@ pub fn publish_moment(
             let event_id = req.match_info().query("event_id").to_string();
             // TODO: 检查是否符合活动和发布者对应
             let now = Local::now().to_string();
+<<<<<<< HEAD
             match moment::publish_moment(&sponsor_name, &event_id,
              &moment.event_name, &md5(&(sponsor_name.clone() + &event_id + &now)), &moment.text, &moment.pictures) {
+=======
+            match moment::publish_moment(&sponsor_name, &event_id, &moment.event_name,
+            &md5(&(sponsor_name.clone() + &event_id + &now)),&moment.text, &moment.pictures) {
+>>>>>>> 14ed18e189bbbcb05c1c69ba47b5e392389250e2
                 Ok(_) => Ok(HttpResponse::Ok().finish()),
                 Err(e) => {
                     println!("{}", e);
