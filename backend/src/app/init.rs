@@ -10,6 +10,11 @@ fn format_string(src: &String) -> String {
     src[1..src.len() - 1].to_string()
 }
 
+#[inline]
+fn format_time(time: &String) -> String {
+    return time.replace('-', "/");
+}
+
 pub fn initiate(
     event_list: &mut HashMap<String, Event>,
     record_list: &mut HashMap<String, Record>
@@ -36,8 +41,8 @@ pub fn initiate(
             let event = Event {
                 event_id: format_string(&ev[0].as_sql(true)),
                 sponsor_name: format_string(&ev[1].as_sql(true)),
-                event_name: format_string(&ev[2].as_sql(true)),
-                start_time: format_string(&ev[3].as_sql(true)),
+                event_name: format_time(&format_string(&ev[2].as_sql(true))),
+                start_time: format_time(&format_string(&ev[3].as_sql(true))),
                 end_time: format_string(&ev[4].as_sql(true)),
                 event_type: ev[5].as_sql(true).parse().unwrap(),
                 event_introduction: format_string(&ev[6].as_sql(true)),
