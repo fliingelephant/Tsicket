@@ -81,7 +81,7 @@ fn main() {
     /*let pic1 = "123".to_string();
     let pic2 = "456".to_string();
     let pic = vec![pic1, pic2];
-    let s = db::moment::publish_moment(&"2".to_string(), &"0".to_string(), &"id1".to_string(), &"jjj".to_string(), &pic);
+    let s = db::moment::publish_moment(&"xx学生会".to_string(), &"6752fd533376ab9c8c408a697cf56566".to_string(), &"活动2".to_string(), &"11".to_string(), &"tesxty".to_string(), &pic);
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {},
