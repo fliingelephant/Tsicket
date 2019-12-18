@@ -25,6 +25,11 @@ fn format_string(src: &String) -> String {
      src[1..src.len() - 1].to_string()
 }
 
+#[inline]
+fn format_time(time: &String) -> String {
+    return time.replace('-', "/");
+}
+
 pub fn publish_moment(
     sponsor_name: &String,
     event_id: &String,
@@ -74,7 +79,7 @@ pub fn get_event_moments_sorted(event_id: &String) ->Result<Vec<Moment>, String>
              moment_id: format_string(&info[3].as_sql(true)),
              text: format_string(&info[4].as_sql(true)),
              pictures,
-             time: format_string(&info[6].as_sql(true))
+             time: format_time(&format_string(&info[6].as_sql(true)))
          };
          moments.push(moment);
      }
@@ -105,7 +110,7 @@ pub fn get_sponsor_moments_sorted(sponsor_name: &String) ->Result<Vec<Moment>, S
             moment_id: format_string(&info[3].as_sql(true)),
             text: format_string(&info[4].as_sql(true)),
             pictures,
-            time: format_string(&info[6].as_sql(true))
+            time: format_time(&format_string(&info[6].as_sql(true)))
         };
         moments.push(moment);
     }
@@ -180,7 +185,7 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                             moment_id: format_string(&info[3].as_sql(true)),
                             text: format_string(&info[4].as_sql(true)),
                             pictures,
-                            time: format_string(&info[6].as_sql(true))
+                            time: format_time(&format_string(&info[6].as_sql(true)))
                         };
                         moments.push(moment);
                     }
@@ -226,7 +231,7 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                             moment_id: format_string(&info[3].as_sql(true)),
                             text: format_string(&info[4].as_sql(true)),
                             pictures,
-                            time: format_string(&info[6].as_sql(true))
+                            time: format_time(&format_string(&info[6].as_sql(true)))
                         };
                         moments.push(moment);
                     }

@@ -25,6 +25,11 @@ fn format_string(src: &String) -> String {
     src[1..src.len() - 1].to_string()
 }
 
+#[inline]
+fn format_time(time: &String) -> String {
+    return time.replace('-', "/");
+}
+
 pub fn release_notification(sponsor_name: &String, event_id: &String, notice_id: &String, text: &String)
                     -> Result<(), String>{
     let res = users::get_users_by_event_id(event_id);
@@ -78,7 +83,7 @@ pub fn get_user_notifications(user_id: &String)->Result<Vec<Notification>, Strin
             user_id: format_string(&info[2].as_sql(true)),
             notice_id: format_string(&info[3].as_sql(true)),
             text: format_string(&info[4].as_sql(true)),
-            time: format_string(&info[5].as_sql(true)),
+            time: format_time(&format_string(&info[5].as_sql(true))),
             read: info[6].as_sql(true).parse().unwrap()
         };
         notices.push(notice);
