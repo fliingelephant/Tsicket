@@ -1054,11 +1054,13 @@ pub struct QueryListWithEventID {
 
 pub fn get_event_moments(
     id: Identity,
-    Query(query_list): Query<QueryListWithEventID>
+    req: HttpRequest,
+    Query(query_list): Query<QueryList>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
         Ok(_) => {
-            match moment::get_event_moments_sorted(&query_list.event_id) {
+            let event_id = req.match_info().query("event_id").to_string();
+            match moment::get_event_moments_sorted(&event_id) {
                 Ok(moments) => {
                     let index = query_list.index;
 
