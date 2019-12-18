@@ -7,6 +7,7 @@ use crate::db::users;
 pub struct Moment {
      pub sponsor_name: String,
      pub event_id: String,
+     pub event_name: String,
      pub moment_id: String,
      pub text: String,
      pub pictures: Vec<String>,
@@ -24,9 +25,15 @@ fn format_string(src: &String) -> String {
      src[1..src.len() - 1].to_string()
 }
 
+#[inline]
+fn format_time(time: &String) -> String {
+    return time.replace('-', "/");
+}
+
 pub fn publish_moment(
     sponsor_name: &String,
     event_id: &String,
+    event_name: &String,
     moment_id: &String,
     text: &String,
     pictures: &Vec<String>
@@ -39,9 +46,9 @@ pub fn publish_moment(
             picture_str = picture_str + "&" + &pic;
         }
     }
-    let command = format!("INSERT INTO moment (sponsor_name, event_id, moment_id, text, pictures\
-    ) VALUES ('{sponsor_name}', '{event_id}', '{moment_id}', '{text}', '{pictures}');", sponsor_name
-    = sponsor_name, event_id = event_id, moment_id = moment_id, text = text, pictures = picture_str);
+    let command = format!("INSERT INTO moment (sponsor_name, event_id, event_name, moment_id, text, pictures\
+    ) VALUES ('{sponsor_name}', '{event_id}', '{event_name}', '{moment_id}', '{text}', '{pictures}');", sponsor_name
+    = sponsor_name, event_id = event_id, event_name = event_name, moment_id = moment_id, text = text, pictures = picture_str);
     let res = POOL.prep_exec(command, ());
     match res {
         Err(e) => return Err(e.to_string()),
@@ -60,7 +67,7 @@ pub fn get_event_moments_sorted(event_id: &String) ->Result<Vec<Moment>, String>
      let mut moments:Vec<Moment> = Vec::new();
      for row in res.unwrap(){
          let info = row.unwrap().unwrap();
-         let pcs = format_string(&info[4].as_sql(true));
+         let pcs = format_string(&info[5].as_sql(true));
          let pts: Vec<&str> = pcs.split('&').collect();
          let mut pictures: Vec<String> = Vec::new();
          for pc in pts{
@@ -69,10 +76,11 @@ pub fn get_event_moments_sorted(event_id: &String) ->Result<Vec<Moment>, String>
          let moment = Moment{
              sponsor_name: format_string(&info[0].as_sql(true)),
              event_id: format_string(&info[1].as_sql(true)),
-             moment_id: format_string(&info[2].as_sql(true)),
-             text: format_string(&info[3].as_sql(true)),
+             event_name: format_string(&info[2].as_sql(true)),
+             moment_id: format_string(&info[3].as_sql(true)),
+             text: format_string(&info[4].as_sql(true)),
              pictures,
-             time: format_string(&info[5].as_sql(true))
+             time: format_time(&format_string(&info[6].as_sql(true)))
          };
          moments.push(moment);
      }
@@ -90,7 +98,7 @@ pub fn get_sponsor_moments_sorted(sponsor_name: &String) ->Result<Vec<Moment>, S
     let mut moments:Vec<Moment> = Vec::new();
     for row in res.unwrap(){
         let info = row.unwrap().unwrap();
-        let pcs = format_string(&info[3].as_sql(true));
+        let pcs = format_string(&info[5].as_sql(true));
         let pts: Vec<&str> = pcs.split('&').collect();
         let mut pictures: Vec<String> = Vec::new();
         for pc in pts{
@@ -99,10 +107,11 @@ pub fn get_sponsor_moments_sorted(sponsor_name: &String) ->Result<Vec<Moment>, S
         let moment = Moment{
             sponsor_name: format_string(&info[0].as_sql(true)),
             event_id: format_string(&info[1].as_sql(true)),
-            moment_id: format_string(&info[2].as_sql(true)),
-            text: format_string(&info[3].as_sql(true)),
+            event_name: format_string(&info[2].as_sql(true)),
+            moment_id: format_string(&info[3].as_sql(true)),
+            text: format_string(&info[4].as_sql(true)),
             pictures,
-            time: format_string(&info[5].as_sql(true))
+            time: format_time(&format_string(&info[6].as_sql(true)))
         };
         moments.push(moment);
     }
@@ -153,9 +162,12 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                 if names != "("{
                     names = names + ", "
                 }
-                names = names + sponsor.as_ref();
+                names = names + "'" + sponsor.as_ref() + "'" ;
             }
             names = names + ")";
+            if names == "()"{
+                return Ok(moments);
+            }
             let command = format!("SELECT * FROM moment WHERE sponsor_name IN {names} ORDER BY `time` DESC;", names=names);
             println!("{}", command);
             let res = POOL.prep_exec(command, ());
@@ -164,7 +176,7 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                 Ok(o) => {
                     for row in o{
                         let info = row.unwrap().unwrap();
-                        let pcs = format_string(&info[3].as_sql(true));
+                        let pcs = format_string(&info[5].as_sql(true));
                         let pts: Vec<&str> = pcs.split('&').collect();
                         let mut pictures: Vec<String> = Vec::new();
                         for pc in pts{
@@ -173,10 +185,11 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                         let moment = Moment{
                             sponsor_name: format_string(&info[0].as_sql(true)),
                             event_id: format_string(&info[1].as_sql(true)),
-                            moment_id: format_string(&info[2].as_sql(true)),
-                            text: format_string(&info[3].as_sql(true)),
+                            event_name: format_string(&info[2].as_sql(true)),
+                            moment_id: format_string(&info[3].as_sql(true)),
+                            text: format_string(&info[4].as_sql(true)),
                             pictures,
-                            time: format_string(&info[5].as_sql(true))
+                            time: format_time(&format_string(&info[6].as_sql(true)))
                         };
                         moments.push(moment);
                     }
@@ -198,7 +211,7 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                 if ids != "("{
                     ids = ids + ", "
                 }
-                ids = ids + event.as_ref();
+                ids = ids + "'" + event.as_ref() + "'";
             }
             ids = ids + ")";
             let command = format!("SELECT * FROM moment WHERE event_id IN {ids} ORDER BY `time` DESC;", ids=ids);
@@ -209,7 +222,7 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                 Ok(o) => {
                     for row in o{
                         let info = row.unwrap().unwrap();
-                        let pcs = format_string(&info[3].as_sql(true));
+                        let pcs = format_string(&info[5].as_sql(true));
                         let pts: Vec<&str> = pcs.split('&').collect();
                         let mut pictures: Vec<String> = Vec::new();
                         for pc in pts{
@@ -218,10 +231,11 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                         let moment = Moment{
                             sponsor_name: format_string(&info[0].as_sql(true)),
                             event_id: format_string(&info[1].as_sql(true)),
-                            moment_id: format_string(&info[2].as_sql(true)),
-                            text: format_string(&info[3].as_sql(true)),
+                            event_name: format_string(&info[2].as_sql(true)),
+                            moment_id: format_string(&info[3].as_sql(true)),
+                            text: format_string(&info[4].as_sql(true)),
                             pictures,
-                            time: format_string(&info[5].as_sql(true))
+                            time: format_time(&format_string(&info[6].as_sql(true)))
                         };
                         moments.push(moment);
                     }

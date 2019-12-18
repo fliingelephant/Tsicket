@@ -82,7 +82,8 @@ CREATE TABLE `event`
     `event_status`         TINYINT                            NOT NULL,
     `event_location`       VARCHAR(255)                       NOT NULL,
     `event_time`           VARCHAR(255)                       NOT NULL DEFAULT '',
-    PRIMARY KEY (`event_id`) USING BTREE,
+    UNIQUE (`event_id`),
+    PRIMARY KEY (`event_id`, `event_name`) USING BTREE,
     CONSTRAINT fk_event_spo FOREIGN KEY (`sponsor_name`) REFERENCES `sponsor_account` (`sponsor_name`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 
@@ -166,21 +167,23 @@ INSERT INTO `follow` VALUES ('123', '7');
 DROP TABLE IF EXISTS `moment`;
 CREATE TABLE `moment`
 (
-    `sponsor_name` VARCHAR(255) NOT NULL,
-    `event_id`     VARCHAR(32)  NOT NULL,
-    `moment_id`    VARCHAR(255) NOT NULL,
+    `sponsor_name` VARCHAR(255)                       NOT NULL,
+    `event_id`     VARCHAR(255)                       NOT NULL,
+    `event_name`   VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
+    `moment_id`    VARCHAR(255)                       NOT NULL,
     `text`         TEXT,
     `pictures`     TEXT,
-    `time`         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `time`         TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (moment_id),
     CONSTRAINT fk_moment_sponsor FOREIGN KEY (`sponsor_name`) REFERENCES `sponsor_account` (`sponsor_name`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_moment_event FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT fk_moment_event FOREIGN KEY (`event_id`, `event_name`) REFERENCES `event` (`event_id`, `event_name`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4;
 
 -- ----------------------------
 -- Records of follow list
 -- ----------------------------
 
-INSERT INTO moment (`sponsor_name`, `event_id`, `moment_id`) VALUES ('2', '0', '999');
+INSERT INTO moment (`sponsor_name`, `event_id`, `event_name`, `moment_id`) VALUES ('2', '0', '3', '999');
 
 -- ----------------------------
 -- Table structure for push list
@@ -190,12 +193,13 @@ DROP TABLE IF EXISTS `notification`;
 CREATE TABLE `notification`
 (
     `sponsor_name` VARCHAR(255) NOT NULL,
-    `event_id`     VARCHAR(32)  NOT NULL,
+    `event_id`     VARCHAR(255) NOT NULL,
     `user_id`      VARCHAR(32)  NOT NULL,
     `notice_id`    VARCHAR(255) NOT NULL,
     `text`         TEXT,
     `time`         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `read`         TINYINT               DEFAULT 0,
+    PRIMARY KEY (notice_id),
     CONSTRAINT fk_push_sponsor FOREIGN KEY (`sponsor_name`) REFERENCES `sponsor_account` (`sponsor_name`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_push_event FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_push_user FOREIGN KEY (`user_id`) REFERENCES `user_account` (`account_id`) ON DELETE CASCADE ON UPDATE CASCADE

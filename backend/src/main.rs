@@ -3,6 +3,7 @@ extern crate lazy_static;
 extern crate serde_derive;
 extern crate serde_json;
 
+use regex::Regex;
 use crate::db::records::Record;
 
 mod app;
@@ -10,6 +11,16 @@ mod db;
 mod utils;
 
 fn main() {
+    /*
+    let test_p = "学生会".to_string();
+    let test_str_1 = "学生会sdasdas".to_string();
+    let test_str_2 = "学dasds生会".to_string();
+    let test_str_3 = "学生会".to_string();
+    let re = Regex::new(&test_p).unwrap();
+
+    println!("{:?},{:?},{:?}",re.is_match(&test_str_1), re.is_match(&test_str_2), re.is_match(&test_str_3));*/
+    
+    
     dotenv::dotenv().ok();
 
     let sys = actix::System::new("conduit");
@@ -81,7 +92,7 @@ fn main() {
     /*let pic1 = "123".to_string();
     let pic2 = "456".to_string();
     let pic = vec![pic1, pic2];
-    let s = db::moment::publish_moment(&"2".to_string(), &"0".to_string(), &"id1".to_string(), &"jjj".to_string(), &pic);
+    let s = db::moment::publish_moment(&"xx学生会".to_string(), &"6752fd533376ab9c8c408a697cf56566".to_string(), &"活动2".to_string(), &"11".to_string(), &"tesxty".to_string(), &pic);
     match s{
         Err(e) => println!("{}", e),
         Ok(o) => {},
@@ -132,7 +143,7 @@ fn main() {
             }
         },
     }*/
-//    let s = db::moment::get_user_like_event_moments_ordered(&"123".to_string());
+//    let s = db::moment::get_user_like_event_moments_ordered(&"oXkuv4ne9bcnE1aoVQvHkLNMMQy4".to_string());
 //    match s{
 //        Err(e) => println!("{}", e),
 //        Ok(o) => {
@@ -141,5 +152,15 @@ fn main() {
 //                         moment.sponsor_name, moment.event_id, moment.moment_id, moment.text, moment.time);
 //            }
 //        },
+//    }
+//    let s = db::sponsors::get_all_sponsor_info();
+//    match s {
+//        Err(e) => println!("{}", e),
+//        Ok(o) => {
+//            for sponsor in o{
+//                println!("id:{}, name:{}, head:{}, email:{}, number:{}",
+//                         sponsor.id, sponsor.sponsor_name, sponsor.head_portrait, sponsor.email, sponsor.phone_number);
+//            }
+//        }
 //    }
 }

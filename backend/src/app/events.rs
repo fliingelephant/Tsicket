@@ -10,6 +10,7 @@ use super::sponsors::QuerySponsor;
 use super::update::{update_events};
 use crate::db::events::Event;
 use crate::db::records::{MomentRecord, PostRecord};
+use crate::db::sponsors;
 use crate::db::moment;
 use crate::utils::auth::{identify_some, identify_sponsor, identify_user};
 
@@ -94,6 +95,25 @@ pub struct EventInfo {
     pub update_type: i8,
 }
 
+#[derive(Serialize)]
+pub struct EventInfoWithSponsorAvatar {
+    pub event_id: String,
+    pub sponsor_avatar: String,
+    pub sponsor_name: String,
+    pub event_name: String,
+    pub start_time: String,
+    pub event_time: String,
+    pub end_time: String,
+    pub event_type: i8,
+    pub event_introduction: String,
+    pub event_picture: String,
+    pub event_capacity: i32,
+    pub event_status: i8,
+    pub current_participants: i32,
+    pub left_tickets: i32,
+    pub event_location: String,
+}
+
 #[allow(dead_code)]
 pub fn get_event_info(
     id: Identity,
@@ -116,7 +136,27 @@ pub fn get_event_info(
         if events.contains_key(&query_event.event_id) {
             let event = events.get(&query_event.event_id).unwrap().clone();
             drop(events);
-            Ok(HttpResponse::Ok().json(event.clone()))
+            let sponsor_avatar = match sponsors::get_avatar_by_name(&event.sponsor_name) {
+                Ok(avatar_url) => avatar_url,
+                Err(_) => "".to_string()
+            };
+            Ok(HttpResponse::Ok().json(EventInfoWithSponsorAvatar {
+                event_id: event.event_id.clone(),
+                sponsor_avatar: sponsor_avatar.clone(),
+                sponsor_name: event.sponsor_name.clone(),
+                event_name: event.event_name.clone(),
+                start_time: event.start_time.clone(),
+                event_time: event.event_time.clone(),
+                end_time: event.end_time.clone(),
+                event_type: event.event_type.clone(),
+                event_introduction: event.event_introduction.clone(),
+                event_picture: event.event_picture.clone(),
+                event_capacity: event.event_capacity,
+                current_participants: event.current_participants,
+                left_tickets: event.left_tickets,
+                event_status: event.event_status,
+                event_location: event.event_location.clone(),
+            }))
         } else {
             Ok(HttpResponse::UnprocessableEntity().json("Event does not exist."))
         }
@@ -155,6 +195,7 @@ pub fn alter_event_info(
                     event.event_type = alter_event.event_type;
                     event.event_introduction = alter_event.event_introduction.clone();
                     event.event_picture = alter_event.event_picture.clone();
+                    event.event_status %= 10; 
                     event.left_tickets += alter_event.event_capacity - event.event_capacity;
                     if event.left_tickets < 0 {
                         event.left_tickets = 0;

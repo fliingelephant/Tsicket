@@ -69,3 +69,16 @@ pub fn get_all_events(
     }
     Ok(())
 }
+
+pub fn cancel_event(
+    event_id: &String
+) -> Result<(), String> {
+    let command = format!("UPDATE event SET event_status=4 WHERE event_id='{event_id}';",
+        event_id=event_id);
+    println!("{}", command);
+    let req=POOL.prep_exec(command, ());
+    match req {
+        Err(e) => Err(e.to_string()),
+        Ok(_) => Ok(())
+    }
+}
