@@ -1243,3 +1243,62 @@ pub fn get_sponsor_events(
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }
+
+#[allow(dead_code)]
+pub fn get_random_events(
+    id: Identity,
+    req: HttpRequest,
+    Query(query_list): Query<QueryList>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            let events = (*EVENT_LIST).lock().unwrap();
+            let mut available_event_id = vec![];
+            for event in events.values() {
+                if (event.event_status % 10 > 0) && (event.event_status % 10 < 3) {
+                    available_event_id.push(event.event_id.clone());
+                }
+            }
+            let index = query_list.index;
+            let more: bool;
+            let end: usize;
+            if index + 6 >= available_event_id.len() {
+                    more = false;
+                    end = available_event_id.len();
+            } else {
+                more = true;
+                end = index + 6;
+            }
+            let mut events_ret = vec![];
+            for i in index..end {
+                let event = &events.get(&available_event_id[i]).unwrap();
+                let like = match users::check_user_like(&openid, &event.event_id) {
+                        Ok(flag) => flag,
+                        Err(_) => false
+                };
+                events_ret.push(UserEventInfo {
+                    like: like,
+                    event_id: event.event_id.clone(),
+                    sponsor_name: event.sponsor_name.clone(),
+                    event_name: event.event_name.clone(),
+                    start_time: event.start_time.clone(),
+                    event_time: event.event_time.clone(),
+                    end_time: event.end_time.clone(),
+                    event_type: event.event_type,
+                    event_introduction: event.event_introduction.clone(),
+                    event_picture: event.event_picture.clone(),
+                    event_capacity: event.event_capacity,
+                    current_participants: event.current_participants,
+                    left_tickets: event.left_tickets,
+                    event_status: event.event_status,
+                    event_location: event.event_location.clone(),
+                });
+            }
+            Ok(HttpResponse::Ok().json(UserEventsRet { // 200 OK
+                more: more,
+                events: events_ret,
+            }))
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}

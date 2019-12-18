@@ -33,6 +33,7 @@ fn format_time(time: &String) -> String {
 pub fn publish_moment(
     sponsor_name: &String,
     event_id: &String,
+    event_name: &String,
     moment_id: &String,
     text: &String,
     pictures: &Vec<String>
@@ -45,9 +46,9 @@ pub fn publish_moment(
             picture_str = picture_str + "&" + &pic;
         }
     }
-    let command = format!("INSERT INTO moment (sponsor_name, event_id, moment_id, text, pictures\
-    ) VALUES ('{sponsor_name}', '{event_id}', '{moment_id}', '{text}', '{pictures}');", sponsor_name
-    = sponsor_name, event_id = event_id, moment_id = moment_id, text = text, pictures = picture_str);
+    let command = format!("INSERT INTO moment (sponsor_name, event_id, event_name, moment_id, text, pictures\
+    ) VALUES ('{sponsor_name}', '{event_id}', '{event_name}', '{moment_id}', '{text}', '{pictures}');", sponsor_name
+    = sponsor_name, event_id = event_id, event_name = event_name, moment_id = moment_id, text = text, pictures = picture_str);
     let res = POOL.prep_exec(command, ());
     match res {
         Err(e) => return Err(e.to_string()),

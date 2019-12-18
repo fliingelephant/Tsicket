@@ -12,6 +12,7 @@ use actix_web::{
     HttpResponse,
     web,
     web::Json};
+use chrono::prelude::Local;
 use futures::{Stream, Future, future::result};
 use futures::future::{err, Either};
 use md5::compute;
@@ -505,8 +506,8 @@ pub fn update_pic(
                 })
             })
             .map_err(|e| {
-                    println!("failed: {}", e);
-                    e
+                println!("failed: {}", e);
+                e
             })
 }
 
@@ -522,6 +523,7 @@ pub fn get_pic(
 
 #[derive(Deserialize)]
 pub struct Moment {
+    pub event_name: String,
     pub text: String,
     pub pictures: Vec<String>
 }
@@ -536,7 +538,9 @@ pub fn publish_moment(
         Ok(sponsor_name) => {
             let event_id = req.match_info().query("event_id").to_string();
             // TODO: 检查是否符合活动和发布者对应
-            match moment::publish_moment(&sponsor_name, &event_id, &"1".to_string(), &moment.text, &moment.pictures) {
+            let now = Local::now().to_string();
+            match moment::publish_moment(&sponsor_name, &event_id, &md5(&(sponsor_name.clone() + &event_id + &now)),
+             &moment.event_name, &moment.text, &moment.pictures) {
                 Ok(_) => Ok(HttpResponse::Ok().finish()),
                 Err(e) => {
                     println!("{}", e);
