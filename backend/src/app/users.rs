@@ -1247,7 +1247,6 @@ pub fn get_sponsor_events(
 #[allow(dead_code)]
 pub fn get_random_events(
     id: Identity,
-    req: HttpRequest,
     Query(query_list): Query<QueryList>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     result(match identify_user(&id) {
