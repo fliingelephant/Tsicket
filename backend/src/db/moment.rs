@@ -165,6 +165,9 @@ pub fn get_user_follow_sponsor_moments_sorted(user_id: &String)->Result<Vec<Mome
                 names = names + "'" + sponsor.as_ref() + "'" ;
             }
             names = names + ")";
+            if names == "()"{
+                return Ok(moments);
+            }
             let command = format!("SELECT * FROM moment WHERE sponsor_name IN {names} ORDER BY `time` DESC;", names=names);
             println!("{}", command);
             let res = POOL.prep_exec(command, ());
