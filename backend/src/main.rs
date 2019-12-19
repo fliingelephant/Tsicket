@@ -3,24 +3,12 @@ extern crate lazy_static;
 extern crate serde_derive;
 extern crate serde_json;
 
-use regex::Regex;
-use crate::db::records::Record;
-
 mod app;
 mod db;
 mod utils;
 
 fn main() {
-    /*
-    let test_p = "学生会".to_string();
-    let test_str_1 = "学生会sdasdas".to_string();
-    let test_str_2 = "学dasds生会".to_string();
-    let test_str_3 = "学生会".to_string();
-    let re = Regex::new(&test_p).unwrap();
 
-    println!("{:?},{:?},{:?}",re.is_match(&test_str_1), re.is_match(&test_str_2), re.is_match(&test_str_3));*/
-    
-    
     dotenv::dotenv().ok();
 
     let sys = actix::System::new("conduit");
@@ -28,7 +16,7 @@ fn main() {
     app::start();
 
     let _ = sys.run();
-
+    
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 
     println!("result of sponsor sign up: {}", sponsor_sign_up("123".to_string(), "1".to_string(), "123456".to_string()));

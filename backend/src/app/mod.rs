@@ -159,11 +159,13 @@ fn routes(app: &mut web::ServiceConfig) {
                         .route(web::post().to_async(users::bind_tsinghua_id))
                      )
                     
-                    
                      /* Sponsor routes ↓ */
                      .service(web::resource("sponsors")
                          .route(web::get().to_async(sponsors::get_available_events))
                          .route(web::post().to_async(sponsors::publish_event))
+                     )
+                     .service(web::resource("sponsors/events")
+                         .route(web::get().to_async(sponsors::get_all_events))
                      )
                      .service(web::resource("sponsors/advertise/{event_id}")
                          .route(web::post().to_async(sponsors::advertise_event))
@@ -200,6 +202,13 @@ fn routes(app: &mut web::ServiceConfig) {
                      .service(web::resource("admins")
                          .route(web::get().to_async(admins::get_all_events))
                      )
+                     /*
+                     .service(web::resource("admins/book")
+                         .route(web::post().to_async(admins::get_user_events))
+                     )
+                     .service(web::resource("admins/book/{event_id}")
+                         .route(web::get().to_async(admins::get_event_user))
+                     )*/
                      .service(web::resource("admins/login")
                          .route(web::post().to_async(admins::login))
                      )
@@ -216,6 +225,9 @@ fn routes(app: &mut web::ServiceConfig) {
                      .service(web::resource("admins/review/{event_id}")
                          .route(web::post().to_async(admins::review_event))
                          .route(web::delete().to_async(admins::cancel_review_event))
+                     )
+                     .service(web::resource("admins/sponsorevents/{sponsor_name}")
+                         .route(web::get().to_async(admins::get_sponsor_event))
                      )
                      .service(web::resource("admins/sponsors")
                          .route(web::get().to_async(admins::get_all_sponsor_info))

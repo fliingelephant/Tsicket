@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use super::{ADMIN_ID, ADMIN_PASSWORD_WITH_SALT, EVENT_LIST};
 use super::events::{QueryEventByID};
 use super::update::{update_events};
-use crate::db::{admins, sponsors};
+use crate::db::{admins, events, sponsors};
 
 use crate::utils::auth::{identify_admin};
 
@@ -373,6 +373,30 @@ pub fn get_all_sponsor_info(
             match sponsors::get_all_sponsor_info() {
                 Ok(sponsors) => Ok(HttpResponse::Ok().json(AllSponsorInfo {
                     sponsors: sponsors
+                })),
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
+            }
+        }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+#[derive(Serialize)]
+pub struct EventsRet {
+    pub events: Vec<events::Event>
+}
+
+#[allow(dead_code)]
+pub fn get_sponsor_event(
+    id: Identity,
+    req: HttpRequest
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_admin(&id) {
+        Ok(_) => {
+            let sponsor_name = req.match_info().query("sponsor_name").to_string();
+            match sponsors::get_sponsor_events(&sponsor_name) {
+                Ok(events) => Ok(HttpResponse::Ok().json(EventsRet {
+                    events: events
                 })),
                 Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e))
             }

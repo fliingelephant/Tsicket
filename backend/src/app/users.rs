@@ -15,6 +15,8 @@ use reqwest::{get, Client};
 use serde::{Deserialize, Serialize};
 use actix_service::ServiceExt;
 
+use rand::{thread_rng, Rng};
+
 use super::{APP_ID, EVENT_LIST, RECORD, SECRET};
 use super::sponsors::{QuerySponsor, QuerySponsorByID};
 use super::events::{QueryEvent, QueryEventByID, EventsRet};
@@ -90,6 +92,7 @@ pub fn login(
     id: Identity,
     info: Json<WechatLoginInfo>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
+    
     let url = format!("https://api.weixin.qq.com/sns/jscode2session?\
         appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code",
         appid = env::var("APP_ID").unwrap(), secret = env::var("SECRET").unwrap(), code = info.code);
@@ -121,6 +124,11 @@ pub fn login(
             Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
         }
     })
+    /*
+    let openid = thread_rng().gen::<u32>().to_string();
+    id.remember("2".to_owned() + &openid);
+    result(Ok(HttpResponse::Ok().finish()))
+    */
 }
 
 #[derive(Deserialize)]
@@ -571,29 +579,19 @@ pub fn book_event(
     result(match identify_user(&id) {
         Ok(openid) => {
             let event_id = req.match_info().query("event_id").to_string();
-            match (*EVENT_LIST).try_lock() {
-                Ok(a) => {println!("OKOKOK!");drop(a);}
-                Err(e) => {println!("{:?}", e);}
-            }
             let mut events = (*EVENT_LIST).lock().unwrap();
             match events.get_mut(&event_id) {
                 Some(mut event) => {
-                    println!("{} is booking {}", openid, event_id);
                     if (event.event_status % 10 == 2) && (event.left_tickets > 0) {
                         event.left_tickets -= 1;
                         event.update_type = 1;
                         let index_str = event_id + "_" + &openid;
                         let success: bool;
-                        match (*RECORD).try_lock() {
-                            Ok(a) => {println!("OKOKOK!");drop(a);}
-                            Err(e) => {println!("{:?}", e);}
-                        }
                         let mut records = (*RECORD).lock().unwrap();
                         success = match records.get(&index_str) {
                             Some(_) => false,
                             None => true,
                         };
-                        println!("HERE!!{:?}",success);
                         if success == true {
                             records.insert(index_str.clone(), Record {
                                 // TODO: 改变record_id
@@ -606,13 +604,13 @@ pub fn book_event(
                                 update_type: 1
                             });
                         }
+                        
                         drop(records);
                         drop(events);
                         match update_events() {
                             Ok(_) => {}
                             Err(e) => {println!("{}",e);}
                         }
-                        println!("HERE!!updated events");
                         match update_records() {
                             Ok(_) => {}
                             Err(e) => {println!("{}",e);}
