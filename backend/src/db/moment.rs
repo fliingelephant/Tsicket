@@ -214,6 +214,9 @@ pub fn get_user_like_event_moments_ordered(user_id: &String)->Result<Vec<Moment>
                 ids = ids + "'" + event.as_ref() + "'";
             }
             ids = ids + ")";
+            if ids == "()"{
+                return Ok(moments);
+            }
             let command = format!("SELECT * FROM moment WHERE event_id IN {ids} ORDER BY `time` DESC;", ids=ids);
             println!("{}", command);
             let res = POOL.prep_exec(command, ());
