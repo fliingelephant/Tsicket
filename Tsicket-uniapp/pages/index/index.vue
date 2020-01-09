@@ -131,6 +131,12 @@
 							if (res.data.events) {
 								res.data.events.forEach((res, index) => {
 									//res.like = true
+									// if(res.event_picture != '' ) {
+									// 	res.img_url = res.event_picture
+									// } else 
+									if (!res.img_url || (res.img_url == '')) {
+										res.img_url = app.globalData.backimg[parseInt('11' + res.event_id) % 4]
+									}
 									res.delay = '' + (index + 5) * 0.1 + 's'
 									setTimeout(() => {
 										res.delay = undefined
@@ -182,7 +188,7 @@
 			InputBlur(e) {
 				console.log(e)
 			},
-			searchPage(){
+			searchPage() {
 				console.log(this.keyword)
 				uni.navigateTo({
 					url: "../search/search?keyword=" + this.keyword

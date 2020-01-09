@@ -4,7 +4,11 @@
 	margin-bottom: 40rpx;
 	height: 250rpx;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
-	background-color: #007AFF;
+	/* background-color: #007AFF; */
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	-webkit-backdrop-filter: blur(10rpx);
+	        backdrop-filter: blur(10rpx);
 }
 .collapse {
 	width: 100%;
@@ -19,7 +23,7 @@
 	width: inherit;
 	height: 250rpx;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
-	background-color: #007AFF;
+	/* background-color: #007AFF; */
 }
 .line-round {
 	margin-top: 5rpx;
@@ -28,9 +32,6 @@
 	height: 10rpx;
 	border-radius: 5rpx 5rpx 5rpx 5rpx;
 	background-color: gainsboro;
-}
-.info {
-	height: 250rpx;
 }
 .info-flex {
 	height: 190rpx;
@@ -57,8 +58,30 @@
 .like {
 	font-size: 60rpx;
 }
+.cuIcon-likefill.likefill {
+	-webkit-transition: all 0.3s ease-in 0s;
+	transition: all 0.3s ease-in 0s;
+	color: #DD514C;
+	opacity: 1;
+}
 .cuIcon-likefill {
-	-webkit-transition: opacity 1s ease-in 0s;
-	transition: opacity 1s ease-in 0s;
+	-webkit-transition: all 0.3s ease-in 0s;
+	transition: all 0.3s ease-in 0s;
+	color: #FFFFFF;
+	position: relative;
+	left: 60rpx;
+	opacity: 0;
+}
+.cuIcon-like.likefill {
+	-webkit-transition: all 0.3s ease-in 0s;
+	transition: all 0.3s ease-in 0s;
+	color: #DD514C;
+	opacity: 0;
+}
+.cuIcon-like {
+	-webkit-transition: all 0.3s ease-in 0s;
+	transition: all 0.3s ease-in 0s;
+	color: #FFFFFF;
+	opacity: 1;
 }
 

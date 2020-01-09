@@ -20,7 +20,7 @@
 	width: inherit;
 	height: 300rpx;
 	border-radius: 20rpx 20rpx 20rpx 20rpx;
-	background-color: #007AFF;
+	/* background-color: #007AFF; */
 }
 .card-back {
 	position: absolute;

@@ -76,6 +76,9 @@
 								this.likelist = []
 							}
 							res.data.list.forEach((item, index) => {
+								if(!item.img_url || (item.img_url == '') ) {
+									item.img_url =  app.globalData.backimg[parseInt('11' + item.event_id) % 4]
+								}
 								item.like = true
 								item.event_introduction = ''
 								item.delay = '' + (index + 5) * 0.1 + 's'

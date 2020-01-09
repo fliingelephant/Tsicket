@@ -267,6 +267,9 @@
 							res.isUnfold = false
 							res.delay = '' + (index + 1) * 0.1 + 's'
 							res.cancel = undefined
+							if(!res.img_url || (res.img_url == '') ) {
+								res.img_url =  app.globalData.backimg[parseInt('11' + res.event_id) % 4]
+							}
 							setTimeout(() => {
 								res.delay = undefined
 							}, (index + 11) * 100)

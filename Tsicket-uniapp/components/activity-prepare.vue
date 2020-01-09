@@ -1,6 +1,6 @@
 <template>
 	<view class="activity-prepare" :class="{'unfold': activity.isUnfold}">
-		<view class="imgcard" :style="{backgroundImage: activity.img_url ?  'url(' + activity.img_url + ')':'' }" >
+		<view class="imgcard" :style="{backgroundImage: activity.img_url ?  'url(' + activity.img_url + ')':'' , backgroundRepeat : 'no-repeat', backgroundSize : '100% 100%'}" >
 		<!-- <image :src="activity.bgUrl" class="imgcard"></image>
 		<view class="card-back" :class="{'unfold': activity.isUnfold}"></view> -->
 		<view class="info padding flex align-start justify-between text-white" @click="$emit('unfold')">
@@ -91,7 +91,7 @@
 		width: inherit;
 		height: 300rpx;
 		border-radius: 20rpx 20rpx 20rpx 20rpx;
-		background-color: #007AFF;
+		/* background-color: #007AFF; */
 	}
 
 	.card-back {
