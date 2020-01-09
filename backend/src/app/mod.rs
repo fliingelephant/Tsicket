@@ -15,6 +15,9 @@ use actix_web::{
 };
 use mysql::{Pool};
 use rand::{thread_rng, Rng};
+# #![deny(deprecated)]
+# extern crate tokio;
+#
 use tokio::prelude::*;
 use tokio::timer::Interval;
 
