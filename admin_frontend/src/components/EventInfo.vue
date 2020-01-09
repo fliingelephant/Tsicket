@@ -4,7 +4,6 @@
     <el-header class="header">
       <el-row>
         <el-col :span="20"><div>活动详情</div></el-col>
-<!--        <el-col :span="4"><div class="add-event"><el-button @click="addNotice" disabled>发布通知</el-button></div></el-col>-->
         <el-col :span="4"><div class="add-event"><el-button @click="addMoment">添加动态</el-button></div></el-col>
       </el-row>
     </el-header>
@@ -184,7 +183,6 @@
         },
         mounted(){
             this.getInfo()
-            //this.getNotice()
             this.getMoment()
         },
         methods: {
@@ -209,26 +207,7 @@
                     })
                 })
             },
-            getNotice(){
-                this.$axios.get("/events/posts/"+this.$route.params.id).then(response => {
-                    if(response.status===200) {
-                        this.notice_data=response.data
-                        console.log(this.notice_data)
-                    }
-                    else{
-                        this.$message({
-                            message: '查询通知失败',
-                            type: 'error'
-                        })
-                    }
-                },err=>{
-                    this.$message({
-                        message: '查询通知失败',
-                        type: 'error'
-                    })
-                })
 
-            },
             getMoment(){
                 this.$axios.get("/events/moments/"+this.$route.params.id).then(response => {
                     if(response.status===200) {
@@ -247,9 +226,6 @@
                     })
                 })
 
-            },
-            addNotice(){
-                this.$router.push('/AddNotice/'+this.$route.params.id)
             },
             addMoment(){
                 this.$router.push('/AddMoment/'+this.$route.params.id)

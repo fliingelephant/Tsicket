@@ -22,19 +22,18 @@
           <el-row :gutter="20">
             <el-col :span="4"><div class="event-text">动态图片</div></el-col>
             <el-col :span="16">
-              <!--上传图片-->
               <el-upload
-                :action="url+time_string"
-                :limit="9"
-                multiple
-                accept="image/png,image/jpeg"
-                list-type="picture-card"
-                :before-upload="beforeUploadPicture"
-                :on-remove="handleRemove"
-                :on-success="uploadSuccess"
-                :on-error="uploadError"
-                :show-file-list="true"
-                >
+                      :action="url+time_string"
+                      :limit="9"
+                      multiple
+                      accept="image/png,image/jpeg"
+                      list-type="picture-card"
+                      :before-upload="beforeUploadPicture"
+                      :on-remove="handleRemove"
+                      :on-success="uploadSuccess"
+                      :on-error="uploadError"
+                      :show-file-list="true"
+              >
                 <i class="el-icon-plus"></i>
               </el-upload>
             </el-col>
@@ -61,7 +60,7 @@
             return({
                 filelist:[],
                 url:'apis/sponsors/pic/',
-                script:'这是一个动态',
+                script:'',
                 picture:'',
                 event_name:'',
                 time_string:'',

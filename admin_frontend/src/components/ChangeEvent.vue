@@ -82,8 +82,6 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动发票方式</div></el-col>
             <el-col :span="12">
               <el-radio v-model="info.event_type" label="0">抢票</el-radio>
-<!--              <el-radio v-model="info.event_type" label="1">扫码领票</el-radio>-->
-<!--              <el-radio v-model="info.event_type" label="2">申请审核</el-radio>-->
             </el-col>
           </el-row>
         </el-form-item>
@@ -117,7 +115,6 @@
           <el-row :gutter="20">
             <el-col :span="4"><div class="event-text">修改图片</div></el-col>
             <el-col :span="20">
-              <!--上传图片-->
               <el-upload
                       :action="upload_url+new Date().toISOString()"
                       :limit="1"

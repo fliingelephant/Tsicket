@@ -11,7 +11,7 @@
     <el-main>
       <el-table
               stripe
-              :data="events.slice((currentPage-1)*pageSize,currentPage*pageSize)">
+              :data="events.slice((current_page-1)*page_size,current_page*page_size)">
         <el-table-column
           prop="event_name"
           label="活动名称">
@@ -60,9 +60,9 @@
       <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage"
+      :current-page="current_page"
       :page-sizes="[10, 20]"
-      :page-size="pageSize"
+      :page-size="page_size"
       :total="events.length"
       layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
@@ -103,8 +103,8 @@
                 stop_state: [1,2,11,12,21,22],
                 apply_state: [1,2],
                 drop_state : [11,12],
-                currentPage:1,
-                pageSize:10
+                current_page:1,
+                page_size:10
             })
         },
         mounted(){
@@ -125,10 +125,10 @@
                 this.$router.push('/Help')
             },
             handleSizeChange: function(val) {
-                this.pageSize = val;
+                this.page_size = val;
             },
             handleCurrentChange: function(page) {
-                this.currentPage = page;
+                this.current_page = page;
             },
             testLogIn(){
 

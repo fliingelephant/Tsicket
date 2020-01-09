@@ -36,7 +36,7 @@
             <el-col :span="12">
               <el-date-picker
                       value-format="yyyy/MM/dd HH:mm:ss"
-                      v-model="distributestart"
+                      v-model="distribute_start"
                       type="datetime"
               ></el-date-picker>
             </el-col>
@@ -49,7 +49,7 @@
             <el-col :span="12">
               <el-date-picker
                       value-format="yyyy/MM/dd HH:mm:ss"
-                      v-model="distributeend"
+                      v-model="distribute_end"
                       type="datetime"
               ></el-date-picker>
             </el-col>
@@ -71,7 +71,7 @@
             <el-col :span="12">
               <el-date-picker
                       value-format="yyyy/MM/dd HH:mm:ss"
-                      v-model="date"
+                      v-model="event_time"
                       type="datetime"
               ></el-date-picker>
             </el-col>
@@ -83,8 +83,6 @@
             <el-col :span="5"><div class="event-text"><a class="compulsory">*</a>活动发票方式</div></el-col>
             <el-col :span="12">
               <el-radio v-model="method" label='0'>抢票</el-radio>
-<!--              <el-radio v-model="method" label='1'>扫码领票</el-radio>-->
-<!--              <el-radio v-model="method" label='2'>申请审核</el-radio>-->
             </el-col>
           </el-row>
         </el-form-item>
@@ -141,32 +139,32 @@
             return {
                 name: '',
                 place: '',
-                date: '',
+                event_time: '',
                 method: '',
                 description:'',
                 upload_url:'apis/sponsors/pic/',
                 event_picture:'',
-                distributestart:'',
-                distributeend:'',
+                distribute_start:'',
+                distribute_end:'',
                 capacity:'',
             }
         },
         methods:{
             post(){
 
-                if(this.name === '' || this.place === ''|| this.date === ''||this.method === ''||this.description === ''||this.distributestart === ''||this.distributeend === ''||this.capacity === ''){
+                if(this.name === '' || this.place === ''|| this.event_time === ''||this.method === ''||this.description === ''||this.distribute_start === ''||this.distribute_end === ''||this.capacity === ''){
                     this.$message.error('请输入必填项')
                 }
                 else {
-                    let time_start=Date.parse(this.distributestart)
-                    let time_end=Date.parse(this.distributeend)
-                    let time_event=Date.parse(this.date)
+                    let time_start=Date.parse(this.distribute_start)
+                    let time_end=Date.parse(this.distribute_end)
+                    let time_event=Date.parse(this.event_time)
                     if(time_start<time_end&&time_end<time_event) {
                         let data = {
                             "event_name": this.name,
-                            "start_time": this.distributestart,
-                            "end_time": this.distributeend,
-                            "event_time": this.date,
+                            "start_time": this.distribute_start,
+                            "end_time": this.distribute_end,
+                            "event_time": this.event_time,
                             "event_type": parseInt(this.method),
                             "event_introduction": this.description,
                             "event_picture": this.event_picture,
@@ -201,7 +199,7 @@
             },
             beforeUploadPicture(file) {
                 if(file.size > 10*1024*1024){
-                    this.$message.error("上传图片不能大于10M");
+                    this.$message.error("上传图片不能大于10M")
                     return false;
                 }
             },
@@ -212,7 +210,7 @@
             },
 
             uploadError(err, file, fileList) {
-                this.$message.error("上传出错");
+                this.$message.error("上传出错")
             },
 
             handleRemove(file, fileList) {
