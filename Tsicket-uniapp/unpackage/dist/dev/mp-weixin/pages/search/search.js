@@ -197,7 +197,7 @@ var app = getApp();var _default =
             keyword: this.keyword },
 
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
@@ -246,7 +246,7 @@ var app = getApp();var _default =
         url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id,
         method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {

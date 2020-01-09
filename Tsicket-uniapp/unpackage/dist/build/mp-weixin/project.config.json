@@ -4,10 +4,13 @@
 		"ignore": []
 	},
 	"setting": {
-		"urlCheck": false
+		"urlCheck": false,
+		"minified": true,
+		"postcss": true,
+		"es6": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.9.2",
+	"libVersion": "2.10.0",
 	"appid": "wxcb9e0809f7d48b0f",
 	"projectname": "Tsicket",
 	"simulatorType": "wechat",

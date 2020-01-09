@@ -28,12 +28,6 @@
 			</view>
 		</view>
 	</view>
-	<!-- <view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view class="text-area">
-			<text class="title">{{title}}</text>
-		</view>
-	</view> -->
 </template>
 
 <script>
@@ -53,9 +47,6 @@
 				url: "/static/cardback0.jpg",
 				activitylist: [],
 				current: 0,
-				tabs: [
-					"介绍", "动态"
-				]
 			};
 		},
 		onLoad() {
@@ -97,7 +88,7 @@
 				uni.request({
 					url: app.globalData.apiurl + 'users/broadcast',
 					header: {
-						'content-type': 'application/json', //自定义请求头信息
+						'content-type': 'application/json',
 						'cookie': app.globalData.cookie
 					},
 					success: (res) => {
@@ -122,7 +113,7 @@
 							index: this.activityindex
 						},
 						header: {
-							'content-type': 'application/json', //自定义请求头信息
+							'content-type': 'application/json',
 							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
@@ -134,9 +125,9 @@
 									// if(res.event_picture != '' ) {
 									// 	res.img_url = res.event_picture
 									// } else 
-									if (!res.img_url || (res.img_url == '')) {
-										res.img_url = app.globalData.backimg[parseInt('11' + res.event_id) % 4]
-									}
+									//if (!res.img_url || (res.img_url == '')) {
+									res.img_url = app.globalData.backimg[parseInt('11' + res.event_id) % 4]
+									//}
 									res.delay = '' + (index + 5) * 0.1 + 's'
 									setTimeout(() => {
 										res.delay = undefined
@@ -199,7 +190,7 @@
 					url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id,
 					method: 'POST',
 					header: {
-						'content-type': 'application/json', //自定义请求头信息
+						'content-type': 'application/json',
 						'cookie': app.globalData.cookie
 					},
 					success: (res) => {

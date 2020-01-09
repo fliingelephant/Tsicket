@@ -196,12 +196,12 @@ var app = getApp();var _default =
     loadpage: function loadpage() {var _this = this;
       if (this.more) {
         uni.request({
-          url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
+          url: app.globalData.apiurl + 'users/like',
           data: {
             index: this.likeindex },
 
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
@@ -211,9 +211,9 @@ var app = getApp();var _default =
               _this.likelist = [];
             }
             res.data.list.forEach(function (item, index) {
-              if (!item.img_url || item.img_url == '') {
-                item.img_url = app.globalData.backimg[parseInt('11' + item.event_id) % 4];
-              }
+              //if(!item.img_url || (item.img_url == '') ) {
+              item.img_url = app.globalData.backimg[parseInt('11' + item.event_id) % 4];
+              //}
               item.like = true;
               item.event_introduction = '';
               item.delay = '' + (index + 5) * 0.1 + 's';
@@ -256,12 +256,11 @@ var app = getApp();var _default =
 
     },
     like: function like(index) {var _this2 = this;
-      //console.log(id)
       uni.request({
-        url: app.globalData.apiurl + 'users/like/' + this.likelist[index].event_id, //仅为示例，并非真实接口地址。
+        url: app.globalData.apiurl + 'users/like/' + this.likelist[index].event_id,
         method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {

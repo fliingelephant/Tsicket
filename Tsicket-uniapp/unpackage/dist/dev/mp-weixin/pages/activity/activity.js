@@ -218,11 +218,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 var app = getApp();
-var touchStartX = 0; //触摸时的原点
-var touchStartY = 0; //触摸时的原点  
-var touchMoveX = 0; // x轴方向移动的距离
-var touchMoveY = 0; // y轴方向移动的距离
-var _default =
+var touchStartX = 0;
+var touchStartY = 0;
+var touchMoveX = 0;
+var touchMoveY = 0;var _default =
+
 {
   data: function data() {
     return {
@@ -275,7 +275,7 @@ var _default =
           event_id: this.id },
 
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -288,7 +288,7 @@ var _default =
       uni.request({
         url: app.globalData.apiurl + 'users/like/' + this.id,
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -299,7 +299,7 @@ var _default =
       uni.request({
         url: app.globalData.apiurl + 'users/book/' + this.id,
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -316,7 +316,7 @@ var _default =
       if (this.momentmore) {
         console.log('loadmoment' + this.momentindex);
         uni.request({
-          url: app.globalData.apiurl + 'users/moments/' + this.activity.event_id, //仅为示例，并非真实接口地址。
+          url: app.globalData.apiurl + 'users/moments/' + this.activity.event_id,
           data: {
             event_id: this.activity.event_id,
             index: this.momentindex },
@@ -343,14 +343,11 @@ var _default =
 
       }
     },
-    // 触摸开始事件
-    touchStart: function touchStart(e) {
-      touchStartX = e.touches[0].pageX; // 获取触摸时的原点  
-      touchStartY = e.touches[0].pageY; // 获取触摸时的原点  
-      // 使用js计时器记录时间    
 
+    touchStart: function touchStart(e) {
+      touchStartX = e.touches[0].pageX;
+      touchStartY = e.touches[0].pageY;
     },
-    // 触摸移动事件  
     touchMove: function touchMove(e) {
       touchMoveX = e.touches[0].pageX;
       touchMoveY = e.touches[0].pageY;
@@ -397,10 +394,10 @@ var _default =
           success: function success(res) {
             if (res.confirm) {
               uni.request({
-                url: app.globalData.apiurl + 'users/book/' + _this3.activity.event_id, //仅为示例，并非真实接口地址。
+                url: app.globalData.apiurl + 'users/book/' + _this3.activity.event_id,
                 method: 'DELETE',
                 header: {
-                  'content-type': 'application/json', //自定义请求头信息
+                  'content-type': 'application/json',
                   'cookie': app.globalData.cookie },
 
                 success: function success(res) {
@@ -493,7 +490,7 @@ var _default =
         url: app.globalData.apiurl + 'users/like/' + this.activity.event_id,
         method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -503,26 +500,7 @@ var _default =
 
     },
     appreciate: function appreciate(id) {
-      // uni.request({
-      // 	url: app.globalData.apiurl + 'users/like',
-      // 	method: 'POST',
-      // 	data: {
-      // 		openid: app.globalData.openid,
-      // 		messageid: id,
-      // 		session: '',
-      // 	},
-      // 	header: {
-      // 		'content-type': 'application/json' //自定义请求头信息
-      // 	},
-      // 	success: (res) => {
-      // 		console.log(res.data);
-      // 	}
-      // });
-      // var index = this.momentlist.findIndex((item) => {
-      // 	return item.id == id
-      // })
-      // console.log(index)
-      // this.momentlist[index].appreciate = !this.momentlist[index].appreciate
+
     },
     sponsorPage: function sponsorPage() {
       var page = getCurrentPages();

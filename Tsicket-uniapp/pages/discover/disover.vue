@@ -31,7 +31,7 @@
 							<view v-if="momentmore1" style="height: 80rpx"></view>
 						</scroll-view>
 					</swiper-item>
-					<swiper-item>
+					<!-- <swiper-item>
 						<scroll-view scroll-y class="tab-scroll" @scrolltolower='loadmoment'>
 							<view class="flex-column">
 								<message v-for="(item, index) in momentlist2" :class="[item.delay? momentanimation[2] :'']" :style="[{animationDelay: item.delay}]"
@@ -39,7 +39,7 @@
 							</view>
 							<view v-if="momentmore2" style="height: 80rpx"></view>
 						</scroll-view>
-					</swiper-item>
+					</swiper-item> -->
 				</swiper>
 			</view>
 		</view>
@@ -54,16 +54,14 @@
 			return {
 				momentlist0: [],
 				momentmore0: true,
-				momentindex0: 0,
 				momentlist1: [],
 				momentmore1: true,
-				momentindex1: 0,
 				momentlist2: [],
-				momentindex2: 0,
+				momentindex: [0, 0, 0],
 				momentanimation: ['animation-slide-bottom', 'animation-slide-right', 'animation-slide-right'],
 				current: 0,
 				tabs: [
-					"喜爱", "关注"//, "广场"
+					"喜爱", "关注" //, "广场"
 				]
 			};
 		},
@@ -115,7 +113,9 @@
 			swiperChange(e) {
 				this.current = e.detail.current;
 				console.log(this.current)
-				this.loadmoment()
+				if (this.momentindex[this.current] == 0) {
+					this.loadmoment()
+				}
 			},
 			loadmoment(e) {
 				console.log(e)
@@ -123,10 +123,10 @@
 					uni.request({
 						url: app.globalData.apiurl + 'users/momentslike',
 						data: {
-							index: this.momentindex0
+							index: this.momentindex[0]
 						},
 						header: {
-							'content-type': 'application/json', //自定义请求头信息
+							'content-type': 'application/json',
 							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
@@ -139,7 +139,7 @@
 							})
 							this.momentlist0 = this.momentlist0.concat(res.data.moments)
 							this.momentmore0 = res.data.more
-							this.momentindex0 += res.data.moments.length
+							this.momentindex[0] += res.data.moments.length
 							uni.hideLoading()
 							uni.stopPullDownRefresh()
 						}
@@ -148,10 +148,10 @@
 					uni.request({
 						url: app.globalData.apiurl + 'users/momentsfollow',
 						data: {
-							index: this.momentindex1
+							index: this.momentindex[1]
 						},
 						header: {
-							'content-type': 'application/json', //自定义请求头信息
+							'content-type': 'application/json',
 							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
@@ -164,18 +164,18 @@
 							})
 							this.momentlist1 = this.momentlist1.concat(res.data.moments)
 							this.momentmore1 = res.data.more
-							this.momentindex1 += res.data.moments.length
+							this.momentindex[1] += res.data.moments.length
 							uni.hideLoading()
 						}
 					});
 				} else if ((this.current == 2) && (this.momentindex2 != -1)) {
 					uni.request({
-						url: app.globalData.apiurl + 'users/moments/like',
+						url: app.globalData.apiurl + 'users/random',
 						data: {
-							index: this.momentmore2
+							index: this.momentindex[2]
 						},
 						header: {
-							'content-type': 'application/json', //自定义请求头信息
+							'content-type': 'application/json',
 							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
@@ -188,6 +188,7 @@
 							})
 							this.momentlist2 = this.momentlist2.concat(res.data.moments)
 							this.momentmore2 = res.data.more
+							this.momentindex[2] += res.data.moments.length
 							uni.hideLoading()
 						}
 					});
@@ -203,7 +204,7 @@
 						session: '',
 					},
 					header: {
-						'content-type': 'application/json' //自定义请求头信息
+						'content-type': 'application/json'
 					},
 					success: (res) => {
 						console.log(res.data);

@@ -174,12 +174,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 var app = getApp();var _default =
 
@@ -196,10 +190,7 @@ var app = getApp();var _default =
       dotStyle: false,
       url: "/static/cardback0.jpg",
       activitylist: [],
-      current: 0,
-      tabs: [
-      "介绍", "动态"] };
-
+      current: 0 };
 
   },
   onLoad: function onLoad() {
@@ -241,7 +232,7 @@ var app = getApp();var _default =
       uni.request({
         url: app.globalData.apiurl + 'users/broadcast',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -266,7 +257,7 @@ var app = getApp();var _default =
             index: this.activityindex },
 
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
@@ -278,9 +269,9 @@ var app = getApp();var _default =
                 // if(res.event_picture != '' ) {
                 // 	res.img_url = res.event_picture
                 // } else 
-                if (!res.img_url || res.img_url == '') {
-                  res.img_url = app.globalData.backimg[parseInt('11' + res.event_id) % 4];
-                }
+                //if (!res.img_url || (res.img_url == '')) {
+                res.img_url = app.globalData.backimg[parseInt('11' + res.event_id) % 4];
+                //}
                 res.delay = '' + (index + 5) * 0.1 + 's';
                 setTimeout(function () {
                   res.delay = undefined;
@@ -343,7 +334,7 @@ var app = getApp();var _default =
         url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id,
         method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {

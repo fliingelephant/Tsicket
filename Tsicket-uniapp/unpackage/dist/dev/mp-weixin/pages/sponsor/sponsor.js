@@ -214,11 +214,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 var app = getApp();
-var touchStartX = 0; //触摸时的原点
-var touchStartY = 0; //触摸时的原点  
-var touchMoveX = 0; // x轴方向移动的距离
-var touchMoveY = 0; // y轴方向移动的距离
-var _default =
+var touchStartX = 0;
+var touchStartY = 0;
+var touchMoveX = 0;
+var touchMoveY = 0;var _default =
+
 {
   data: function data() {
     return {
@@ -266,9 +266,8 @@ var _default =
       this.activitymore = true;
       uni.request({
         url: app.globalData.apiurl + 'sponsors/view/' + this.sponsor.name,
-        //method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -292,7 +291,7 @@ var _default =
             sponsor_name: this.sponsor.name },
 
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
@@ -349,14 +348,11 @@ var _default =
 
       }
     },
-    // 触摸开始事件
-    touchStart: function touchStart(e) {
-      touchStartX = e.touches[0].pageX; // 获取触摸时的原点  
-      touchStartY = e.touches[0].pageY; // 获取触摸时的原点  
-      // 使用js计时器记录时间    
 
+    touchStart: function touchStart(e) {
+      touchStartX = e.touches[0].pageX;
+      touchStartY = e.touches[0].pageY;
     },
-    // 触摸移动事件  
     touchMove: function touchMove(e) {
       touchMoveX = e.touches[0].pageX;
       touchMoveY = e.touches[0].pageY;
@@ -394,7 +390,7 @@ var _default =
         url: app.globalData.apiurl + 'users/follow/' + this.sponsor.name,
         method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -404,23 +400,7 @@ var _default =
 
     },
     appreciate: function appreciate(index) {
-      // uni.request({
-      // 	url: app.globalData.apiurl + 'users/appreciate',
-      // 	method: 'POST',
-      // 	data: {
-      // 		openid: app.globalData.openid,
-      // 		messageid: id,
-      // 		session: '',
-      // 	},
-      // 	header: {
-      // 		'content-type': 'application/json', 
-      // 		'cookie': app.globalData.cookie
-      // 	},
-      // 	success: (res) => {
-      // 		console.log(res.data);
-      // 		this.momentlist[index].appreciate = !this.momentlist[index].appreciate
-      // 	}
-      // });
+
     },
     activityPage: function activityPage(id) {
       var page = getCurrentPages();
@@ -436,10 +416,10 @@ var _default =
     like: function like(index) {var _this5 = this;
       //console.log(id)
       uni.request({
-        url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id, //仅为示例，并非真实接口地址。
+        url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id,
         method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {

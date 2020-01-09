@@ -159,129 +159,57 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var app = getApp();var _default =
 
 {
   data: function data() {
     return {
-      historylist: [{
-        id: 0,
-        name: '活动名',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 1,
-        name: '活动名1',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 2,
-        name: '活动名2',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 3,
-        name: '活动名3',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true },
-
-      {
-        id: 0,
-        name: '活动名4',
-        intro: '活动介绍语',
-        tickets: 80,
-        location: '活动地点',
-        start: '2019年xx月xx日',
-        end: '',
-        sponsorid: 100,
-        sponsorname: 'xx学生会',
-        type: 1,
-        state: 200,
-        like: true }],
-
-
+      scrollTop: 0,
+      historylist: [],
+      historyindex: 0,
+      more: true,
       current: 0,
       tabs: [
-      "喜爱"] };
+      "历史活动"] };
 
 
   },
   onLoad: function onLoad() {
-    // uni.request({
-    // 	url: app.globalData.apiurl + 'admins/sponsors',
-    // 	header: {
-    // 		'content-type': 'application/json', //自定义请求头信息
-    // 		'cookie': app.globalData.cookie
-    // 	},
-    // 	success: (res) => {
-    // 		console.log(res.data);
-    // 		res.data.sponsors.forEach((res) => {
-    // 			uni.request({
-    // 				url: app.globalData.apiurl + 'users/follow/' + res.sponsor_name,
-    // 				method: 'POST',
-    // 				header: {
-    // 					'content-type': 'application/json', //自定义请求头信息
-    // 					'cookie': app.globalData.cookie
-    // 				},
-    // 				success: (res) => {
-    // 					console.log(res.data);
-    // 				}
-    // 			});
-    // 		})
-    // 	}
-    // });
-    uni.request({
-      url: app.globalData.apiurl + 'users/search',
-      method: 'POST',
-      data: {
-        index: 0,
-        keyword: 'xx' },
-
-      header: {
-        'content-type': 'application/json', //自定义请求头信息
-        'cookie': app.globalData.cookie },
-
-      success: function success(res) {
-        console.log(res.data);
-      } });
-
+    this.loadpage();
     uni.showShareMenu({});
+  },
+  onPageScroll: function onPageScroll(res) {
+    this.scrollTop = res.scrollTop;
+  },
+  onPullDownRefresh: function onPullDownRefresh() {
+    this.historyindex = 0;
+    this.more = true;
+    this.loadpage();
+  },
+  onReachBottom: function onReachBottom() {
+    this.loadpage();
   },
   onShareAppMessage: function onShareAppMessage(res) {
     return {
@@ -291,6 +219,51 @@ var app = getApp();var _default =
 
   },
   methods: {
+    loadpage: function loadpage() {var _this = this;
+      if (this.more) {
+        uni.request({
+          url: app.globalData.apiurl + 'users/history',
+          data: {
+            index: this.historyindex },
+
+          header: {
+            'content-type': 'application/json',
+            'cookie': app.globalData.cookie },
+
+          success: function success(res) {
+            console.log(res);
+            console.log(res.data.events.length);
+            if (_this.historyindex == 0) {
+              _this.historylist = [];
+            }
+            res.data.events.forEach(function (item, index) {
+              //if(!item.img_url || (item.img_url == '') ) {
+              item.img_url = app.globalData.backimg[parseInt('11' + item.event_id) % 4];
+              //}
+              item.like = true;
+              item.event_introduction = '';
+              item.delay = '' + (index + 5) * 0.1 + 's';
+              setTimeout(function () {
+                item.delay = undefined;
+              }, (index + 11) * 100);
+            });
+            _this.historylist = _this.historylist.concat(res.data.events);
+            if (_this.historyindex != 0) {
+              setTimeout(function () {
+                uni.pageScrollTo({
+                  scrollTop: _this.scrollTop + 300,
+                  duration: 500 });
+
+                console.log("top" + _this.scrollTop);
+              }, 200);
+            }
+            _this.more = res.data.more;
+            _this.historyindex += res.data.events.length;
+            uni.stopPullDownRefresh();
+          } });
+
+      }
+    },
     cardSwiper: function cardSwiper(e) {
       this.cardCur = e.detail.current;
     },
@@ -303,34 +276,24 @@ var app = getApp();var _default =
     swiperChange: function swiperChange(e) {
       this.current = e.detail.current;
     },
-    activityPage: function activityPage(id) {
+    activityPage: function activityPage(index) {
       uni.navigateTo({
-        url: "../activity/activity?id=" + this.historylist.find(function (item) {
-          return item.id == id;
-        }).id });
+        url: "../activity/activity?id=" + this.historylist[index].event_id });
 
     },
-    like: function like(id) {
+    like: function like(index) {var _this2 = this;
       uni.request({
-        url: app.globalData.apiurl + 'users/like', //仅为示例，并非真实接口地址。
+        url: app.globalData.apiurl + 'users/like/' + this.historylist[index].event_id,
         method: 'POST',
-        data: {
-          openid: app.globalData.openid,
-          eventid: id },
-
         header: {
-          'content-type': 'application/json' //自定义请求头信息
-        },
+          'content-type': 'application/json',
+          'cookie': app.globalData.cookie },
+
         success: function success(res) {
           console.log(res.data);
-          //var index = this.likelist.findIndex(item => {return item.id == id})
-          //this.likelist[index].like = !this.likelist[index].like
+          _this2.historylist[index].like = res.data.like;
         } });
 
-      var index = this.historylist.findIndex(function (item) {
-        return item.id == id;
-      });
-      this.historylist[index].like = !this.historylist[index].like;
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

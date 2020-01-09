@@ -84,4 +84,9 @@
 	color: #FFFFFF;
 	opacity: 1;
 }
+.text-ellipsis {
+	max-width: 400rpx;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
 

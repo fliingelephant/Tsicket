@@ -64,7 +64,7 @@
 							keyword: this.keyword
 						},
 						header: {
-							'content-type': 'application/json', //自定义请求头信息
+							'content-type': 'application/json',
 							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
@@ -72,8 +72,8 @@
 							if (res.data.events && res.data.events[0]) {
 								res.data.events.forEach((res, index) => {
 									res.delay = '' + (index + 5) * 0.1 + 's'
-									if(!res.img_url || (res.img_url == '') ) {
-										res.img_url =  app.globalData.backimg[parseInt('11' + res.event_id) % 4]
+									if (!res.img_url || (res.img_url == '')) {
+										res.img_url = app.globalData.backimg[parseInt('11' + res.event_id) % 4]
 									}
 									setTimeout(() => {
 										res.delay = undefined
@@ -113,7 +113,7 @@
 					url: app.globalData.apiurl + 'users/like/' + this.activitylist[index].event_id,
 					method: 'POST',
 					header: {
-						'content-type': 'application/json', //自定义请求头信息
+						'content-type': 'application/json',
 						'cookie': app.globalData.cookie
 					},
 					success: (res) => {

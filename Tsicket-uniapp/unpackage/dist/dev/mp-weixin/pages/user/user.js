@@ -204,75 +204,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 var app = getApp();var _default =
 
@@ -370,9 +301,9 @@ var app = getApp();var _default =
   methods: {
     loadpage: function loadpage() {var _this3 = this;
       uni.request({
-        url: app.globalData.apiurl + 'users/view', //仅为示例，并非真实接口地址。
+        url: app.globalData.apiurl + 'users/view',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -390,9 +321,9 @@ var app = getApp();var _default =
 
 
       uni.request({
-        url: app.globalData.apiurl + 'users/book', //仅为示例，并非真实接口地址。
+        url: app.globalData.apiurl + 'users/book',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -457,9 +388,9 @@ var app = getApp();var _default =
     },
     historyPage: function historyPage() {
       console.log("historypage");
-      // uni.navigateTo({
-      // 	url: "../history/history"
-      // })
+      uni.navigateTo({
+        url: "../history/history" });
+
     },
     sponsorPage: function sponsorPage(name) {
       uni.navigateTo({
@@ -478,24 +409,44 @@ var app = getApp();var _default =
 
     },
     cancelActivity: function cancelActivity(index) {var _this4 = this;
-      uni.request({
-        url: app.globalData.apiurl + 'users/book/' + this.userActivity[index].event_id, //仅为示例，并非真实接口地址。
-        method: 'DELETE',
-        header: {
-          'content-type': 'application/json', //自定义请求头信息
-          'cookie': app.globalData.cookie },
-
+      uni.showModal({
+        title: '',
+        content: '请确认是否取消参加\r\n' + this.userActivity[index].event_name,
         success: function success(res) {
-          console.log(res);
-          _this4.userActivity[index].delay = undefined;
-          _this4.userActivity[index].cancel = 'animation-delete-slide-left';
-          setTimeout(function () {
-            _this4.userActivity[index].isUnfold = false;
-            _this4.userActivity.splice(index, 1);
-          }, 2000);
-        },
-        fail: function fail(res) {
+          if (res.confirm) {
+            uni.request({
+              url: app.globalData.apiurl + 'users/book/' + _this4.userActivity[index].event_id,
+              method: 'DELETE',
+              header: {
+                'content-type': 'application/json',
+                'cookie': app.globalData.cookie },
 
+              success: function success(res) {
+                console.log(res);
+                if (res.data.success) {
+                  _this4.isreserved = false;
+                  _this4.userActivity[index].delay = undefined;
+                  _this4.userActivity[index].cancel = 'animation-delete-slide-left';
+                  setTimeout(function () {
+                    _this4.userActivity[index].isUnfold = false;
+                    _this4.userActivity.splice(index, 1);
+                  }, 2000);
+                  uni.showToast({
+                    icon: 'none',
+                    title: '取消成功' });
+
+                } else {
+                  uni.showToast({
+                    icon: 'none',
+                    title: '操作失败' });
+
+                }
+              },
+              fail: function fail(res) {
+                console.log(res);
+              } });
+
+          }
         } });
 
     },
@@ -504,7 +455,7 @@ var app = getApp();var _default =
         url: app.globalData.apiurl + 'users/like/' + this.userActivity[index].event_id,
         method: 'POST',
         header: {
-          'content-type': 'application/json', //自定义请求头信息
+          'content-type': 'application/json',
           'cookie': app.globalData.cookie },
 
         success: function success(res) {
@@ -527,7 +478,6 @@ var app = getApp();var _default =
           type: "id.tsinghua" },
 
         success: function success(res) {
-          // 打开成功
           console.log(res);
         },
         fail: function fail(res) {
