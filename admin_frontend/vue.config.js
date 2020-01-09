@@ -5,7 +5,7 @@ module.exports = {
     devServer: {
         proxy: {
             '': {
-                target: 'http://154.8.167.168:8080',
+                target: 'https://2019-a18.iterator-traits.com',
                 changeOrigin: true,
                 ws: true,
                 pathRewrite: {

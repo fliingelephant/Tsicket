@@ -6,10 +6,10 @@
     </el-header>
 
     <el-main>
-    <el-tabs v-model="activeName">
+    <el-tabs v-model="active_name">
       <el-tab-pane label="活动管理" name="first">
         <el-table
-                :data="events.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                :data="events.slice((current_page-1)*page_size,current_page*page_size)"
                 style="width: 100%">
 
           <el-table-column
@@ -49,9 +49,9 @@
         <el-pagination
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :current-page="currentPage"
+                :current-page="current_page"
                 :page-sizes="[10, 20]"
-                :page-size="pageSize"
+                :page-size="page_size"
                 :total="events.length"
                 layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
@@ -125,9 +125,9 @@
                 pass_state:[0,10,20],
                 post_state:[11,12],
                 drop_state:[21,22],
-                activeName: 'first',
-                currentPage:1,
-                pageSize:10,
+                active_name: 'first',
+                current_page:1,
+                page_size:10,
                 sponsor_page:1,
                 sponsor_size:10,
             };
@@ -176,10 +176,10 @@
                 })
             },
             handleSizeChange: function(val) {
-                this.pageSize = val;
+                this.page_size = val;
             },
             handleCurrentChange: function(page) {
-                this.currentPage = page;
+                this.current_page = page;
             },
             sponsorSizeChange: function(val) {
                 this.sponsor_size = val;

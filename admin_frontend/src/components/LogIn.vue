@@ -38,10 +38,6 @@
           </el-row>
         </el-form-item>
       </el-form>
-<!--找回密码连接-->
-<!--      <el-row class="retrieve-text">-->
-<!--        <div align="right"> 找回密码 </div>-->
-<!--      </el-row>-->
 
       <el-row>
         <el-col :span="12">
