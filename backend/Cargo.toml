@@ -1,12 +1,9 @@
-[workspace]
+[package]
+name = "tsicket"
+version = "0.1.0"
+authors = ["zhou <fliingelephant@163.com>"]
+edition = "2018"
 
-<<<<<<< HEAD
-members = [
-    "app",
-    "db",
-    "utils",
-]
-=======
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -37,4 +34,3 @@ slug = "0.1.4"
 time = "*"
 tokio = "*"
 uuid = { version = "0.7.4", features = ["serde", "v4"] }
->>>>>>> backend-dev
