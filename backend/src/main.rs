@@ -7,6 +7,8 @@ mod app;
 mod db;
 mod utils;
 
+use chrono::prelude::*;
+
 fn main() {
 
     dotenv::dotenv().ok();
@@ -16,7 +18,7 @@ fn main() {
     app::start();
 
     let _ = sys.run();
-    
+
     /*println!("result of user sign up: {}", user_sign_up("999".to_string(), "zjr".to_string()));
 
     println!("result of sponsor sign up: {}", sponsor_sign_up("123".to_string(), "1".to_string(), "123456".to_string()));

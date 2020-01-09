@@ -1,6 +1,7 @@
 use std::collections::{HashMap};
 use std::env;
 use std::sync::{Mutex};
+use std::time::{Duration, Instant};
 
 use actix_files;
 use actix_identity::{Identity, CookieIdentityPolicy, IdentityService};
@@ -14,11 +15,14 @@ use actix_web::{
 };
 use mysql::{Pool};
 use rand::{thread_rng, Rng};
+use tokio::prelude::*;
+use tokio::timer::Interval;
 
 use crate::db;
 use crate::db::events::Event;
 use crate::db::records::{Record};
 use init::initiate;
+use update::update;
 
 pub mod admins;
 mod events;
@@ -84,6 +88,16 @@ pub fn start() -> () {
         .bind(&bind_address)
         .unwrap_or_else(|_| panic!("Could not bind server to address {}", &bind_address))
         .start();
+    
+    let task = Interval::new(Instant::now(), Duration::from_millis(500))
+        .for_each(|_| {
+            update();
+            Ok(())
+        })
+        .map_err(|e| panic!("interval errored; err={:?}", e));
+ 
+    tokio::run(task);
+
 }
 
 fn routes(app: &mut web::ServiceConfig) {
@@ -116,6 +130,9 @@ fn routes(app: &mut web::ServiceConfig) {
                         .route(web::get().to_async(users::check_follow))
                         .route(web::post().to_async(users::follow_or_unfo))
                     )
+                    .service(web::resource("users/history")
+                        .route(web::get().to_async(users::get_history_list))
+                    )
                     .service(web::resource("users/index")
                         .route(web::get().to_async(users::get_random_events))
                     )
@@ -147,6 +164,9 @@ fn routes(app: &mut web::ServiceConfig) {
                     .service(web::resource("users/pic/{filename}")
                          .route(web::get().to_async(users::get_pic))
                          .route(web::post().to_async(users::update_pic))
+                     )
+                     .service(web::resource("users/random")
+                         .route(web::get().to_async(users::get_random_events))
                      )
                      .service(web::resource("users/search")
                         .route(web::post().to_async(users::search_events))

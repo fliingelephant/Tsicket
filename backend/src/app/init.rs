@@ -12,7 +12,13 @@ fn format_string(src: &String) -> String {
 
 #[inline]
 fn format_time(time: &String) -> String {
-    return time.replace('-', "/");
+    let time_after: String;
+    if time.len() == 10 {
+        time_after = time.clone() + " 00:00:00";
+    } else {
+        time_after = time.clone();
+    }
+    return time_after.replace('-', "/");
 }
 
 pub fn initiate(
@@ -37,13 +43,13 @@ pub fn initiate(
             2: whose tickets can be booked
             3: whose tickets can not be booked (already sold out, banned by the administrator, etc.) */
         let ev_type: String = ev[11].as_sql(true).parse().unwrap();
-        if ev_type != "3" {
+        if true {
             let event = Event {
                 event_id: format_string(&ev[0].as_sql(true)),
                 sponsor_name: format_string(&ev[1].as_sql(true)),
                 event_name: format_time(&format_string(&ev[2].as_sql(true))),
                 start_time: format_time(&format_string(&ev[3].as_sql(true))),
-                end_time: format_string(&ev[4].as_sql(true)),
+                end_time: format_time(&format_string(&ev[4].as_sql(true))),
                 event_type: ev[5].as_sql(true).parse().unwrap(),
                 event_introduction: format_string(&ev[6].as_sql(true)),
                 event_picture: format_string(&ev[7].as_sql(true)),

@@ -1,3 +1,4 @@
+use std::time::{Duration, Instant};
 use actix_identity::{Identity};
 use actix_web::{
     Error, 
@@ -6,9 +7,12 @@ use actix_web::{
     web::Json,
     web::Query
 };
+use chrono::prelude::*;
 use futures::{Future, future::result};
 use md5::compute;
 use serde::{Deserialize, Serialize};
+use tokio::prelude::*;
+use tokio::timer::Delay;
 
 use super::{ADMIN_ID, ADMIN_PASSWORD_WITH_SALT, EVENT_LIST};
 use super::events::{QueryEventByID};
@@ -117,11 +121,44 @@ pub fn review_event(
                 -1 => Ok(HttpResponse::UnprocessableEntity().finish()),
                 0 => {
                     let mut event = events.get_mut(&event_id).unwrap();
-                    event.event_status += 1;
+                    let start_time;
+                    if event.start_time.len() == 10 {
+                        if event.end_time.chars().nth(4) == Some('-') {
+                            start_time = Local.datetime_from_str(&(event.start_time.clone() + " 00:00:00+0800"), "%Y-%m-%d %H:%M:%S%z").unwrap();
+                        } else {
+                            start_time = Local.datetime_from_str(&(event.start_time.clone() + " 00:00:00+0800"), "%Y/%m/%d %H:%M:%S%z").unwrap();
+                        }
+                    } else {
+                        if event.end_time.chars().nth(4) == Some('-') {
+                            start_time = Local.datetime_from_str(&(event.start_time.clone() + "+0800"), "%Y-%m-%d %H:%M:%S%z").unwrap();
+                        } else {
+                            start_time = Local.datetime_from_str(&(event.start_time.clone() + "+0800"), "%Y/%m/%d %H:%M:%S%z").unwrap();
+                        }
+                    }
+                    let end_time;
+                    if event.end_time.len() == 10 {
+                        if event.end_time.chars().nth(4) == Some('-') {
+                            end_time = Local.datetime_from_str(&(event.end_time.clone() + " 00:00:00+0800"), "%Y-%m-%d %H:%M:%S%z").unwrap();
+                        } else {
+                            end_time = Local.datetime_from_str(&(event.end_time.clone() + " 00:00:00+0800"), "%Y/%m/%d %H:%M:%S%z").unwrap();
+                        }
+                    } else {
+                        if event.end_time.chars().nth(4) == Some('-') {
+                            end_time = Local.datetime_from_str(&(event.end_time.clone() + "+0800"), "%Y-%m-%d %H:%M:%S%z").unwrap();
+                        } else {
+                            end_time = Local.datetime_from_str(&(event.end_time.clone() + "+0800"), "%Y/%m/%d %H:%M:%S%z").unwrap();
+                        }
+                    }
+                    let now = Local::now();
+                    let ad_status = event.event_status / 10;
+                    if end_time < now {
+                        event.event_status = 10 * ad_status + 3;
+                    } else if start_time <= now {
+                        event.event_status = 10 * ad_status + 2;
+                    } else {
+                        event.event_status = 10 * ad_status + 1;
+                    }
                     event.update_type = 1;
-                    drop(events);
-                    update_events();
-                    
                     Ok(HttpResponse::Ok().finish())
                 }
                 _ => Ok(HttpResponse::UnprocessableEntity().finish())
