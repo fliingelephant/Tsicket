@@ -4,7 +4,7 @@
 			<!-- <text class="cuIcon-roundadd margin-left" style="font-size: 48rpx"></text> -->
 			<view class="search-form round">
 				<text class="cuIcon-search"></text>
-				<input v-model="keyword" :adjust-position="false" type="text" placeholder="搜索活动、组织(暂未实现功能)" confirm-type="search"
+				<input v-model="keyword" :adjust-position="false" type="text" placeholder="根据活动名,组织搜索活动" confirm-type="search"
 				 @confirm="newsearch"></input>
 			</view>
 			<view class="action">
@@ -72,6 +72,9 @@
 							if (res.data.events && res.data.events[0]) {
 								res.data.events.forEach((res, index) => {
 									res.delay = '' + (index + 5) * 0.1 + 's'
+									if(!res.img_url || (res.img_url == '') ) {
+										res.img_url =  app.globalData.backimg[parseInt('11' + res.event_id) % 4]
+									}
 									setTimeout(() => {
 										res.delay = undefined
 									}, (index + 11) * 100)

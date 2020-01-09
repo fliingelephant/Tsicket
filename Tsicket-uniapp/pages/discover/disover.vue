@@ -141,6 +141,7 @@
 							this.momentmore0 = res.data.more
 							this.momentindex0 += res.data.moments.length
 							uni.hideLoading()
+							uni.stopPullDownRefresh()
 						}
 					})
 				} else if ((this.current == 1) && (this.momentindex1 != -1)) {

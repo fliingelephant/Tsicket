@@ -16,7 +16,9 @@
 		},
 		{
 			"path": "pages/activity/activity",
-			"style": {}
+			"style": {
+				"enablePullDownRefresh": false
+			}
 		},
 		{
 			"path":"pages/following/following",
@@ -24,7 +26,9 @@
 		},
 		{
 			"path":"pages/sponsor/sponsor",
-			"style":{}
+			"style":{
+				"enablePullDownRefresh": false
+			}
 		},
 		{
 			"path":"pages/like/like",
@@ -36,7 +40,9 @@
 		}
 	    ,{
             "path" : "pages/search/search",
-            "style" : {}
+            "style" : {
+				"enablePullDownRefresh": false
+			}
         }
     ],
 	"globalStyle": {
