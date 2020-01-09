@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::env;
 use std::fs;
 use std::io::{Write};
@@ -14,6 +15,8 @@ use regex::Regex;
 use reqwest::{get, Client};
 use serde::{Deserialize, Serialize};
 use actix_service::ServiceExt;
+
+use rand::{thread_rng, Rng};
 
 use super::{APP_ID, EVENT_LIST, RECORD, SECRET};
 use super::sponsors::{QuerySponsor, QuerySponsorByID};
@@ -90,6 +93,7 @@ pub fn login(
     id: Identity,
     info: Json<WechatLoginInfo>
 ) -> impl Future<Item=HttpResponse, Error=Error> {
+    
     let url = format!("https://api.weixin.qq.com/sns/jscode2session?\
         appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code",
         appid = env::var("APP_ID").unwrap(), secret = env::var("SECRET").unwrap(), code = info.code);
@@ -121,6 +125,11 @@ pub fn login(
             Ok(HttpResponse::UnprocessableEntity().json("Wrong code"))
         }
     })
+    /*
+    let openid = thread_rng().gen::<u32>().to_string();
+    id.remember("2".to_owned() + &openid);
+    result(Ok(HttpResponse::Ok().finish()))
+    */
 }
 
 #[derive(Deserialize)]
@@ -206,7 +215,14 @@ pub fn get_personal_info(
         Ok(openid) => {
             let follow = users::get_user_follows(&openid).unwrap().len();
             let like = users::get_user_likes(&openid).unwrap().len();
-            let history = users::get_user_records(&openid).unwrap().len();
+            let history_list = users::get_user_records(&openid).unwrap();
+            let mut history = 0;
+            for record in history_list {
+                let event = events::get_info_by_id(&record.event_id).unwrap();
+                if event.event_status % 10 > 2 {
+                    history += 1;
+                }
+            }
             match users::get_tsinghua_id(&openid) {
                 Ok(tsinghua_id) => Ok(HttpResponse::Ok().json(UserInfo{
                     follow: follow,
@@ -571,29 +587,19 @@ pub fn book_event(
     result(match identify_user(&id) {
         Ok(openid) => {
             let event_id = req.match_info().query("event_id").to_string();
-            match (*EVENT_LIST).try_lock() {
-                Ok(a) => {println!("OKOKOK!");drop(a);}
-                Err(e) => {println!("{:?}", e);}
-            }
             let mut events = (*EVENT_LIST).lock().unwrap();
             match events.get_mut(&event_id) {
                 Some(mut event) => {
-                    println!("{} is booking {}", openid, event_id);
                     if (event.event_status % 10 == 2) && (event.left_tickets > 0) {
                         event.left_tickets -= 1;
                         event.update_type = 1;
                         let index_str = event_id + "_" + &openid;
                         let success: bool;
-                        match (*RECORD).try_lock() {
-                            Ok(a) => {println!("OKOKOK!");drop(a);}
-                            Err(e) => {println!("{:?}", e);}
-                        }
                         let mut records = (*RECORD).lock().unwrap();
                         success = match records.get(&index_str) {
                             Some(_) => false,
                             None => true,
                         };
-                        println!("HERE!!{:?}",success);
                         if success == true {
                             records.insert(index_str.clone(), Record {
                                 // TODO: 改变record_id
@@ -606,13 +612,13 @@ pub fn book_event(
                                 update_type: 1
                             });
                         }
+                        
                         drop(records);
                         drop(events);
                         match update_events() {
                             Ok(_) => {}
                             Err(e) => {println!("{}",e);}
                         }
-                        println!("HERE!!updated events");
                         match update_records() {
                             Ok(_) => {}
                             Err(e) => {println!("{}",e);}
@@ -757,11 +763,17 @@ pub fn get_all_enrolled_events(
                         let event_name: String;
                         let event_time: String;
                         let event_location: String;
+                        let mut curr = false;
                         match event_list.get(&record.event_id) {
                             Some(event) => {
                                 event_location = event.event_location.clone();
                                 event_name = event.event_name.clone();
                                 event_time = event.event_time.clone();
+                                if (event.event_status % 10 <= 3) && (event.event_status % 10 >= 1) {
+                                    curr = true;
+                                } else {
+                                    curr = false;
+                                }
                             }
                             None => {
                                 event_location = "".to_string();
@@ -769,18 +781,19 @@ pub fn get_all_enrolled_events(
                                 event_time = "".to_string();
                             }
                         }
-                            
-                        events.push(EventBriefInfo {
-                            like: like,
-                            event_id: record.event_id,
-                            event_location: event_location.clone(),
-                            event_name: event_name.clone(),
-                            event_time: event_time.clone(),
-                            sponsor_name: record.sponsor_name,
-                            sponsor_avatar: sponsor_avatar,
-                            start_time: record.start_time,
-                            end_time: record.end_time
-                        })
+                        if curr {
+                            events.push(EventBriefInfo {
+                                like: like,
+                                event_id: record.event_id,
+                                event_location: event_location.clone(),
+                                event_name: event_name.clone(),
+                                event_time: event_time.clone(),
+                                sponsor_name: record.sponsor_name,
+                                sponsor_avatar: sponsor_avatar,
+                                start_time: record.start_time,
+                                end_time: record.end_time
+                            })
+                        }
                     }
                     Ok(HttpResponse::Ok().json(EnrolledEventsRet {
                         events: events
@@ -1324,38 +1337,41 @@ pub fn get_random_events(
             }
             let index = query_list.index;
             let more: bool;
-            let end: usize;
             if index + 6 >= available_event_id.len() {
-                    more = false;
-                    end = available_event_id.len();
+                more = false;
             } else {
                 more = true;
-                end = index + 6;
             }
+            let mut rng = rand::thread_rng();
             let mut events_ret = vec![];
-            for i in index..end {
-                let event = &events.get(&available_event_id[i]).unwrap();
-                let like = match users::check_user_like(&openid, &event.event_id) {
+            let mut chosen_event_ids = BTreeSet::new();
+            while (chosen_event_ids.len() < 6) && (chosen_event_ids.len() < available_event_id.len()) {
+                let test = rng.gen_range(0, &available_event_id.len());
+                if !chosen_event_ids.contains(&test) {
+                    chosen_event_ids.insert(test);
+                    let event = events::get_info_by_id(&available_event_id[test]).unwrap();
+                    let like = match users::check_user_like(&openid, &event.event_id) {
                         Ok(flag) => flag,
                         Err(_) => false
-                };
-                events_ret.push(UserEventInfo {
-                    like: like,
-                    event_id: event.event_id.clone(),
-                    sponsor_name: event.sponsor_name.clone(),
-                    event_name: event.event_name.clone(),
-                    start_time: event.start_time.clone(),
-                    event_time: event.event_time.clone(),
-                    end_time: event.end_time.clone(),
-                    event_type: event.event_type,
-                    event_introduction: event.event_introduction.clone(),
-                    event_picture: event.event_picture.clone(),
-                    event_capacity: event.event_capacity,
-                    current_participants: event.current_participants,
-                    left_tickets: event.left_tickets,
-                    event_status: event.event_status,
-                    event_location: event.event_location.clone(),
-                });
+                    };
+                    events_ret.push(UserEventInfo {
+                        like: like,
+                        event_id: event.event_id.clone(),
+                        sponsor_name: event.sponsor_name.clone(),
+                        event_name: event.event_name.clone(),
+                        start_time: event.start_time.clone(),
+                        event_time: event.event_time.clone(),
+                        end_time: event.end_time.clone(),
+                        event_type: event.event_type,
+                        event_introduction: event.event_introduction.clone(),
+                        event_picture: event.event_picture.clone(),
+                        event_capacity: event.event_capacity,
+                        current_participants: event.current_participants,
+                        left_tickets: event.left_tickets,
+                        event_status: event.event_status,
+                        event_location: event.event_location.clone(),
+                    });
+                }
             }
             Ok(HttpResponse::Ok().json(UserEventsRet { // 200 OK
                 more: more,
@@ -1430,6 +1446,68 @@ pub fn search_events(
                 events: events_ret,
             }))
         }
+        Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
+    })
+}
+
+pub fn get_history_list(
+    id: Identity,
+    Query(query_list): Query<QueryList>
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    result(match identify_user(&id) {
+        Ok(openid) => {
+            match users::get_user_records(&openid) {
+                Ok(record_list) => {
+                    let mut history_list = Vec::new();
+                    for record in record_list{
+                        let event = events::get_info_by_id(&record.event_id).unwrap();
+                        if event.event_status % 10 > 2 {
+                            history_list.push(record.event_id.clone());
+                        }
+                    }
+                    let index = query_list.index;
+                    let more: bool;
+                    let end: usize;
+                    if index + 6 >= history_list.len() {
+                        more = false;
+                        end = history_list.len();
+                    } else {
+                        more = true;
+                        end = index + 6;
+                    }
+                    let mut events_ret = vec![];
+                    for i in index..end {
+                        let like = match users::check_user_like(&openid, &history_list[i]) {
+                                Ok(flag) => flag,
+                                Err(_) => false
+                        };
+                        let event = events::get_info_by_id(&history_list[i]).unwrap();
+                        events_ret.push(UserEventInfo {
+                            like: like,
+                            event_id: event.event_id.clone(),
+                            sponsor_name: event.sponsor_name.clone(),
+                            event_name: event.event_name.clone(),
+                            start_time: event.start_time.clone(),
+                            event_time: event.event_time.clone(),
+                            end_time: event.end_time.clone(),
+                            event_type: event.event_type,
+                            event_introduction: event.event_introduction.clone(),
+                            event_picture: event.event_picture.clone(),
+                            event_capacity: event.event_capacity,
+                            current_participants: event.current_participants,
+                            left_tickets: event.left_tickets,
+                            event_status: event.event_status,
+                            event_location: event.event_location.clone(),
+                        });
+                    }
+                    Ok(HttpResponse::Ok().json(UserEventsRet { // 200 OK
+                        more: more,
+                        events: events_ret,
+                    }))
+                }
+                Err(e) => Ok(HttpResponse::UnprocessableEntity().json(e)) // 422 Unprocessable Entity
+            }
+        },
         Err(_) => Ok(HttpResponse::Unauthorized().finish()) // 401 Unauthorized
     })
 }

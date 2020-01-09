@@ -3,24 +3,14 @@ extern crate lazy_static;
 extern crate serde_derive;
 extern crate serde_json;
 
-use regex::Regex;
-use crate::db::records::Record;
-
 mod app;
 mod db;
 mod utils;
 
-fn main() {
-    /*
-    let test_p = "学生会".to_string();
-    let test_str_1 = "学生会sdasdas".to_string();
-    let test_str_2 = "学dasds生会".to_string();
-    let test_str_3 = "学生会".to_string();
-    let re = Regex::new(&test_p).unwrap();
+use chrono::prelude::*;
 
-    println!("{:?},{:?},{:?}",re.is_match(&test_str_1), re.is_match(&test_str_2), re.is_match(&test_str_3));*/
-    
-    
+fn main() {
+
     dotenv::dotenv().ok();
 
     let sys = actix::System::new("conduit");
