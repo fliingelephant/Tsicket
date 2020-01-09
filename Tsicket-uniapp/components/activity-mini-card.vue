@@ -5,7 +5,7 @@
 			<view class="text-left flex-column info-flex">
 				<view class="text-xxl">{{activity.event_name}}
 					<view class="line-round"></view>
-					<view class="text-df">{{activity.event_introduction}}</view>
+					<view class="text-df text-ellipsis">{{activity.event_introduction}}</view>
 				</view>
 				<view class="text-df">{{activity.event_time}}</view>
 			</view>
@@ -107,7 +107,7 @@
 	.like {
 		font-size: 60rpx;
 	}
-	
+
 	.cuIcon-likefill.likefill {
 		transition: all 0.3s ease-in 0s;
 		color: #DD514C;
@@ -121,7 +121,7 @@
 		left: 60rpx;
 		opacity: 0;
 	}
-	
+
 	.cuIcon-like.likefill {
 		transition: all 0.3s ease-in 0s;
 		color: #DD514C;
@@ -132,5 +132,11 @@
 		transition: all 0.3s ease-in 0s;
 		color: #FFFFFF;
 		opacity: 1;
+	}
+
+	.text-ellipsis {
+		max-width: 400rpx;
+		text-overflow: ellipsis;
+		overflow: hidden;
 	}
 </style>

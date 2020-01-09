@@ -83,12 +83,12 @@
 			loadpage() {
 				if (this.more) {
 					uni.request({
-						url: app.globalData.apiurl + 'users/follow', //仅为示例，并非真实接口地址。
+						url: app.globalData.apiurl + 'users/follow',
 						data: {
 							index: this.followindex
 						},
 						header: {
-							'content-type': 'application/json', //自定义请求头信息
+							'content-type': 'application/json',
 							'cookie': app.globalData.cookie
 						},
 						success: (res) => {
@@ -139,10 +139,10 @@
 			},
 			follow(index) {
 				uni.request({
-					url: app.globalData.apiurl + 'users/follow/' + this.followlist[index].name, //仅为示例，并非真实接口地址。
+					url: app.globalData.apiurl + 'users/follow/' + this.followlist[index].name,
 					method: 'POST',
 					header: {
-						'content-type': 'application/json', //自定义请求头信息
+						'content-type': 'application/json',
 						'cookie': app.globalData.cookie
 					},
 					success: (res) => {

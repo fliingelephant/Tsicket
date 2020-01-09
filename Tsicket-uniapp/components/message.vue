@@ -16,7 +16,8 @@
 			<view class="grid padding-bottom-xs grid-square solid-bottom" :class="'col-' + (message.pictures.length < 2 ? 1 : message.pictures.length < 5 ? 2 : 3)">
 				<!-- <image class="padding" v-for="(item,index) in message.pictures" :key="index" :src="item"></image> -->
 				<!-- <view class="padding" v-for="(item,index) in message.pictures" :key="index">{{index}}</view> -->
-				<view class="bg-img" v-for="(item,index) in message.pictures" v-show="message.pictures[index] != '' " :key="index" :style="[{ backgroundImage:'url(' + message.pictures[index] + ')' }]"></view>
+				<view class="bg-img" v-for="(item,index) in message.pictures" v-show="message.pictures[index] != '' " :key="index"
+				 :style="[{ backgroundImage:'url(' + message.pictures[index] + ')' }]"></view>
 			</view>
 		</view>
 		<view class="toolbar flex align-stretch text-center text-xxl">

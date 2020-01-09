@@ -189,12 +189,10 @@ var app = getApp();var _default =
     return {
       momentlist0: [],
       momentmore0: true,
-      momentindex0: 0,
       momentlist1: [],
       momentmore1: true,
-      momentindex1: 0,
       momentlist2: [],
-      momentindex2: 0,
+      momentindex: [0, 0, 0],
       momentanimation: ['animation-slide-bottom', 'animation-slide-right', 'animation-slide-right'],
       current: 0,
       tabs: [
@@ -250,7 +248,9 @@ var app = getApp();var _default =
     swiperChange: function swiperChange(e) {
       this.current = e.detail.current;
       console.log(this.current);
-      this.loadmoment();
+      if (this.momentindex[this.current] == 0) {
+        this.loadmoment();
+      }
     },
     loadmoment: function loadmoment(e) {var _this = this;
       console.log(e);
@@ -258,10 +258,10 @@ var app = getApp();var _default =
         uni.request({
           url: app.globalData.apiurl + 'users/momentslike',
           data: {
-            index: this.momentindex0 },
+            index: this.momentindex[0] },
 
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
@@ -274,7 +274,7 @@ var app = getApp();var _default =
             });
             _this.momentlist0 = _this.momentlist0.concat(res.data.moments);
             _this.momentmore0 = res.data.more;
-            _this.momentindex0 += res.data.moments.length;
+            _this.momentindex[0] += res.data.moments.length;
             uni.hideLoading();
             uni.stopPullDownRefresh();
           } });
@@ -283,10 +283,10 @@ var app = getApp();var _default =
         uni.request({
           url: app.globalData.apiurl + 'users/momentsfollow',
           data: {
-            index: this.momentindex1 },
+            index: this.momentindex[1] },
 
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
@@ -299,18 +299,18 @@ var app = getApp();var _default =
             });
             _this.momentlist1 = _this.momentlist1.concat(res.data.moments);
             _this.momentmore1 = res.data.more;
-            _this.momentindex1 += res.data.moments.length;
+            _this.momentindex[1] += res.data.moments.length;
             uni.hideLoading();
           } });
 
       } else if (this.current == 2 && this.momentindex2 != -1) {
         uni.request({
-          url: app.globalData.apiurl + 'users/moments/like',
+          url: app.globalData.apiurl + 'users/random',
           data: {
-            index: this.momentmore2 },
+            index: this.momentindex[2] },
 
           header: {
-            'content-type': 'application/json', //自定义请求头信息
+            'content-type': 'application/json',
             'cookie': app.globalData.cookie },
 
           success: function success(res) {
@@ -323,6 +323,7 @@ var app = getApp();var _default =
             });
             _this.momentlist2 = _this.momentlist2.concat(res.data.moments);
             _this.momentmore2 = res.data.more;
+            _this.momentindex[2] += res.data.moments.length;
             uni.hideLoading();
           } });
 
@@ -338,8 +339,8 @@ var app = getApp();var _default =
           session: '' },
 
         header: {
-          'content-type': 'application/json' //自定义请求头信息
-        },
+          'content-type': 'application/json' },
+
         success: function success(res) {
           console.log(res.data);
         } });

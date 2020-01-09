@@ -150,7 +150,7 @@
 		height: calc(100vh - 480rpx - 80rpx)
 	}
 
-	
+
 
 	.cuIcon-likefill {
 		transition: opacity 1s ease-in 0s;
