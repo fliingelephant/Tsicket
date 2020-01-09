@@ -1,3 +1,6 @@
+DROP DATABASE `tsicket`;
+CREATE DATABASE `tsicket`;
+USE `tsicket`;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -17,7 +20,7 @@ CREATE TABLE `user_account`
 -- ----------------------------
 -- Records of user account
 -- ----------------------------
-INSERT INTO `user_account` (`account_id`) VALUES ('123');
+# INSERT INTO `user_account` (`account_id`) VALUES ('123');
 
 -- ----------------------------
 -- Table structure for sponsor account
@@ -39,8 +42,8 @@ CREATE TABLE `sponsor_account`
 -- Records of sponsor account
 -- ----------------------------+
 
-INSERT INTO `sponsor_account` VALUES ('1', '2', '3', '9', '4', '5');
-INSERT INTO `sponsor_account` VALUES ('6', '7', '8', '10', '8', '0');
+# INSERT INTO `sponsor_account` VALUES ('1', '2', '3', '9', '4', '5');
+# INSERT INTO `sponsor_account` VALUES ('6', '7', '8', '10', '8', '0');
 
 -- ----------------------------
 -- Table structure for administrator account
@@ -59,7 +62,7 @@ CREATE TABLE `admin_account`
 -- Records of administrator account
 -- ----------------------------
 
-#INSERT INTO `admin_account` VALUES ('000', 'tsinghua', '123');
+# INSERT INTO `admin_account` VALUES ('000', 'tsinghua', '123');
 
 -- ----------------------------
 -- Table structure for event
@@ -91,8 +94,8 @@ CREATE TABLE `event`
 -- Records of event
 -- ----------------------------
 
-INSERT INTO `event` VALUES ('1', '2', '3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, '简单的交流会', '11',  2, 0, 1, 1, '210中厅', '11');
-INSERT INTO `event` VALUES ('0', '2', '3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, '简单的交流会', '22', 2, 0, 1, 1, '210中厅', '11');
+# INSERT INTO `event` VALUES ('1', '2', '3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, '简单的交流会', '11',  2, 0, 1, 1, '210中厅', '11');
+# INSERT INTO `event` VALUES ('0', '2', '3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, '简单的交流会', '22', 2, 0, 1, 1, '210中厅', '11');
 
 -- ----------------------------
 -- Table structure for ticket records
@@ -117,7 +120,7 @@ CREATE TABLE `ticket_record`
 -- Records of ticket records
 -- ----------------------------
 
-#INSERT INTO `ticket_record` VALUES ('001', '000', 'zjr', '123', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+# INSERT INTO `ticket_record` VALUES ('001', '000', 'zjr', '123', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
 -- ----------------------------
 -- Table structure for like list
@@ -137,7 +140,7 @@ CREATE TABLE `like`
 -- Records of like list
 -- ----------------------------
 
-INSERT INTO `like` VALUES ('123', '1');
+# INSERT INTO `like` VALUES ('123', '1');
 
 -- ----------------------------
 -- Table structure for follow list
@@ -157,8 +160,8 @@ CREATE TABLE `follow`
 -- Records of follow list
 -- ----------------------------
 
-INSERT INTO `follow` VALUES ('123', '2');
-INSERT INTO `follow` VALUES ('123', '7');
+# INSERT INTO `follow` VALUES ('123', '2');
+# INSERT INTO `follow` VALUES ('123', '7');
 
 -- ----------------------------
 -- Table structure for moment list
@@ -183,7 +186,7 @@ CREATE TABLE `moment`
 -- Records of follow list
 -- ----------------------------
 
-INSERT INTO moment (`sponsor_name`, `event_id`, `event_name`, `moment_id`) VALUES ('2', '0', '3', '999');
+# INSERT INTO moment (`sponsor_name`, `event_id`, `event_name`, `moment_id`) VALUES ('2', '0', '3', '999');
 
 -- ----------------------------
 -- Table structure for push list
@@ -210,7 +213,7 @@ CREATE TABLE `notification`
 -- ----------------------------
 
 
-INSERT INTO notification (`sponsor_name`, `event_id`, `user_id`, `notice_id`, `text`) VALUES ('2', '0', '123', '090', '活动取消');
+# INSERT INTO notification (`sponsor_name`, `event_id`, `user_id`, `notice_id`, `text`) VALUES ('2', '0', '123', '090', '活动取消');
 
 
 SET FOREIGN_KEY_CHECKS = 1;
